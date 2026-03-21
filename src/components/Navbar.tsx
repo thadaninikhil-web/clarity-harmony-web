@@ -39,8 +39,8 @@ export const Navbar = () => {
       }`}
     >
       <div className="container mx-auto flex items-center justify-between h-20 px-6 lg:px-8">
-        <Link to="/" className="font-display text-xl font-semibold text-primary tracking-tight">
-          Balancing Act
+        <Link to="/" className="flex items-center gap-3">
+          <img src={logo} alt="Balancing Act" className="h-12 w-auto" />
         </Link>
 
         {/* Desktop nav */}
