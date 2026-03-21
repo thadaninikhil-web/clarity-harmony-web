@@ -55,7 +55,7 @@ export const Footer = () => {
                 +91 99875 22690
               </a>
               <a
-                href="https://linkedin.com/in/thadaninikhil"
+                href="https://www.linkedin.com/in/thadaninikhil"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-gold transition-colors"
