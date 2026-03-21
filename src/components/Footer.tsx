@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import logo from "@/assets/logo.png";
 
 export const Footer = () => {
   return (
@@ -66,7 +67,7 @@ export const Footer = () => {
         </div>
 
         <div className="mt-12 pt-8 border-t border-primary-foreground/10 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="font-display text-lg text-primary-foreground/80">Balancing Act</p>
+          <img src={logo} alt="Balancing Act" className="h-10 w-auto brightness-0 invert opacity-80" />
           <p className="text-xs text-primary-foreground/40">
             &copy; {new Date().getFullYear()} Balancing Act Financial Advisory. All rights reserved.
           </p>
