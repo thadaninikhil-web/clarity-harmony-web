@@ -40,7 +40,7 @@ const Contact = () => {
                     <Phone className="w-5 h-5 text-gold" strokeWidth={1.5} />
                     <span>+91 99875 22690</span>
                   </a>
-                  <a href="https://linkedin.com/in/thadaninikhil" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 text-foreground hover:text-gold transition-colors">
+                  <a href="https://www.linkedin.com/in/thadaninikhil" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 text-foreground hover:text-gold transition-colors">
                     <Linkedin className="w-5 h-5 text-gold" strokeWidth={1.5} />
                     <span>linkedin.com/in/thadaninikhil</span>
                   </a>
