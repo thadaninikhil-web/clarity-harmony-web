@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Briefcase, LineChart, Compass, Globe, Heart, ArrowRight } from "lucide-react";
 
 const segments = [
-  { icon: Briefcase, title: "Young Professionals", desc: "You're in the early years of your career and want to start building wealth the right way. We help you set clear financial goals, create a savings discipline, and invest with a long-term mindset from the very beginning.", color: "text-gold" },
+  { icon: Briefcase, title: "Young Turks", desc: "You're in the early years of your career and want to start building wealth the right way. We help you set clear financial goals, create a savings discipline, and invest with a long-term mindset from the very beginning.", color: "text-gold" },
   { icon: LineChart, title: "Senior Professionals", desc: "You've built a strong career and significant assets. Now you need a clear path to financial independence. We help you optimize your portfolio, plan for retirement, and make smart decisions about stock options, bonuses, and benefits.", color: "text-gold" },
   { icon: Compass, title: "Business Owners", desc: "Your financial life is intertwined with your business. We help you separate personal wealth from business assets, plan for succession, and build a safety net independent of your enterprise.", color: "text-gold" },
   { icon: Globe, title: "NRIs", desc: "Managing finances across borders adds complexity — taxation, repatriation, global asset allocation, and regulatory compliance. We provide clarity on cross-border investing and help you build globally diversified portfolios.", color: "text-gold" },
