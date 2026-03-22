@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
 const steps = [
-  { num: "01", title: "Discover Your Goals", desc: "We begin every engagement by listening deeply. What do you want your money to do for you? What does financial success look like in your life? We help you articulate goals you may not even have considered." },
+  { num: "01", title: "Discover Your Goals", desc: "We begin every engagement by listening deeply. What do you want your money to do for you? What does financial success look like in your life? We help you discover and articulate goals you may not even have considered." },
   { num: "02", title: "Assess Your Financial Position", desc: "A comprehensive review of your income, expenses, assets, liabilities, insurance, and tax situation. We build a complete picture of where you stand today." },
   { num: "03", title: "Portfolio & Risk Analysis", desc: "We analyze your existing investments for diversification, cost efficiency, and alignment with your goals. We assess your risk capacity — not just your risk tolerance." },
   { num: "04", title: "Personalized Financial Strategy", desc: "Based on your goals and current position, we design a clear, actionable financial plan. This includes asset allocation, investment strategy, tax optimization, and insurance review." },
