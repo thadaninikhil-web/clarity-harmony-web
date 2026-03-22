@@ -3,19 +3,19 @@ import storyImage from "@/assets/story-planning.jpg";
 
 const testimonials = [
   {
-    situation: "A senior IT professional in Bengaluru with scattered investments across 15 mutual funds, 3 insurance policies, and no clear retirement plan.",
-    strategy: "Consolidated the portfolio, eliminated underperforming funds, and designed a goal-based investment strategy aligned with early retirement at 50.",
-    outcome: "Achieved clarity on retirement corpus, reduced portfolio overlap by 70%, and is now on track to retire 5 years earlier than planned.",
+    situation: "An NRI based out of Singapore with assets across India, Singapore and USA. Assets were mostly in savings account or low yielding deposits with certain investments in US stocks and ETFs",
+    strategy: "Discovered financial goals, allocated assets and recommended rebalancing across all three geographies to match goal tenors and risk profile. Also identified Ireland domiciled UCITS to replace US ETFs for better tax efficiency",
+    outcome: "Achieved clarity on all goals, initiated rebalancing over 18 to 24 months in a tax efficient manner. Each goal now has assets and future investments aligned to them.",
   },
   {
-    situation: "An NRI couple in Dubai wanting to build a diversified portfolio across India and global markets while planning for their children's education.",
-    strategy: "Created a cross-border investment plan balancing Indian equities, global ETFs, and education-specific savings instruments with tax-efficient structures.",
-    outcome: "Built a ₹2.5 Cr education fund on track for 2031, with clear visibility into global asset allocation and repatriation planning.",
+    situation: "Singapore domiciled NRI planning to start a family soon who was investing mostly based on advice from friends or family ",
+    strategy: "Comprehensive plan distributing incremental investments across India and Global Equities with execution in a systematic manner. Each investment serves a specific purpose in life.",
+    outcome: "Automated investments across geographies on track to meet goals ranging from education to retirement to starting up in the long run",
   },
   {
-    situation: "A family business owner with no separation between personal and business finances, and significant concentration risk in a single asset class.",
-    strategy: "Separated personal wealth from business assets, introduced systematic diversification, and established a succession plan.",
-    outcome: "Personal wealth grew independently of business performance, with a clear estate plan that protects both the family and the enterprise.",
+    situation: "A senior corporate professional based in Mumbai had investments primarily in real estate, low yielding endowment / money back policies, and certain Mutual Funds through SIPs",
+    strategy: "Created a complete financial plan allocating assets to goals. Realigned equity mutual funds investments into core (stable) and satellite (high return high risk) as per time remaining to goal.",
+    outcome: "Outcome based investing aligned to goals rather than different assets bought at different points of time in the quest for returns",
   },
 ];
 

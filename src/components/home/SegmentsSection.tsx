@@ -2,7 +2,7 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 import { Briefcase, LineChart, Compass, Globe, Heart } from "lucide-react";
 
 const segments = [
-  { icon: Briefcase, title: "Young Professionals", desc: "Starting their wealth building journey with clarity and confidence." },
+  { icon: Briefcase, title: "Young Turks", desc: "Starting their wealth building journey with clarity and confidence." },
   { icon: LineChart, title: "Senior Professionals", desc: "Preparing for financial independence with disciplined planning." },
   { icon: Compass, title: "Business Owners", desc: "Managing complex financial decisions across personal and business life." },
   { icon: Globe, title: "NRIs", desc: "Building globally diversified portfolios while managing cross-border complexity." },
