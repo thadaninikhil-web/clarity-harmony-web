@@ -66,16 +66,34 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'DM Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1 {
     font-family: 'Playfair Display', serif;
     overflow-wrap: break-word;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    overflow-wrap: break-word;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+  }
+
+  h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+    overflow-wrap: break-word;
+    line-height: 1.2;
   }
 
   p {
     text-wrap: pretty;
     overflow-wrap: break-word;
+    line-height: 1.7;
   }
 }
 
