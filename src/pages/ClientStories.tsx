@@ -7,22 +7,22 @@ import { ArrowRight } from "lucide-react";
 
 const stories = [
   {
-    title: "From Scattered to Structured",
-    situation: "A senior IT professional in Bengaluru with investments scattered across 15 mutual funds, 3 insurance-cum-investment policies, and no clear retirement plan. Portfolio had significant overlap and high expense ratios.",
-    strategy: "Consolidated the portfolio to 5 well-diversified funds, surrendered underperforming ULIPs, and designed a goal-based investment strategy aligned with early retirement at 50. Introduced systematic rebalancing.",
-    outcome: "Achieved clarity on retirement corpus requirement, reduced portfolio overlap by 70%, cut annual fund expenses by ₹1.2L, and is now on track to retire 5 years earlier than originally planned.",
+    title: "Cross-Border Clarity for an NRI",
+    situation: "An NRI based out of Singapore with assets across India, Singapore and USA. Assets were mostly in savings account or low yielding deposits with certain investments in US stocks and ETFs",
+    strategy: "Discovered financial goals, allocated assets and recommended rebalancing across all three geographies to match goal tenors and risk profile. Also identified Ireland domiciled UCITS to replace US ETFs for better tax efficiency",
+    outcome: "Achieved clarity on all goals, initiated rebalancing over 18 to 24 months in a tax efficient manner. Each goal now has assets and future investments aligned to them.",
   },
   {
-    title: "Cross-Border Clarity",
-    situation: "An NRI couple in Dubai with significant savings but no structured investment plan. Confusion around Indian vs. international investing, tax implications, and future repatriation of funds. Children's education funding was a growing concern.",
-    strategy: "Created a comprehensive cross-border investment plan balancing Indian equities, global ETFs, and education-specific savings instruments. Established a clear tax-efficient structure for both NRE and NRO accounts.",
-    outcome: "Built a ₹2.5 Cr education fund on track for 2031, with clear visibility into global asset allocation, repatriation planning, and tax-optimized returns across both jurisdictions.",
+    title: "Building a Foundation for the Future",
+    situation: "Singapore domiciled NRI planning to start a family soon who was investing mostly based on advice from friends or family ",
+    strategy: "Comprehensive plan distributing incremental investments across India and Global Equities with execution in a systematic manner. Each investment serves a specific purpose in life.",
+    outcome: "Automated investments across geographies on track to meet goals ranging from education to retirement to starting up in the long run",
   },
   {
-    title: "Business to Personal Separation",
-    situation: "A family business owner with no separation between personal and business finances. 80% of net worth concentrated in the business. No succession plan, no independent retirement corpus, and inadequate life insurance.",
-    strategy: "Separated personal wealth from business assets through systematic SIPs and diversified portfolio construction. Introduced adequate term insurance, created a succession plan, and established a family governance framework.",
-    outcome: "Personal wealth now grows independently of business performance. Clear succession plan in place. Adequate insurance coverage. Family members aligned on wealth transfer and business continuity planning.",
+    title: "From Product-Led to Goal-Led Investing",
+    situation: "A senior corporate professional based in Mumbai had investments primarily in real estate, low yielding endowment / money back policies, and certain Mutual Funds through SIPs",
+    strategy: "Created a complete financial plan allocating assets to goals. Realigned equity mutual funds investments into core (stable) and satellite (high return high risk) as per time remaining to goal.",
+    outcome: "Outcome based investing aligned to goals rather than different assets bought at different points of time in the quest for returns",
   },
 ];
 
@@ -36,7 +36,7 @@ const ClientStories = () => (
           <h1 className="font-display text-4xl md:text-6xl font-semibold text-primary leading-[1.1] tracking-tight mb-6 text-balance max-w-3xl">
             Client Stories
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed">
+          <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed text-justify">
             Real planning journeys that demonstrate the impact of disciplined, unbiased financial advice.
           </p>
         </ScrollReveal>
@@ -49,17 +49,17 @@ const ClientStories = () => (
             <div className="border border-border p-8 md:p-12">
               <h2 className="font-display text-2xl font-semibold text-primary mb-8">{s.title}</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div>
+                <div className="flex flex-col">
                   <p className="label-caps text-gold/60 mb-3">Situation</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{s.situation}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed text-justify flex-1">{s.situation}</p>
                 </div>
-                <div>
+                <div className="flex flex-col">
                   <p className="label-caps text-gold/60 mb-3">Strategy</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{s.strategy}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed text-justify flex-1">{s.strategy}</p>
                 </div>
-                <div>
+                <div className="flex flex-col">
                   <p className="label-caps text-gold/60 mb-3">Outcome</p>
-                  <p className="text-sm text-foreground font-medium leading-relaxed">{s.outcome}</p>
+                  <p className="text-sm text-foreground font-medium leading-relaxed text-justify flex-1">{s.outcome}</p>
                 </div>
               </div>
             </div>

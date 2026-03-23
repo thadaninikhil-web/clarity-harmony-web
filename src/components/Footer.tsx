@@ -38,6 +38,7 @@ export const Footer = () => {
                 { label: "Client Stories", path: "/client-stories" },
                 { label: "Insights", path: "/insights" },
                 { label: "Who We Work With", path: "/who-we-work-with" },
+                { label: "Privacy Policy", path: "/privacy-policy" },
               ].map((l) => (
                 <Link key={l.path} to={l.path} className="text-sm text-primary-foreground/60 hover:text-gold transition-colors">
                   {l.label}
@@ -55,6 +56,14 @@ export const Footer = () => {
                 +91 99875 22690
               </a>
               <a
+                href="https://wa.me/919987522690"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-gold transition-colors"
+              >
+                WhatsApp
+              </a>
+              <a
                 href="https://www.linkedin.com/in/thadaninikhil"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -70,6 +79,21 @@ export const Footer = () => {
           <img src={logo} alt="Balancing Act" className="h-10 w-auto brightness-0 invert opacity-80" />
           <p className="text-xs text-primary-foreground/40">
             &copy; {new Date().getFullYear()} Balancing Act Financial Advisory. All rights reserved.
+          </p>
+        </div>
+
+        {/* SEBI Registration & Compliance */}
+        <div className="mt-6 pt-6 border-t border-primary-foreground/10">
+          <p className="text-[10px] text-primary-foreground/30 leading-relaxed text-center max-w-4xl mx-auto">
+            SEBI Registered Mutual Fund Distributor | ARN-346988 | Date of Initial Registration: 23-Nov-2025 | Current Validity: 25-Nov-2026
+          </p>
+          <p className="text-[10px] text-primary-foreground/25 leading-relaxed text-center max-w-4xl mx-auto mt-3">
+            Disclaimer: Mutual fund investments are subject to market risks. Please read all scheme related documents carefully before investing. Past performance is not indicative of future results. The information provided on this website is for general informational purposes only and should not be construed as investment advice. Please consult your financial advisor before making any investment decisions.
+          </p>
+          <p className="text-[10px] text-primary-foreground/25 text-center mt-3">
+            <Link to="/privacy-policy" className="hover:text-gold transition-colors underline">Privacy Policy</Link>
+            {" · "}
+            <span>Terms & Conditions apply</span>
           </p>
         </div>
       </div>
