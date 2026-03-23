@@ -5,7 +5,7 @@ import { ScrollReveal } from "@/components/ScrollReveal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Mail, Phone, Linkedin } from "lucide-react";
+import { Mail, Phone, Linkedin, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 
 const Contact = () => {
@@ -39,6 +39,10 @@ const Contact = () => {
                   <a href="tel:+919987522690" className="flex items-center gap-4 text-foreground hover:text-gold transition-colors">
                     <Phone className="w-5 h-5 text-gold" strokeWidth={1.5} />
                     <span>+91 99875 22690</span>
+                  </a>
+                  <a href="https://wa.me/919987522690" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 text-foreground hover:text-gold transition-colors">
+                    <MessageCircle className="w-5 h-5 text-gold" strokeWidth={1.5} />
+                    <span>WhatsApp</span>
                   </a>
                   <a href="https://www.linkedin.com/in/thadaninikhil" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 text-foreground hover:text-gold transition-colors">
                     <Linkedin className="w-5 h-5 text-gold" strokeWidth={1.5} />

@@ -47,17 +47,17 @@ export const ClientStoriesSection = () => (
         {testimonials.map((t, i) => (
           <ScrollReveal key={i} delay={i * 120}>
             <div className="border border-border p-10 h-full flex flex-col group hover:border-accent/20 transition-colors duration-500">
-              <div className="mb-8">
+              <div className="mb-8 flex-1">
                 <p className="label-caps text-accent/50 mb-3">Situation</p>
-                <p className="text-sm text-muted-foreground">{t.situation}</p>
+                <p className="text-sm text-muted-foreground text-justify">{t.situation}</p>
               </div>
-              <div className="mb-8">
+              <div className="mb-8 flex-1">
                 <p className="label-caps text-accent/50 mb-3">Strategy</p>
-                <p className="text-sm text-muted-foreground">{t.strategy}</p>
+                <p className="text-sm text-muted-foreground text-justify">{t.strategy}</p>
               </div>
-              <div className="mt-auto pt-8 border-t border-border">
+              <div className="pt-8 border-t border-border flex-1">
                 <p className="label-caps text-accent/50 mb-3">Outcome</p>
-                <p className="text-sm text-foreground font-medium">{t.outcome}</p>
+                <p className="text-sm text-foreground font-medium text-justify">{t.outcome}</p>
               </div>
             </div>
           </ScrollReveal>

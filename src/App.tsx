@@ -12,6 +12,7 @@ import Insights from "./pages/Insights";
 import ClientStories from "./pages/ClientStories";
 import Book from "./pages/Book";
 import Contact from "./pages/Contact";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/client-stories" element={<ClientStories />} />
           <Route path="/book" element={<Book />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
