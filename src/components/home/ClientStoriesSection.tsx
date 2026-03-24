@@ -1,4 +1,5 @@
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { MutualFundDisclaimer } from "@/components/MutualFundDisclaimer";
 import storyImage from "@/assets/story-planning.jpg";
 
 const testimonials = [
