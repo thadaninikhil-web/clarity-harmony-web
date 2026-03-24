@@ -73,7 +73,7 @@ const About = () => (
               {[
                 "Financial planning is about life goals, never about products",
                 "Asset allocation is the foundation of investment success",
-                "Discipline and patience outperform market timing — every time",
+                "Discipline and patience matter more than market timing",
                 "Ethical advice builds lifelong partnerships",
                 "Transparency is non-negotiable",
               ].map((belief, i) => (

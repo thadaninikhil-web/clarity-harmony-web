@@ -5,7 +5,7 @@ import {
 
 const services = [
   { icon: Target, title: "Goal Based Financial Planning", desc: "Align your investments with your life's most meaningful milestones." },
-  { icon: PieChart, title: "Portfolio Review & Asset Allocation", desc: "Evaluate and restructure your portfolio for optimal risk-adjusted returns." },
+  { icon: PieChart, title: "Portfolio Review & Asset Allocation", desc: "Evaluate and restructure your portfolio for appropriate risk-adjusted allocation." },
   { icon: Globe, title: "Global Investing Guidance", desc: "Access international markets with a disciplined, diversified approach." },
   { icon: Shield, title: "Insurance Planning", desc: "Ensure adequate protection without over-insuring or under-insuring." },
   { icon: Calculator, title: "Tax Planning", desc: "Minimize tax liability through strategic, compliant planning." },
