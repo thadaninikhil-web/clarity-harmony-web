@@ -41,6 +41,9 @@ export const InsightsPreview = () => (
           </ScrollReveal>
         ))}
       </div>
+      <ScrollReveal delay={350}>
+        <EducationalDisclaimer className="mt-10" />
+      </ScrollReveal>
     </div>
   </section>
 );

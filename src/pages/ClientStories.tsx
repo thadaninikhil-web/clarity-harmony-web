@@ -37,9 +37,10 @@ const ClientStories = () => (
           <h1 className="font-display text-4xl md:text-6xl font-semibold text-primary leading-[1.1] tracking-tight mb-6 text-balance max-w-3xl">
             Client Stories
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed text-justify">
-            Real planning journeys that demonstrate the impact of disciplined, unbiased financial advice.
+          <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed text-justify mb-6">
+            Real planning journeys that demonstrate the impact of disciplined, unbiased financial advice. Individual results may vary based on personal circumstances and market conditions.
           </p>
+          <MutualFundDisclaimer variant="inline" className="max-w-2xl" />
         </ScrollReveal>
       </div>
     </section>
