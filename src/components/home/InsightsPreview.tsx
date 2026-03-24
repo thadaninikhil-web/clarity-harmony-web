@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { EducationalDisclaimer } from "@/components/MutualFundDisclaimer";
 import { ArrowRight } from "lucide-react";
 
 const articles = [
