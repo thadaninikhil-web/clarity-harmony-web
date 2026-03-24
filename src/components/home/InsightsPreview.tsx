@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { EducationalDisclaimer } from "@/components/MutualFundDisclaimer";
 import { ArrowRight } from "lucide-react";
 
 const articles = [
@@ -40,6 +41,9 @@ export const InsightsPreview = () => (
           </ScrollReveal>
         ))}
       </div>
+      <ScrollReveal delay={350}>
+        <EducationalDisclaimer className="mt-10" />
+      </ScrollReveal>
     </div>
   </section>
 );

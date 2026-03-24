@@ -1,4 +1,5 @@
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { MutualFundDisclaimer } from "@/components/MutualFundDisclaimer";
 import storyImage from "@/assets/story-planning.jpg";
 
 const testimonials = [
@@ -63,6 +64,14 @@ export const ClientStoriesSection = () => (
           </ScrollReveal>
         ))}
       </div>
+      <ScrollReveal delay={400}>
+        <div className="mt-10 space-y-4">
+          <p className="text-xs text-muted-foreground/60 text-center">
+            The above are illustrative case studies. Individual results may vary based on personal circumstances and market conditions.
+          </p>
+          <MutualFundDisclaimer variant="compact" />
+        </div>
+      </ScrollReveal>
     </div>
   </section>
 );

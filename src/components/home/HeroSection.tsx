@@ -1,13 +1,14 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { MutualFundDisclaimer } from "@/components/MutualFundDisclaimer";
 import heroImage from "@/assets/hero-abstract.jpg";
 import { ArrowRight } from "lucide-react";
 
 export const HeroSection = () => (
-  <section className="relative min-h-[100svh] flex items-center pt-24 pb-16">
-    <div className="container mx-auto px-6 lg:px-8">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+  <section className="relative min-h-[100svh] flex flex-col pt-24 pb-0">
+    <div className="container mx-auto px-6 lg:px-8 flex-1 flex items-center">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center w-full">
         <div className="lg:col-span-7 space-y-10">
           <div className="animate-fade-in" style={{ animationDelay: "200ms" }}>
             <p className="label-caps text-accent tracking-[0.15em] mb-2">Clarity &bull; Stability &bull; Prosperity</p>
@@ -53,6 +54,9 @@ export const HeroSection = () => (
           </div>
         </div>
       </div>
+    </div>
+    <div className="mt-16">
+      <MutualFundDisclaimer variant="banner" />
     </div>
   </section>
 );
