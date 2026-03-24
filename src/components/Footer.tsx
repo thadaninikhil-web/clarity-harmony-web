@@ -83,7 +83,7 @@ export const Footer = () => {
         </div>
 
         {/* SEBI Registration & Compliance */}
-        <div className="mt-6 pt-6 border-t border-primary-foreground/10">
+        <div className="mt-6 pt-6 border-t border-primary-foreground/10 text-primary-foreground">
           <p className="text-[10px] text-primary-foreground/30 leading-relaxed text-center max-w-4xl mx-auto">
             SEBI Registered Mutual Fund Distributor | ARN-346988 | Date of Initial Registration: 23-Nov-2025 | Current Validity: 25-Nov-2026
           </p>
