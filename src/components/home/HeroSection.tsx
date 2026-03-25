@@ -35,8 +35,8 @@ export const HeroSection = () => (
               <Link to="/book">Book a Discovery Call</Link>
             </Button>
             <Button variant="heroOutline" size="xl" asChild>
-              <Link to="/process">
-                Explore Our Process <ArrowRight className="w-4 h-4 ml-1" />
+              <Link to="/insights">
+                Explore Insights <ArrowRight className="w-4 h-4 ml-1" />
               </Link>
             </Button>
           </div>

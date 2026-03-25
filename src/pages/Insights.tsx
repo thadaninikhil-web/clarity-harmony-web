@@ -1,12 +1,12 @@
+import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { EducationalDisclaimer, MutualFundDisclaimer, SourceAttribution } from "@/components/MutualFundDisclaimer";
 import { useFilteredInsights } from "@/hooks/useInsights";
-import { INSIGHT_CATEGORIES } from "@/types/insight";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
-import { Search, FileText, Video, BarChart3 } from "lucide-react";
+import { Search, FileText, Video, BarChart3, ArrowRight } from "lucide-react";
 
 const Insights = () => {
   const { insights, isLoading, category, setCategory, search, setSearch, categories } = useFilteredInsights();
@@ -91,39 +91,43 @@ const Insights = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border">
               {insights.map((a, i) => (
                 <ScrollReveal key={a.id || i} delay={i * 60}>
-                  <div className="bg-background p-8 h-full hover:bg-cream-dark transition-colors duration-300 group cursor-pointer">
-                    <p className="label-caps text-gold/60 mb-4">{a.category}</p>
-                    <h2 className="font-display text-xl font-semibold text-primary mb-4 group-hover:text-gold transition-colors duration-300">
-                      {a.title}
-                    </h2>
-                    <p className="text-sm text-muted-foreground leading-relaxed mb-4">{a.summary}</p>
+                  <Link to={`/insights/${a.slug}`} className="block h-full">
+                    <div className="bg-background p-8 h-full hover:bg-cream-dark transition-colors duration-300 group">
+                      <p className="label-caps text-gold/60 mb-4">{a.category}</p>
+                      <h2 className="font-display text-xl font-semibold text-primary mb-4 group-hover:text-gold transition-colors duration-300">
+                        {a.title}
+                      </h2>
+                      <p className="text-sm text-muted-foreground leading-relaxed mb-4">{a.summary}</p>
 
-                    {/* Optional media badges */}
-                    {(a.chart_url || a.pdf_resource || a.video_link) && (
-                      <div className="flex gap-3 mb-4">
-                        {a.chart_url && (
-                          <a href={a.chart_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-accent hover:text-gold transition-colors">
-                            <BarChart3 className="w-3.5 h-3.5" /> Chart
-                          </a>
-                        )}
-                        {a.pdf_resource && (
-                          <a href={a.pdf_resource} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-accent hover:text-gold transition-colors">
-                            <FileText className="w-3.5 h-3.5" /> PDF
-                          </a>
-                        )}
-                        {a.video_link && (
-                          <a href={a.video_link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-accent hover:text-gold transition-colors">
-                            <Video className="w-3.5 h-3.5" /> Video
-                          </a>
-                        )}
+                      {/* Optional media badges */}
+                      {(a.chart_url || a.pdf_resource || a.video_link) && (
+                        <div className="flex gap-3 mb-4">
+                          {a.chart_url && (
+                            <span className="flex items-center gap-1 text-xs text-accent">
+                              <BarChart3 className="w-3.5 h-3.5" /> Chart
+                            </span>
+                          )}
+                          {a.pdf_resource && (
+                            <span className="flex items-center gap-1 text-xs text-accent">
+                              <FileText className="w-3.5 h-3.5" /> PDF
+                            </span>
+                          )}
+                          {a.video_link && (
+                            <span className="flex items-center gap-1 text-xs text-accent">
+                              <Video className="w-3.5 h-3.5" /> Video
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-muted-foreground/60">{a.publish_date}</p>
+                        <span className="flex items-center gap-1 text-xs text-accent/0 group-hover:text-accent transition-colors duration-300">
+                          Read Insight <ArrowRight className="w-3 h-3" />
+                        </span>
                       </div>
-                    )}
-
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs text-muted-foreground/60">{a.publish_date}</p>
-                      <SourceAttribution source={a.source} />
                     </div>
-                  </div>
+                  </Link>
                 </ScrollReveal>
               ))}
             </div>
