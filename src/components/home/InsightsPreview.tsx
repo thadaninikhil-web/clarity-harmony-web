@@ -37,16 +37,18 @@ export const InsightsPreview = () => {
               ))
             : displayArticles.map((article, i) => (
                 <ScrollReveal key={article.id || i} delay={i * 100}>
-                  <div className="group cursor-pointer p-10 border border-border hover:border-accent/20 transition-all duration-500 h-full">
-                    <p className="label-caps text-accent/40 mb-6">{article.category}</p>
-                    <h3 className="font-display text-lg font-semibold text-primary mb-6 group-hover:text-accent transition-colors duration-300">
-                      {article.title}
-                    </h3>
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs text-muted-foreground">{article.publish_date}</p>
-                      <ArrowRight className="w-4 h-4 text-accent/0 group-hover:text-accent transition-all duration-300 translate-x-0 group-hover:translate-x-1" />
+                  <Link to={`/insights/${article.slug}`} className="block h-full">
+                    <div className="group cursor-pointer p-10 border border-border hover:border-accent/20 transition-all duration-500 h-full">
+                      <p className="label-caps text-accent/40 mb-6">{article.category}</p>
+                      <h3 className="font-display text-lg font-semibold text-primary mb-6 group-hover:text-accent transition-colors duration-300">
+                        {article.title}
+                      </h3>
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-muted-foreground">{article.publish_date}</p>
+                        <ArrowRight className="w-4 h-4 text-accent/0 group-hover:text-accent transition-all duration-300 translate-x-0 group-hover:translate-x-1" />
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                 </ScrollReveal>
               ))}
         </div>

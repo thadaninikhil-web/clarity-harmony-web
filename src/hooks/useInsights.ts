@@ -1,15 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchInsights, fetchFeaturedInsights } from "@/services/insightsService";
+import { fetchInsights, fetchFeaturedInsights, fetchInsightBySlug } from "@/services/insightsService";
 import type { Insight } from "@/types/insight";
 import { useMemo, useState } from "react";
 
 export function useInsights() {
-  const query = useQuery<Insight[]>({
+  return useQuery<Insight[]>({
     queryKey: ["insights"],
     queryFn: fetchInsights,
-    staleTime: 5 * 60 * 1000, // 5 min cache
+    staleTime: 5 * 60 * 1000,
   });
-  return query;
 }
 
 export function useFeaturedInsights() {
@@ -17,6 +16,15 @@ export function useFeaturedInsights() {
     queryKey: ["insights", "featured"],
     queryFn: fetchFeaturedInsights,
     staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useInsightBySlug(slug: string) {
+  return useQuery<Insight | null>({
+    queryKey: ["insights", "slug", slug],
+    queryFn: () => fetchInsightBySlug(slug),
+    staleTime: 5 * 60 * 1000,
+    enabled: !!slug,
   });
 }
 
