@@ -1,6 +1,7 @@
 export interface Insight {
   id: string;
   title: string;
+  slug: string;
   summary: string;
   category: string;
   publish_date: string;
@@ -23,3 +24,18 @@ export const INSIGHT_CATEGORIES = [
   "Market Insights",
   "Investor Education",
 ] as const;
+
+export function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+export function titleCase(str: string): string {
+  return str
+    .toLowerCase()
+    .split(" ")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
