@@ -3,8 +3,8 @@ import philosophyImage from "@/assets/philosophy-abstract.jpg";
 
 const pillars = [
   "Understanding your life goals with depth and care",
-  "Assessing your complete financial position objectively",
-  "Designing disciplined investment strategies built for the long term",
+  "Reviewing your complete financial position objectively",
+  "Designing disciplined, long-term investment frameworks",
   "Supporting you through changing markets and evolving life stages",
 ];
 
@@ -20,17 +20,16 @@ export const PhilosophySection = () => (
               className="w-full aspect-square object-cover"
               loading="lazy"
             />
-            <div className="absolute -bottom-6 -right-6 w-32 h-32 border border-accent/30" />
           </div>
         </ScrollReveal>
         <div>
           <ScrollReveal direction="right">
             <p className="label-caps text-accent tracking-[0.15em] mb-4">Our Philosophy</p>
             <h2 className="font-display text-3xl md:text-5xl font-semibold text-primary mb-8 text-balance">
-              Financial Advice Without Product Bias
+              Financial Planning Without Product Bias
             </h2>
             <p className="text-lg text-muted-foreground mb-10 max-w-xl">
-              Most financial advice today is driven by product distribution — advisors earn commissions from the products they sell. Balancing Act is fundamentally different. We do not sell financial products. Our only commitment is to your financial well-being.
+              Much of the financial industry today is driven by product distribution — income is often linked to the products being sold. Balancing Act is built differently. Our only commitment is to your financial well-being through clarity and disciplined execution.
             </p>
           </ScrollReveal>
           <div className="space-y-4">

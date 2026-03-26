@@ -6,13 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Target, PieChart, Globe, Shield, Calculator, Users, BarChart3, ArrowRight } from "lucide-react";
 
 const services = [
-  { icon: Target, title: "Goal Based Financial Planning", desc: "We start with your life goals — retirement, children's education, home purchase, financial independence — and work backwards to design an investment strategy that makes them achievable. Every recommendation is anchored to a specific goal." },
-  { icon: PieChart, title: "Portfolio Review & Asset Allocation", desc: "We evaluate your existing portfolio for diversification, cost efficiency, risk alignment, and overlap. We then design an appropriate asset allocation that aims to balance growth with protection, tailored to your unique risk capacity." },
-  { icon: Globe, title: "Global Investing Guidance", desc: "In an interconnected world, your portfolio shouldn't be limited to one geography. We help you access international markets through cost-efficient, tax-aware instruments — building a truly global investment strategy." },
-  { icon: Shield, title: "Insurance Planning", desc: "Insurance is about protection, not investment. We review your existing policies, identify gaps, and ensure you have the right coverage — without overpaying for products that don't serve your needs." },
-  { icon: Calculator, title: "Tax Planning", desc: "We help you minimize your tax liability through strategic planning — leveraging deductions, efficient investment structures, and timing strategies that keep more of your wealth working for you." },
-  { icon: Users, title: "Succession & Estate Planning", desc: "We help you create clarity around wealth transfer — nominations, wills, trusts, and family governance structures that protect your legacy and minimize complexity for your loved ones." },
-  { icon: BarChart3, title: "Ongoing Financial Life Management", desc: "Financial planning doesn't end with a document. We provide continuous support — regular reviews, portfolio rebalancing, life-event planning, and proactive adjustments as your world evolves." },
+  { icon: Target, title: "Goal Based Financial Planning", desc: "Every engagement starts with your life goals — retirement, children's education, home purchase, financial independence — and works backwards to design an investment strategy that makes them achievable. Every recommendation is anchored to a specific goal." },
+  { icon: PieChart, title: "Portfolio Review & Asset Allocation", desc: "Evaluate your existing portfolio for diversification, cost efficiency, risk alignment, and overlap. Then design an appropriate asset allocation that aims to balance growth with protection, tailored to your unique risk capacity." },
+  { icon: Globe, title: "Global Investing Guidance", desc: "In an interconnected world, your portfolio shouldn't be limited to one geography. Access international markets through cost-efficient, tax-efficient instruments — building a truly global investment strategy." },
+  { icon: Shield, title: "Insurance Planning", desc: "Insurance is about protection, not investment. A thorough review of your existing policies identifies gaps and ensures you have the right coverage — without overpaying for products that don't serve your needs." },
+  { icon: Calculator, title: "Tax Planning", desc: "Minimize your tax liability through strategic planning — leveraging deductions, efficient investment structures, and timing strategies that keep more of your wealth working for you." },
+  { icon: Users, title: "Succession & Estate Planning", desc: "Create clarity around wealth transfer — nominations, wills, trusts, and family governance structures that protect your legacy and minimize complexity for your loved ones." },
+  { icon: BarChart3, title: "Ongoing Financial Life Management", desc: "Financial planning doesn't end with a document. Continuous support through regular reviews, portfolio rebalancing, life-event planning, and proactive adjustments as your world evolves." },
 ];
 
 const Services = () => (
@@ -23,10 +23,10 @@ const Services = () => (
         <ScrollReveal>
           <p className="label-caps text-gold mb-4">Our Services</p>
           <h1 className="font-display text-4xl md:text-6xl font-semibold text-primary leading-[1.1] tracking-tight mb-6 text-balance max-w-3xl">
-            Comprehensive Financial Advisory
+            Comprehensive Financial Planning
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed">
-            Every service is built on the principle that financial advice should be unbiased, disciplined, and deeply personal.
+            Every engagement is built on the principle that financial decisions should be unbiased, disciplined, and deeply personal.
           </p>
         </ScrollReveal>
       </div>

@@ -24,10 +24,13 @@ export const HeroSection = () => (
           </h1>
           <div className="space-y-4 animate-slide-up" style={{ animationDelay: "550ms" }}>
             <p className="font-display italic text-xl md:text-2xl text-primary/70">
-              Human Touch in the Age of AI.
+              Human Financial Wisdom in the Age of AI.
             </p>
             <p className="text-base md:text-lg text-muted-foreground max-w-lg">
               Balancing Act helps individuals discover their financial goals, understand their financial position, and build disciplined investment strategies that stand the test of time.
+            </p>
+            <p className="text-sm text-muted-foreground/80 max-w-lg italic">
+              We harness AI for research and tools — but your financial journey is guided by human understanding, because money is deeply personal.
             </p>
           </div>
           <div className="flex flex-wrap gap-4 animate-slide-up" style={{ animationDelay: "700ms" }}>

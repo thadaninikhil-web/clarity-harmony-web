@@ -6,14 +6,14 @@ import { ArrowRight, Building2, GraduationCap } from "lucide-react";
 const credentials = [
   "22+ years of personal investing experience",
   "Achieved financial independence at 43",
-  "Commitment to ethical, unbiased advice",
+  "Commitment to ethical, unbiased decision making",
   "Strong discipline around asset allocation",
   "Long-term client partnerships built on trust",
 ];
 
 const experience = [
   { icon: Building2, label: "Professional Experience", items: ["BSE (Bombay Stock Exchange)", "Bank of America", "Tata Capital", "TCS"] },
-  { icon: GraduationCap, label: "Education", items: ["Chartered Accountant (CA)", "IIM Ahmedabad"] },
+  { icon: GraduationCap, label: "Education", items: ["Chartered Accountant (CA)", "IIM Ahmedabad (PGPX — One Year Full Time MBA)"] },
 ];
 
 export const FounderSection = () => (
@@ -26,7 +26,7 @@ export const FounderSection = () => (
             Why I Started Balancing Act
           </h2>
           <p className="text-lg text-muted-foreground mb-10 max-w-xl text-justify">
-            With over 22 years of investing experience and having achieved financial independence at the age of 43, I founded Balancing Act with a simple conviction: financial planning should be about life goals, not products.
+            With over two decades of investing experience and having achieved financial independence at the age of 43, I founded Balancing Act with a simple conviction: financial planning should be about life goals, not products.
           </p>
         </ScrollReveal>
 
