@@ -9,12 +9,22 @@ import { Mail, Phone, Linkedin, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 
 const Contact = () => {
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", city: "", message: "" });
+  const [sending, setSending] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Message sent. We'll respond within 24 hours.");
-    setForm({ name: "", email: "", message: "" });
+    setSending(true);
+
+    const subject = encodeURIComponent(`Contact from ${form.name}`);
+    const body = encodeURIComponent(
+      `Name: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone}\nCity/Country: ${form.city}\n\nMessage:\n${form.message}`
+    );
+    window.location.href = `mailto:nikhil@balancingact.co.in?subject=${subject}&body=${body}`;
+
+    toast.success("Opening your email client. We'll respond within 24 hours.");
+    setForm({ name: "", email: "", phone: "", city: "", message: "" });
+    setSending(false);
   };
 
   return (
@@ -63,12 +73,23 @@ const Contact = () => {
                   <Input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="bg-background border-border" />
                 </div>
                 <div>
-                  <label className="label-caps text-muted-foreground mb-2 block">Message</label>
-                  <Textarea value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} rows={5} className="bg-background border-border resize-none" />
+                  <label className="label-caps text-muted-foreground mb-2 block">Phone</label>
+                  <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="bg-background border-border" />
                 </div>
-                <Button variant="hero" size="lg" type="submit" className="w-full">
-                  Send Message
+                <div>
+                  <label className="label-caps text-muted-foreground mb-2 block">City or Country</label>
+                  <Input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} className="bg-background border-border" />
+                </div>
+                <div>
+                  <label className="label-caps text-muted-foreground mb-2 block">What would you like help with?</label>
+                  <Textarea value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} rows={4} className="bg-background border-border resize-none" />
+                </div>
+                <Button variant="hero" size="lg" type="submit" className="w-full" disabled={sending}>
+                  Book a Discovery Call
                 </Button>
+                <p className="text-xs text-muted-foreground/60 text-center">
+                  Free &bull; No obligation &bull; 30 minutes
+                </p>
               </form>
             </ScrollReveal>
           </div>
