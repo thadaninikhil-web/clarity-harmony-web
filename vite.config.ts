@@ -18,6 +18,6 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  // 👇 This is the critical fix
-  base: "/clarity-harmony-web/",
+  // 👇 Critical fix for GitHub Pages
+  base: "./",
 }));
