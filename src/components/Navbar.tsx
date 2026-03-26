@@ -8,10 +8,10 @@ const navLinks = [
   { label: "Home", path: "/" },
   { label: "Our Process", path: "/process" },
   { label: "Who We Work With", path: "/who-we-work-with" },
-  { label: "About Nikhil", path: "/about" },
   { label: "Services", path: "/services" },
-  { label: "Insights", path: "/insights" },
   { label: "Client Stories", path: "/client-stories" },
+  { label: "Insights", path: "/insights" },
+  { label: "About Nikhil", path: "/about" },
   { label: "Contact", path: "/contact" },
 ];
 
@@ -40,7 +40,7 @@ export const Navbar = () => {
     >
       <div className="container mx-auto flex items-center justify-between h-20 px-6 lg:px-8">
         <Link to="/" className="flex items-center gap-3">
-          <img src={logo} alt="Balancing Act" className="h-16 w-auto" />
+          <img src={logo} alt="Balancing Act" className="h-14 w-auto" />
         </Link>
 
         {/* Desktop nav */}

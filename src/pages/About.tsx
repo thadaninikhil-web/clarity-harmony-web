@@ -19,17 +19,33 @@ const About = () => (
           </ScrollReveal>
           <ScrollReveal delay={100}>
             <p className="text-lg text-muted-foreground leading-relaxed mb-6 text-justify">
-              For over two decades, I observed the financial services industry from the inside. I saw talented people give conflicted advice because their income depended on products, not planning. I saw families make avoidable mistakes because nobody took the time to understand their goals.
+              For the better part of two decades, I observed the financial services industry from the inside — and saw both its strengths and its contradictions.
+            </p>
+          </ScrollReveal>
+          <ScrollReveal delay={150}>
+            <p className="text-lg text-muted-foreground leading-relaxed mb-6 text-justify">
+              I met many experienced professionals who genuinely wanted to help their clients. Yet the system often created quiet conflicts: advice was shaped by the products that paid commissions rather than by what families truly needed.
             </p>
           </ScrollReveal>
           <ScrollReveal delay={200}>
             <p className="text-lg text-muted-foreground leading-relaxed mb-6 text-justify">
-              I achieved financial independence at the age of 43 — not through speculation or shortcuts, but through disciplined asset allocation, patience, and a clear understanding of what I wanted from my financial life.
+              Over time, the consequences were apparent. Complex financial decisions reduced to product choices. Long-term goals sidelined by short-term recommendations. Mistakes that could have been avoided if someone had simply started with the client's life instead of the market.
+            </p>
+          </ScrollReveal>
+          <ScrollReveal delay={250}>
+            <p className="text-lg text-muted-foreground leading-relaxed mb-6 text-justify">
+              My own journey took a different path. I made my share of mistakes along the way, learned from them, and realigned my approach to money and investing. At 43, I achieved financial independence — not through speculation or shortcuts, but through disciplined asset allocation, patience, and a clear understanding of what I wanted from my financial life.
             </p>
           </ScrollReveal>
           <ScrollReveal delay={300}>
+            <p className="text-lg text-muted-foreground leading-relaxed mb-6 text-justify">
+              Balancing Act was created from that experience.
+            </p>
+            <p className="text-lg text-muted-foreground leading-relaxed mb-6 text-justify">
+              It is built on a simple belief: financial advice should begin with a person's life — their goals, responsibilities, and aspirations — not with a product to sell.
+            </p>
             <p className="text-lg text-muted-foreground leading-relaxed mb-10 text-justify">
-              Balancing Act was born from the conviction that everyone deserves the kind of financial guidance that is rooted in their life — not in product commissions. I believe financial planning should be deeply personal, ethically grounded, and built to last.
+              Because when planning is thoughtful, disciplined, and aligned with the client's interests, better financial decisions naturally follow.
             </p>
           </ScrollReveal>
 
@@ -59,7 +75,7 @@ const About = () => (
                     <p className="label-caps text-gold/60 mb-3">Education</p>
                     <div className="space-y-1.5">
                       <p className="text-sm text-foreground">Chartered Accountant (CA)</p>
-                      <p className="text-sm text-foreground">IIM Ahmedabad</p>
+                      <p className="text-sm text-foreground">IIM Ahmedabad (PGPX — One Year Full Time MBA)</p>
                     </div>
                   </div>
                 </div>
@@ -74,7 +90,7 @@ const About = () => (
                 "Financial planning is about life goals, never about products",
                 "Asset allocation is the foundation of investment success",
                 "Discipline and patience matter more than market timing",
-                "Ethical advice builds lifelong partnerships",
+                "Trust and integrity build lifelong partnerships",
                 "Transparency is non-negotiable",
               ].map((belief, i) => (
                 <div key={i} className="flex items-start gap-4">

@@ -9,11 +9,21 @@ import { toast } from "sonner";
 
 const Book = () => {
   const [form, setForm] = useState({ name: "", email: "", phone: "", city: "", message: "" });
+  const [sending, setSending] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Thank you! We'll be in touch within 24 hours.");
+    setSending(true);
+
+    const subject = encodeURIComponent(`Discovery Call Request from ${form.name}`);
+    const body = encodeURIComponent(
+      `Name: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone}\nCity/Country: ${form.city}\n\nWhat they need help with:\n${form.message}`
+    );
+    window.location.href = `mailto:nikhil@balancingact.co.in?subject=${subject}&body=${body}`;
+
+    toast.success("Opening your email client. We'll be in touch within 24 hours.");
     setForm({ name: "", email: "", phone: "", city: "", message: "" });
+    setSending(false);
   };
 
   return (
@@ -96,7 +106,7 @@ const Book = () => {
                     className="bg-background border-border resize-none"
                   />
                 </div>
-                <Button variant="hero" size="lg" type="submit" className="w-full">
+                <Button variant="hero" size="lg" type="submit" className="w-full" disabled={sending}>
                   Book a Discovery Call
                 </Button>
                 <p className="text-xs text-muted-foreground/60 text-center">

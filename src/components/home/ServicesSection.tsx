@@ -5,7 +5,7 @@ import {
 
 const services = [
   { icon: Target, title: "Goal Based Financial Planning", desc: "Align your investments with your life's most meaningful milestones." },
-  { icon: PieChart, title: "Portfolio Review & Asset Allocation", desc: "Evaluate and restructure your portfolio for appropriate risk-adjusted allocation." },
+  { icon: PieChart, title: "Portfolio Review & Asset Allocation", desc: "Evaluate your existing portfolio for appropriate risk-adjusted allocation." },
   { icon: Globe, title: "Global Investing Guidance", desc: "Access international markets with a disciplined, diversified approach." },
   { icon: Shield, title: "Insurance Planning", desc: "Ensure adequate protection without over-insuring or under-insuring." },
   { icon: Calculator, title: "Tax Planning", desc: "Minimize tax liability through strategic, compliant planning." },
@@ -20,8 +20,11 @@ export const ServicesSection = () => (
         <div className="max-w-2xl mb-20">
           <p className="label-caps text-accent tracking-[0.15em] mb-4">What We Do</p>
           <h2 className="font-display text-3xl md:text-5xl font-semibold text-primary text-balance">
-            Comprehensive Financial Advisory
+            Comprehensive Financial Planning
           </h2>
+          <p className="text-muted-foreground mt-4 max-w-xl">
+            Every engagement is built on the principle that financial decisions should be unbiased, disciplined, and deeply personal.
+          </p>
         </div>
       </ScrollReveal>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-border/50">

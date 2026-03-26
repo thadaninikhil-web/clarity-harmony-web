@@ -10,7 +10,7 @@ const stories = [
   {
     title: "Cross-Border Clarity for an NRI",
     situation: "An NRI based out of Singapore with assets across India, Singapore and USA. Assets were mostly in savings account or low yielding deposits with certain investments in US stocks and ETFs",
-    strategy: "Discovered financial goals, allocated assets and recommended rebalancing across all three geographies to match goal tenors and risk profile. Also identified Ireland domiciled UCITS to replace US ETFs for better tax efficiency",
+    strategy: "Clarified financial goals, aligned asset allocation across three geographies with goal horizons and risk considerations, and highlighted rebalancing needs. Also assessed Ireland-domiciled UCITS as a tax-efficient alternative to US-listed ETFs.",
     outcome: "Achieved clarity on all goals, initiated rebalancing over 18 to 24 months in a tax efficient manner. Each goal now has assets and future investments aligned to them.",
   },
   {
@@ -38,7 +38,7 @@ const ClientStories = () => (
             Client Stories
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed text-justify mb-6">
-            Real planning journeys that demonstrate the impact of disciplined, unbiased financial advice. Individual results may vary based on personal circumstances and market conditions.
+            Real planning journeys that demonstrate the impact of disciplined, unbiased financial thinking. Individual outcomes may vary based on personal circumstances and market conditions.
           </p>
           <MutualFundDisclaimer variant="inline" className="max-w-2xl" />
         </ScrollReveal>

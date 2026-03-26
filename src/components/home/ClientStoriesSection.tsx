@@ -5,7 +5,7 @@ import storyImage from "@/assets/story-planning.jpg";
 const testimonials = [
   {
     situation: "An NRI based out of Singapore with assets across India, Singapore and USA. Assets were mostly in savings account or low yielding deposits with certain investments in US stocks and ETFs",
-    strategy: "Discovered financial goals, allocated assets and recommended rebalancing across all three geographies to match goal tenors and risk profile. Also identified Ireland domiciled UCITS to replace US ETFs for better tax efficiency",
+    strategy: "Clarified financial goals, aligned asset allocation across three geographies with goal horizons and risk considerations, and highlighted rebalancing needs. Also assessed Ireland-domiciled UCITS as a tax-efficient alternative to US-listed ETFs.",
     outcome: "Achieved clarity on all goals, initiated rebalancing over 18 to 24 months in a tax efficient manner. Each goal now has assets and future investments aligned to them.",
   },
   {
@@ -67,7 +67,7 @@ export const ClientStoriesSection = () => (
       <ScrollReveal delay={400}>
         <div className="mt-10 space-y-4">
           <p className="text-xs text-muted-foreground/60 text-center">
-            The above are illustrative case studies. Individual results may vary based on personal circumstances and market conditions.
+            These case studies reflect specific client situations. Financial decisions and outcomes may differ based on individual circumstances and market conditions.
           </p>
           <MutualFundDisclaimer variant="compact" />
         </div>
