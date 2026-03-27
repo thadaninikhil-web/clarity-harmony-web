@@ -6,23 +6,53 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { SITE_CONFIG } from "@/config/site";
 
 const Book = () => {
   const [form, setForm] = useState({ name: "", email: "", phone: "", city: "", message: "" });
   const [sending, setSending] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSending(true);
 
-    const subject = encodeURIComponent(`Discovery Call Request from ${form.name}`);
-    const body = encodeURIComponent(
-      `Name: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone}\nCity/Country: ${form.city}\n\nWhat they need help with:\n${form.message}`
-    );
-    window.location.href = `mailto:nikhil@balancingact.co.in?subject=${subject}&body=${body}`;
+    // If Web3Forms key is configured, send directly
+    if (SITE_CONFIG.web3formsKey) {
+      try {
+        const res = await fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            access_key: SITE_CONFIG.web3formsKey,
+            subject: `Discovery Call Request from ${form.name}`,
+            from_name: form.name,
+            email: form.email,
+            phone: form.phone,
+            city: form.city,
+            message: form.message,
+          }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          toast.success("Request sent! We'll be in touch within 24 hours.");
+          setForm({ name: "", email: "", phone: "", city: "", message: "" });
+        } else {
+          throw new Error("Submission failed");
+        }
+      } catch {
+        toast.error("Something went wrong. Please try again or email us directly.");
+      }
+    } else {
+      // Fallback to mailto
+      const subject = encodeURIComponent(`Discovery Call Request from ${form.name}`);
+      const body = encodeURIComponent(
+        `Name: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone}\nCity/Country: ${form.city}\n\nWhat they need help with:\n${form.message}`
+      );
+      window.location.href = `mailto:${SITE_CONFIG.contactEmail}?subject=${subject}&body=${body}`;
+      toast.success("Opening your email client. We'll be in touch within 24 hours.");
+      setForm({ name: "", email: "", phone: "", city: "", message: "" });
+    }
 
-    toast.success("Opening your email client. We'll be in touch within 24 hours.");
-    setForm({ name: "", email: "", phone: "", city: "", message: "" });
     setSending(false);
   };
 
@@ -107,7 +137,7 @@ const Book = () => {
                   />
                 </div>
                 <Button variant="hero" size="lg" type="submit" className="w-full" disabled={sending}>
-                  Book a Discovery Call
+                  {sending ? "Sending…" : "Book a Discovery Call"}
                 </Button>
                 <p className="text-xs text-muted-foreground/60 text-center">
                   Free &bull; No obligation &bull; 30 minutes

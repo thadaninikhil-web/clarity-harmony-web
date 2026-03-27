@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, Phone, Linkedin, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
+import { SITE_CONFIG } from "@/config/site";
 
 const Contact = () => {
   const [form, setForm] = useState({ name: "", email: "", phone: "", city: "", message: "" });
@@ -16,14 +17,41 @@ const Contact = () => {
     e.preventDefault();
     setSending(true);
 
-    const subject = encodeURIComponent(`Contact from ${form.name}`);
-    const body = encodeURIComponent(
-      `Name: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone}\nCity/Country: ${form.city}\n\nMessage:\n${form.message}`
-    );
-    window.location.href = `mailto:nikhil@balancingact.co.in?subject=${subject}&body=${body}`;
+    if (SITE_CONFIG.web3formsKey) {
+      try {
+        const res = await fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            access_key: SITE_CONFIG.web3formsKey,
+            subject: `Contact from ${form.name}`,
+            from_name: form.name,
+            email: form.email,
+            phone: form.phone,
+            city: form.city,
+            message: form.message,
+          }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          toast.success("Message sent! We'll respond within 24 hours.");
+          setForm({ name: "", email: "", phone: "", city: "", message: "" });
+        } else {
+          throw new Error("Submission failed");
+        }
+      } catch {
+        toast.error("Something went wrong. Please try again or email us directly.");
+      }
+    } else {
+      const subject = encodeURIComponent(`Contact from ${form.name}`);
+      const body = encodeURIComponent(
+        `Name: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone}\nCity/Country: ${form.city}\n\nMessage:\n${form.message}`
+      );
+      window.location.href = `mailto:${SITE_CONFIG.contactEmail}?subject=${subject}&body=${body}`;
+      toast.success("Opening your email client. We'll respond within 24 hours.");
+      setForm({ name: "", email: "", phone: "", city: "", message: "" });
+    }
 
-    toast.success("Opening your email client. We'll respond within 24 hours.");
-    setForm({ name: "", email: "", phone: "", city: "", message: "" });
     setSending(false);
   };
 
@@ -42,19 +70,19 @@ const Contact = () => {
               </ScrollReveal>
               <ScrollReveal delay={100}>
                 <div className="space-y-6">
-                  <a href="mailto:nikhil@balancingact.co.in" className="flex items-center gap-4 text-foreground hover:text-gold transition-colors group">
+                  <a href={`mailto:${SITE_CONFIG.contactEmail}`} className="flex items-center gap-4 text-foreground hover:text-gold transition-colors group">
                     <Mail className="w-5 h-5 text-gold" strokeWidth={1.5} />
-                    <span>nikhil@balancingact.co.in</span>
+                    <span>{SITE_CONFIG.contactEmail}</span>
                   </a>
-                  <a href="tel:+919987522690" className="flex items-center gap-4 text-foreground hover:text-gold transition-colors">
+                  <a href={`tel:${SITE_CONFIG.phone}`} className="flex items-center gap-4 text-foreground hover:text-gold transition-colors">
                     <Phone className="w-5 h-5 text-gold" strokeWidth={1.5} />
-                    <span>+91 99875 22690</span>
+                    <span>{SITE_CONFIG.phoneDisplay}</span>
                   </a>
-                  <a href="https://wa.me/919987522690" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 text-foreground hover:text-gold transition-colors">
+                  <a href={SITE_CONFIG.whatsappUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 text-foreground hover:text-gold transition-colors">
                     <MessageCircle className="w-5 h-5 text-gold" strokeWidth={1.5} />
                     <span>WhatsApp</span>
                   </a>
-                  <a href="https://www.linkedin.com/in/thadaninikhil" target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 text-foreground hover:text-gold transition-colors">
+                  <a href={SITE_CONFIG.linkedinUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-4 text-foreground hover:text-gold transition-colors">
                     <Linkedin className="w-5 h-5 text-gold" strokeWidth={1.5} />
                     <span>linkedin.com/in/thadaninikhil</span>
                   </a>
@@ -85,7 +113,7 @@ const Contact = () => {
                   <Textarea value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} rows={4} className="bg-background border-border resize-none" />
                 </div>
                 <Button variant="hero" size="lg" type="submit" className="w-full" disabled={sending}>
-                  Book a Discovery Call
+                  {sending ? "Sending…" : "Book a Discovery Call"}
                 </Button>
                 <p className="text-xs text-muted-foreground/60 text-center">
                   Free &bull; No obligation &bull; 30 minutes

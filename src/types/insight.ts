@@ -13,6 +13,7 @@ export interface Insight {
   chart_url?: string;
   pdf_resource?: string;
   video_link?: string;
+  content?: string; // Full article body (plain text or markdown)
 }
 
 export const INSIGHT_CATEGORIES = [
