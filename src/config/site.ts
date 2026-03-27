@@ -18,5 +18,5 @@ export const SITE_CONFIG = {
    * Get a free key at https://web3forms.com — paste it here.
    * Until configured, forms fall back to mailto.
    */
-  web3formsKey: "",
+  web3formsKey: "29cc8b83-9f23-4b80-b8b5-3b96628a6377",
 } as const;
