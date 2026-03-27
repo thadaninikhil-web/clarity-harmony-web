@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { EducationalDisclaimer, MutualFundDisclaimer, SourceAttribution } from "@/components/MutualFundDisclaimer";
+import { EducationalDisclaimer } from "@/components/MutualFundDisclaimer";
 import { useFilteredInsights } from "@/hooks/useInsights";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
@@ -21,19 +21,10 @@ const Insights = () => {
             <h1 className="font-display text-4xl md:text-6xl font-semibold text-primary leading-[1.1] tracking-tight mb-6 text-balance max-w-3xl">
               Insights
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed mb-6">
+            <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed">
               Perspectives on investing, financial planning, and building long-term wealth.
             </p>
           </ScrollReveal>
-          <ScrollReveal delay={50}>
-            <EducationalDisclaimer className="max-w-2xl mb-4" />
-          </ScrollReveal>
-        </div>
-      </section>
-
-      <section className="pb-8">
-        <div className="container mx-auto px-6 lg:px-8">
-          <MutualFundDisclaimer variant="inline" className="max-w-2xl" />
         </div>
       </section>
 
@@ -70,7 +61,7 @@ const Insights = () => {
       </section>
 
       {/* Insights Grid */}
-      <section className="pb-24 md:pb-32">
+      <section className="pb-12">
         <div className="container mx-auto px-6 lg:px-8">
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border">
@@ -99,7 +90,6 @@ const Insights = () => {
                       </h2>
                       <p className="text-sm text-muted-foreground leading-relaxed mb-4">{a.summary}</p>
 
-                      {/* Optional media badges */}
                       {(a.chart_url || a.pdf_resource || a.video_link) && (
                         <div className="flex gap-3 mb-4">
                           {a.chart_url && (
@@ -134,6 +124,14 @@ const Insights = () => {
           )}
         </div>
       </section>
+
+      {/* Disclaimer at bottom */}
+      <section className="pb-24 md:pb-32">
+        <div className="container mx-auto px-6 lg:px-8">
+          <EducationalDisclaimer className="max-w-2xl mx-auto" />
+        </div>
+      </section>
+
       <Footer />
     </div>
   );
