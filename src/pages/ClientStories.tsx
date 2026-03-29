@@ -74,7 +74,7 @@ const ClientStories = () => (
             </Button>
           </div>
         </ScrollReveal>
-		<MutualFundDisclaimer variant="inline" className="max-w-2xl" />
+		<MutualFundDisclaimer className="max-w-auto" />
       </div>
     </section>
     <Footer />
