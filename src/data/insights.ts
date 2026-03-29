@@ -23,30 +23,80 @@ export const insights: Insight[] = [
     id: "INS001",
     title: "Why Asset Allocation Matters More Than Stock Picking",
     summary:
-      "Historical evidence suggests that long-term portfolio returns are driven primarily by how assets are allocated across asset classes, rather than by individual stock selection.",
+      "Decades of Indian market data confirm that deciding how to divide wealth across equities, debt, and gold generates far more of your long-term return than which individual stock you pick. Here is the evidence — and a framework built for Indian families.",
     category: "Financial Planning",
     publish_date: "March 2026",
     insight_url: "",
-    source: "AMFI / Public Data",
+    source: "AMFI / NSE / FundsIndia Research / Mirae Asset MF",
     risk_note:
       "Mutual fund investments are subject to market risks. Please read all scheme related documents carefully before investing.",
     is_featured: true,
     status: "PUBLISHED",
-    content: `Asset allocation — how your portfolio is divided between equities, debt, gold, and other asset classes — has consistently been shown to be the primary driver of long-term investment returns.
+    content: `Every year, millions of Indian investors spend enormous energy hunting for the next Infosys or the next multibagger small-cap. It is an intellectually satisfying pursuit — but research consistently shows it is the wrong game to be playing.
 
-A landmark study by Brinson, Hood, and Beebower (1986) found that over 90% of the variability in portfolio returns could be attributed to asset allocation decisions, rather than individual security selection or market timing.
+The most consequential investment decision you will ever make is not which company to own. It is how much of your total wealth to place in equities versus debt versus gold versus cash. This allocation decision, made once and reviewed periodically, explains the overwhelming majority of the variation in long-term portfolio returns — across asset managers, across countries, and across decades of Indian market history.
 
-**What does this mean for individual investors?**
+**The research behind the principle**
 
-Rather than spending time trying to pick the next winning stock, investors may benefit more from:
+The landmark 1986 study by Brinson, Hood and Beebower found that asset allocation accounts for roughly 90–94% of the variability in a portfolio's long-term return. Individual security selection and market timing account for the remainder. Indian market data since 1991 broadly validates this finding. Whether you are a salaried professional in Bengaluru, an NRI remitting from Dubai, or a joint-family managing ancestral wealth, the principle holds with equal force.
 
-• Defining a clear asset allocation based on their goals, risk tolerance, and time horizon
-• Maintaining discipline through market cycles
-• Rebalancing periodically to stay aligned with their target allocation
+**What India's 35-year return history tells us**
 
-At Balancing Act, asset allocation is the foundation of every financial plan. It is not about predicting which stock will outperform — it is about building a diversified framework that can weather different market conditions.
+The Nifty 50 is now old enough to have data across every conceivable crisis: the 1997 Asian contagion, the dot-com bust, the 2008 Global Financial Crisis, demonetisation, and COVID-19. Through each of these, the long-run pattern has remained remarkably consistent.
 
-*This content is for investor education and awareness purposes only. It does not constitute investment advice. Past performance may or may not be sustained in the future.*`,
+At a one-year horizon, the Nifty 50 has returned anywhere from −60% to +80% — a range so wide as to be practically useless for planning. But stretch that horizon to 20 years, and every observed rolling CAGR has fallen in a tight band between 8% and 15%, with an average of around 11.8%. The standard deviation collapses from 35% at one year to under 2% at twenty years.
+
+Based on historical Nifty 50 rolling return data, every rolling 7-year SIP investment in the index since 1991 has produced a positive real return. There has been no seven-year period in which a disciplined investor in Indian large-cap equities lost money in inflation-adjusted terms.
+
+**The four asset classes — a 20-year Indian scorecard**
+
+• Indian Equities (Nifty 50 TRI): ~13–16% CAGR over 20 years. Primary engine of long-term wealth creation.
+• Gold (INR): ~12–15% CAGR over 20 years. Hedge, crisis insurance, and INR depreciation buffer. Gold delivered approximately 15% CAGR in rupee terms over the 20 years to 2025, per FundsIndia Research.
+• Debt Mutual Funds: ~7–8% CAGR. Provides stability, liquidity, and reduced portfolio drawdown.
+• Fixed Deposits / Bank Savings: ~6–7% CAGR. Appropriate for emergency funds and capital preservation only.
+
+**Gold's unique role for Indian investors**
+
+Gold occupies a position in Indian portfolios that is unlike any other market. Over the 20 years to 2025, gold delivered approximately 15% CAGR in rupee terms. But these headline numbers can be misleading in isolation.
+
+What gold does uniquely well is reduce portfolio drawdown during equity crises. In 2008, when the Nifty 50 fell over 50%, gold in rupees rose significantly. A portfolio that held 10–15% gold sustained a materially smaller drawdown than a pure equity portfolio. Gold also provides a natural hedge against INR depreciation — as the rupee weakens against the dollar, domestic gold prices rise correspondingly.
+
+A 50:50 portfolio of gold and Nifty 50, rebalanced annually, has been shown to outperform standalone investments in either asset over two decades — the benefit of combining assets with low correlation.
+
+**Allocation frameworks for different investor profiles**
+
+Young Professional (25–35): 65–70% Equity / 15–20% Debt / 10% Gold / 5% Cash
+Family (35–50): 55–60% Equity / 25–30% Debt / 10–15% Gold / 5% FD
+NRI (Any Age): 40–50% Indian Equity / 20–25% Debt / 15% Gold ETF / 15–20% International Equity
+Pre-Retiree (50–60): 35–40% Equity / 40–45% Debt / 10% Gold / 10% Liquid
+
+These are illustrative starting points, not prescriptive recommendations. Individual circumstances vary materially.
+
+**The AMFI picture: how India's ₹82 lakh crore industry allocates**
+
+As of February 2026, the Indian mutual fund industry crossed ₹82 lakh crore in AUM — more than six times its size a decade ago. SIP contributions jumped 45% year-on-year in FY25 to ₹2.89 lakh crore, demonstrating a structural shift toward disciplined, allocation-aware investing. Hybrid funds — those that hold a mandated mix of equity and debt — grew 22% year-on-year to ₹8.83 lakh crore in March 2025.
+
+**Rebalancing: the discipline that compounds**
+
+An asset allocation is not a one-time decision. Markets drift allocations over time. After an equity bull run, a 60/20/20 portfolio might drift to 75/15/10 — concentrating risk precisely when valuations are extended. Annual rebalancing — selling the outperformer and buying the underperformer — is the mechanical embodiment of "buy low, sell high" without requiring any market-timing skill.
+
+**What stock picking actually contributes**
+
+Within the equity portion of a well-structured portfolio, active management can add value — particularly in India's mid- and small-cap space where market inefficiencies persist. But there is an ordering that matters. First, get the allocation right. Second, implement efficiently through index funds or quality actively managed funds. Third, if you wish to hold individual stocks, limit them to 5–10% of the equity allocation.
+
+Most investors reverse this order. They spend 95% of their energy on stock selection and 5% on allocation. Evidence-based investors do the opposite.
+
+**Three conclusions worth keeping close**
+
+1. Time in market matters far more than timing. A ₹1 lakh investment in Nifty 50 in 1991 would have grown to approximately ₹64 lakh by early 2026 — a 35-year CAGR of 12.7% through every crisis imaginable.
+
+2. Gold is not optional for Indian investors. The combination of INR depreciation hedging and negative correlation to equities makes a 10–20% gold allocation mathematically and behaviourally defensible.
+
+3. Allocation is a decision, not a default. Most Indian investors hold 60–70% of their wealth in real estate and bank deposits by default — not by design. An explicit, evidence-based allocation to equity, debt, and gold is a correction of a structural imbalance that erodes real wealth over time.
+
+Begin with the allocation. Let it compound. That is the work.
+
+*This content is for investor education and awareness purposes only. It does not constitute investment advice. Past performance may or may not be sustained in the future. Data sources: AMFI FY2025 Annual Report, NSE India, FundsIndia Research (December 2025), Mirae Asset MF, BusinessToday (August 2024), Capitalmind Research.*`,
   }),
   makeInsight({
     id: "INS002",
