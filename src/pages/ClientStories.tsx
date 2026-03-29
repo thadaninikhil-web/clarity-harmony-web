@@ -40,7 +40,6 @@ const ClientStories = () => (
           <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed text-justify mb-6">
             Real planning journeys that demonstrate the impact of disciplined, unbiased financial thinking. Individual outcomes may vary based on personal circumstances and market conditions.
           </p>
-          <MutualFundDisclaimer variant="inline" className="max-w-2xl" />
         </ScrollReveal>
       </div>
     </section>
@@ -75,6 +74,7 @@ const ClientStories = () => (
             </Button>
           </div>
         </ScrollReveal>
+		<MutualFundDisclaimer variant="inline" className="max-w-2xl" />
       </div>
     </section>
     <Footer />

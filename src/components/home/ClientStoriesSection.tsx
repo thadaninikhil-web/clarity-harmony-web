@@ -69,7 +69,6 @@ export const ClientStoriesSection = () => (
           <p className="text-xs text-muted-foreground/60 text-center">
             These case studies reflect specific client situations. Financial decisions and outcomes may differ based on individual circumstances and market conditions.
           </p>
-          <MutualFundDisclaimer variant="compact" />
         </div>
       </ScrollReveal>
     </div>

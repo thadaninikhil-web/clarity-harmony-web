@@ -5,8 +5,8 @@ const steps = [
   { num: "02", title: "Assess Your Financial Position", desc: "A comprehensive review of your current financial landscape." },
   { num: "03", title: "Portfolio & Risk Analysis", desc: "Understanding your risk capacity and current asset allocation." },
   { num: "04", title: "Personalized Financial Strategy", desc: "A tailored plan built around your unique circumstances." },
-  { num: "05", title: "Execution Support", desc: "Hands-on guidance to implement the strategy with discipline." },
-  { num: "06", title: "Ongoing Monitoring & Guidance", desc: "Regular reviews and adjustments as life unfolds." },
+  { num: "05", title: "Execution Support", desc: "Hands-on implementation of the strategy with discipline." },
+  { num: "06", title: "Ongoing Monitoring", desc: "Regular reviews and adjustments as life unfolds." },
 ];
 
 export const FrameworkSection = () => (
