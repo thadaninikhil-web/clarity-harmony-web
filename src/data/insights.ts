@@ -65,10 +65,17 @@ A 50:50 portfolio of gold and Nifty 50, rebalanced annually, has been shown to o
 
 **Allocation frameworks for different investor profiles**
 
-Young Professional (25–35): 65–70% Equity / 15–20% Debt / 10% Gold / 5% Cash
-Family (35–50): 55–60% Equity / 25–30% Debt / 10–15% Gold / 5% FD
-NRI (Any Age): 40–50% Indian Equity / 20–25% Debt / 15% Gold ETF / 15–20% International Equity
-Pre-Retiree (50–60): 35–40% Equity / 40–45% Debt / 10% Gold / 10% Liquid
+**Young Professional (25–35)**
+65–70% Equity / 15–20% Debt / 10% Gold / 5% Cash
+
+**Family (35–50)**
+55–60% Equity / 25–30% Debt / 10–15% Gold / 5% FD
+
+**NRI (Any Age)**
+40–50% Indian Equity / 20–25% Debt / 15% Gold ETF / 15–20% International Equity
+
+**Pre-Retiree (50–60)**
+35–40% Equity / 40–45% Debt / 10% Gold / 10% Liquid
 
 These are illustrative starting points, not prescriptive recommendations. Individual circumstances vary materially.
 
