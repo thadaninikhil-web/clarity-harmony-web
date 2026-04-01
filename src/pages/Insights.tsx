@@ -64,7 +64,7 @@ const Insights = () => {
       <section className="pb-12">
         <div className="container mx-auto px-6 lg:px-8">
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-gold/10">
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="bg-background p-8">
                   <Skeleton className="h-4 w-24 mb-4" />
