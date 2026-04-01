@@ -98,17 +98,17 @@ export const Navbar = () => {
                 {link.label}
               </Link>
             ))}
+            <Button variant="hero" size="lg" className="mt-4" asChild>
+              <Link to="/book">Book a Discovery Call</Link>
+            </Button>
             <a
               href="https://my-planner.in/login"
               target="_blank"
               rel="noopener noreferrer"
-              className="py-3 text-sm font-body font-medium tracking-wide uppercase border-b border-border/50 text-gold flex items-center gap-2"
+              className="py-3 text-sm font-body font-medium tracking-wide uppercase text-gold flex items-center gap-2 mt-2"
             >
               <LogIn className="w-4 h-4" /> Login
             </a>
-            <Button variant="hero" size="lg" className="mt-4" asChild>
-              <Link to="/book">Book a Discovery Call</Link>
-            </Button>
           </div>
         </div>
       )}

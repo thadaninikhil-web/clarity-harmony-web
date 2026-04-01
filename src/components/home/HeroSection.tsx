@@ -6,7 +6,7 @@ import heroImage from "@/assets/hero-abstract.jpg";
 import { ArrowRight } from "lucide-react";
 
 export const HeroSection = () => (
-  <section className="relative min-h-[100svh] flex flex-col pt-24 pb-0">
+  <section className="relative min-h-[100svh] flex flex-col pt-28 pb-0">
     <div className="container mx-auto px-6 lg:px-8 flex-1 flex items-center">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center w-full">
         <div className="lg:col-span-7 space-y-10">
