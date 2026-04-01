@@ -79,7 +79,7 @@ const Insights = () => {
               <p className="text-muted-foreground text-lg">No insights found matching your criteria.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-gold/10">
               {insights.map((a, i) => (
                 <ScrollReveal key={a.id || i} delay={i * 60}>
                   <Link to={`/insights/${a.slug}`} className="block h-full">
