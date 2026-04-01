@@ -38,9 +38,9 @@ export const Navbar = () => {
           : "bg-transparent"
       }`}
     >
-      <div className="container mx-auto flex items-center justify-between h-20 px-6 lg:px-8">
+      <div className="container mx-auto flex items-center justify-between h-24 px-6 lg:px-8">
         <Link to="/" className="flex items-center gap-3">
-          <img src={logo} alt="Balancing Act" className="h-24 w-auto" />
+          <img src={logo} alt="Balancing Act" className="h-28 w-auto" />
         </Link>
 
         {/* Desktop nav */}
@@ -61,13 +61,13 @@ export const Navbar = () => {
         </div>
 
         <div className="hidden xl:flex items-center gap-3">
+          <Button variant="hero" size="default" asChild>
+            <Link to="/book">Book a Call</Link>
+          </Button>
           <Button variant="heroOutline" size="default" asChild>
             <a href="https://my-planner.in/login" target="_blank" rel="noopener noreferrer">
               <LogIn className="w-4 h-4 mr-1" /> Login
             </a>
-          </Button>
-          <Button variant="hero" size="default" asChild>
-            <Link to="/book">Book a Call</Link>
           </Button>
         </div>
 
@@ -98,17 +98,17 @@ export const Navbar = () => {
                 {link.label}
               </Link>
             ))}
+            <Button variant="hero" size="lg" className="mt-4" asChild>
+              <Link to="/book">Book a Discovery Call</Link>
+            </Button>
             <a
               href="https://my-planner.in/login"
               target="_blank"
               rel="noopener noreferrer"
-              className="py-3 text-sm font-body font-medium tracking-wide uppercase border-b border-border/50 text-gold flex items-center gap-2"
+              className="py-3 text-sm font-body font-medium tracking-wide uppercase text-gold flex items-center gap-2 mt-2"
             >
               <LogIn className="w-4 h-4" /> Login
             </a>
-            <Button variant="hero" size="lg" className="mt-4" asChild>
-              <Link to="/book">Book a Discovery Call</Link>
-            </Button>
           </div>
         </div>
       )}
