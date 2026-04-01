@@ -17,7 +17,7 @@ const Insights = () => {
       <section className="pt-32 pb-8">
         <div className="container mx-auto px-6 lg:px-8">
           <ScrollReveal>
-            <p className="label-caps text-gold mb-4">Knowledge</p>
+            <p className="label-caps text-gold mb-4 text-left">Knowledge</p>
             <h1 className="font-display text-4xl md:text-6xl font-semibold text-primary leading-[1.1] tracking-tight mb-6 text-balance max-w-3xl">
               Insights
             </h1>
@@ -64,7 +64,7 @@ const Insights = () => {
       <section className="pb-12">
         <div className="container mx-auto px-6 lg:px-8">
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-gold/10">
               {[...Array(4)].map((_, i) => (
                 <div key={i} className="bg-background p-8">
                   <Skeleton className="h-4 w-24 mb-4" />
@@ -79,7 +79,7 @@ const Insights = () => {
               <p className="text-muted-foreground text-lg">No insights found matching your criteria.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-border">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-gold/10">
               {insights.map((a, i) => (
                 <ScrollReveal key={a.id || i} delay={i * 60}>
                   <Link to={`/insights/${a.slug}`} className="block h-full">
