@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo-transparent.png";
 
@@ -34,7 +34,7 @@ export const Navbar = () => {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "bg-cream/95 backdrop-blur-md border-b border-border shadow-sm"
+          ? "bg-cream/95 backdrop-blur-md border-b border-gold/20 shadow-sm"
           : "bg-transparent"
       }`}
     >
@@ -60,7 +60,12 @@ export const Navbar = () => {
           ))}
         </div>
 
-        <div className="hidden xl:block">
+        <div className="hidden xl:flex items-center gap-3">
+          <Button variant="heroOutline" size="default" asChild>
+            <a href="https://my-planner.in/login" target="_blank" rel="noopener noreferrer">
+              <LogIn className="w-4 h-4 mr-1" /> Login
+            </a>
+          </Button>
           <Button variant="hero" size="default" asChild>
             <Link to="/book">Book a Call</Link>
           </Button>
@@ -78,7 +83,7 @@ export const Navbar = () => {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="xl:hidden bg-cream/98 backdrop-blur-md border-t border-border">
+        <div className="xl:hidden bg-cream/98 backdrop-blur-md border-t border-gold/20">
           <div className="container mx-auto px-6 py-6 flex flex-col gap-1">
             {navLinks.map((link) => (
               <Link
@@ -93,6 +98,14 @@ export const Navbar = () => {
                 {link.label}
               </Link>
             ))}
+            <a
+              href="https://my-planner.in/login"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="py-3 text-sm font-body font-medium tracking-wide uppercase border-b border-border/50 text-gold flex items-center gap-2"
+            >
+              <LogIn className="w-4 h-4" /> Login
+            </a>
             <Button variant="hero" size="lg" className="mt-4" asChild>
               <Link to="/book">Book a Discovery Call</Link>
             </Button>

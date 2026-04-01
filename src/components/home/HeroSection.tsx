@@ -11,8 +11,8 @@ export const HeroSection = () => (
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center w-full">
         <div className="lg:col-span-7 space-y-10">
           <div className="animate-fade-in" style={{ animationDelay: "200ms" }}>
-            <p className="label-caps text-accent tracking-[0.15em] mb-2">Clarity &bull; Stability &bull; Prosperity</p>
-            <div className="w-12 h-px bg-accent mt-4" />
+            <p className="label-caps text-accent tracking-[0.15em] mb-2 text-left">Clarity &bull; Stability &bull; Prosperity</p>
+            <div className="w-16 h-0.5 bg-accent mt-4" />
           </div>
           <h1
             className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-[4.5rem] font-semibold text-primary text-balance animate-reveal-up"
@@ -23,7 +23,7 @@ export const HeroSection = () => (
             Your Financial Life
           </h1>
           <div className="space-y-4 animate-slide-up" style={{ animationDelay: "550ms" }}>
-            <p className="font-display italic text-xl md:text-2xl text-primary/70">
+            <p className="font-display italic text-xl md:text-2xl text-primary/70 text-left">
               Human Financial Wisdom in the Age of AI.
             </p>
             <p className="text-base md:text-lg text-muted-foreground max-w-lg">
@@ -34,7 +34,7 @@ export const HeroSection = () => (
             </p>
           </div>
           <div className="flex flex-wrap gap-4 animate-slide-up" style={{ animationDelay: "700ms" }}>
-            <Button variant="hero" size="xl" asChild>
+            <Button variant="gold" size="xl" asChild>
               <Link to="/book">Book a Discovery Call</Link>
             </Button>
             <Button variant="heroOutline" size="xl" asChild>
@@ -46,14 +46,14 @@ export const HeroSection = () => (
         </div>
         <div className="lg:col-span-5 animate-slide-up" style={{ animationDelay: "800ms" }}>
           <div className="relative">
-            <div className="absolute -inset-4 border border-accent/20" />
+            <div className="absolute -inset-4 border border-gold/30" />
             <img
               src={heroImage}
               alt="Abstract architectural light and shadow"
               className="w-full aspect-[4/5] object-cover"
               loading="eager"
             />
-            <div className="absolute inset-0 ring-1 ring-inset ring-primary/5" />
+            <div className="absolute inset-0 ring-1 ring-inset ring-gold/10" />
           </div>
         </div>
       </div>

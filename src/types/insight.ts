@@ -13,7 +13,11 @@ export interface Insight {
   chart_url?: string;
   pdf_resource?: string;
   video_link?: string;
-  content?: string; // Full article body (plain text or markdown)
+  content?: string; // Legacy plain text content
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  body?: any[]; // Sanity Portable Text blocks
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  mainImage?: any; // Sanity image reference
 }
 
 export const INSIGHT_CATEGORIES = [

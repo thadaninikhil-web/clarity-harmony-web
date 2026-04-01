@@ -18,7 +18,7 @@ export const ServicesSection = () => (
     <div className="container mx-auto px-6 lg:px-8">
       <ScrollReveal>
         <div className="max-w-2xl mb-20">
-          <p className="label-caps text-accent tracking-[0.15em] mb-4">What We Do</p>
+          <p className="label-caps text-accent tracking-[0.15em] mb-4 text-left">What We Do</p>
           <h2 className="font-display text-3xl md:text-5xl font-semibold text-primary text-balance">
             Comprehensive Financial Planning
           </h2>
@@ -27,11 +27,11 @@ export const ServicesSection = () => (
           </p>
         </div>
       </ScrollReveal>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-border/50">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-gold/10">
         {services.map((s, i) => (
           <ScrollReveal key={i} delay={i * 70}>
             <div className="bg-background p-10 h-full group cursor-default hover:bg-cream-dark transition-colors duration-500">
-              <div className="w-12 h-12 flex items-center justify-center border border-accent/20 mb-8 group-hover:border-accent group-hover:bg-accent/5 transition-all duration-500">
+              <div className="w-12 h-12 flex items-center justify-center border border-gold/30 mb-8 group-hover:border-gold group-hover:bg-gold/10 transition-all duration-500">
                 <s.icon className="w-5 h-5 text-accent" strokeWidth={1.5} />
               </div>
               <h3 className="font-display text-lg font-semibold text-primary mb-3">{s.title}</h3>
