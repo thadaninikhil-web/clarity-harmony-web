@@ -24,7 +24,7 @@ export const PhilosophySection = () => (
         </ScrollReveal>
         <div>
           <ScrollReveal direction="right">
-            <p className="label-caps text-accent tracking-[0.15em] mb-4">Our Philosophy</p>
+            <p className="label-caps text-accent tracking-[0.15em] mb-4 text-left">Our Philosophy</p>
             <h2 className="font-display text-3xl md:text-5xl font-semibold text-primary mb-8 text-balance">
               Financial Planning Without Product Bias
             </h2>
@@ -35,7 +35,7 @@ export const PhilosophySection = () => (
           <div className="space-y-4">
             {pillars.map((item, i) => (
               <ScrollReveal key={i} delay={i * 100} direction="right">
-                <div className="flex items-start gap-4 p-5 border-l-2 border-accent/30 hover:border-accent hover:bg-background transition-all duration-300">
+                <div className="flex items-start gap-4 p-5 border-l-2 border-gold/40 hover:border-gold hover:bg-background transition-all duration-300">
                   <p className="text-foreground text-sm">{item}</p>
                 </div>
               </ScrollReveal>

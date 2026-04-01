@@ -5,7 +5,7 @@ export const Footer = () => {
   return (
     <footer className="bg-primary text-primary-foreground">
       {/* Motto */}
-      <div className="border-b border-primary-foreground/10">
+      <div className="border-b border-gold/15">
         <div className="container mx-auto px-6 lg:px-8 py-16 text-center">
           <p className="font-display text-3xl md:text-5xl text-gold tracking-tight">
             Clarity &bull; Stability &bull; Prosperity
@@ -71,11 +71,19 @@ export const Footer = () => {
               >
                 LinkedIn
               </a>
+              <a
+                href="https://my-planner.in/login"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-gold transition-colors"
+              >
+                Client Login
+              </a>
             </div>
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-primary-foreground/10 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="mt-12 pt-8 border-t border-gold/15 flex flex-col md:flex-row justify-between items-center gap-4">
           <img src={logo} alt="Balancing Act" className="h-10 w-auto brightness-0 invert opacity-80" />
           <p className="text-xs text-primary-foreground/40">
             &copy; {new Date().getFullYear()} Balancing Act. All rights reserved.
@@ -83,14 +91,14 @@ export const Footer = () => {
         </div>
 
         {/* SEBI Registration & Compliance */}
-        <div className="mt-6 pt-6 border-t border-primary-foreground/10 text-gold-light">
-          <p className="text-[10px] text-primary-foreground/30 leading-relaxed text-center max-w-4xl mx-auto">
+        <div className="mt-6 pt-6 border-t border-gold/15">
+          <p className="text-[10px] text-primary-foreground/50 leading-relaxed text-center max-w-4xl mx-auto">
             SEBI Registered Mutual Fund Distributor | ARN-346988 | Date of Initial Registration: 23-Nov-2025 | Current Validity: 25-Nov-2026
           </p>
-          <p className="text-[10px] text-primary-foreground/25 leading-relaxed text-center max-w-4xl mx-auto mt-3">
+          <p className="text-[10px] text-primary-foreground/45 leading-relaxed text-center max-w-4xl mx-auto mt-3">
             Disclaimer: Mutual fund investments are subject to market risks. Please read all scheme related documents carefully before investing. Past performance is not indicative of future results. The information provided on this website is for general informational purposes only and should not be construed as investment advice. Please consult your financial advisor before making any investment decisions.
           </p>
-          <p className="text-[10px] text-primary-foreground/25 text-center mt-3">
+          <p className="text-[10px] text-primary-foreground/45 text-center mt-3">
             <Link to="/privacy-policy" className="hover:text-gold transition-colors underline">Privacy Policy</Link>
             {" · "}
             <span>Terms & Conditions apply</span>
