@@ -61,13 +61,13 @@ export const Navbar = () => {
         </div>
 
         <div className="hidden xl:flex items-center gap-3">
+          <Button variant="hero" size="default" asChild>
+            <Link to="/book">Book a Call</Link>
+          </Button>
           <Button variant="heroOutline" size="default" asChild>
             <a href="https://my-planner.in/login" target="_blank" rel="noopener noreferrer">
               <LogIn className="w-4 h-4 mr-1" /> Login
             </a>
-          </Button>
-          <Button variant="hero" size="default" asChild>
-            <Link to="/book">Book a Call</Link>
           </Button>
         </div>
 
