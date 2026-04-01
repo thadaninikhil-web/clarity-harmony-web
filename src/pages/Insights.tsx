@@ -17,7 +17,7 @@ const Insights = () => {
       <section className="pt-32 pb-8">
         <div className="container mx-auto px-6 lg:px-8">
           <ScrollReveal>
-            <p className="label-caps text-gold mb-4">Knowledge</p>
+            <p className="label-caps text-gold mb-4 text-left">Knowledge</p>
             <h1 className="font-display text-4xl md:text-6xl font-semibold text-primary leading-[1.1] tracking-tight mb-6 text-balance max-w-3xl">
               Insights
             </h1>
