@@ -34,7 +34,7 @@ export const HeroSection = () => (
             </p>
           </div>
           <div className="flex flex-wrap gap-4 animate-slide-up" style={{ animationDelay: "700ms" }}>
-            <Button variant="gold" size="xl" asChild>
+            <Button variant="gold" size="xl" className="bg-foreground text-background hover:bg-foreground/90" asChild>
               <Link to="/book">Book a Discovery Call</Link>
             </Button>
             <Button variant="heroOutline" size="xl" asChild>
