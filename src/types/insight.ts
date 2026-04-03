@@ -1,23 +1,22 @@
 export interface Insight {
   id: string;
   title: string;
-  slug: string;
-  summary: string;
+  slug: string;               // flattened from slug.current
+  summary: string;            // mapped from excerpt in Sanity
   category: string;
   publish_date: string;
-  insight_url: string;
-  source: string;
-  risk_note: string;
+  insight_url?: string;
+  source?: string;
+  risk_note?: string;
   is_featured: boolean;
-  status: "PUBLISHED" | "DRAFT" | "ARCHIVED";
   chart_url?: string;
   pdf_resource?: string;
   video_link?: string;
-  content?: string; // Legacy plain text content
+  content?: string;           // legacy plain text content
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  body?: any[]; // Sanity Portable Text blocks
+  body?: any[];               // Sanity Portable Text blocks
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  mainImage?: any; // Sanity image reference
+  mainImage?: any;            // Sanity image reference
 }
 
 export const INSIGHT_CATEGORIES = [
