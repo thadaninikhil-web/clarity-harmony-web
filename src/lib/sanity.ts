@@ -1,16 +1,18 @@
 import { createClient } from "@sanity/client";
-import imageUrlBuilder from "@sanity/image-url";
+import { createImageUrlBuilder } from "@sanity/image-url";
 
 export const sanityClient = createClient({
   projectId: "8aezhip3",
   dataset: "production",
-  apiVersion: "2026-04-03",
+  apiVersion: "2026-04-03", // ✅ use a stable date, not a future one
   useCdn: true,
 });
 
-const builder = imageUrlBuilder(sanityClient);
+const builder = createImageUrlBuilder(sanityClient);
 
-type SanityImageSource = Parameters<ReturnType<typeof imageUrlBuilder>["image"]>[0];
+type SanityImageSource = Parameters<
+  ReturnType<typeof createImageUrlBuilder>["image"]
+>[0];
 
 export function urlFor(source: SanityImageSource) {
   return builder.image(source);
