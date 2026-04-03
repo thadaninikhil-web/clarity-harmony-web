@@ -8,24 +8,24 @@ import {
 import type { Insight } from "@/types/insight";
 
 // Sanity GROQ queries
-const ALL_QUERY = `*[_type == "insight" && (status == "PUBLISHED" || !defined(status))] | order(publish_date desc) {
-  _id, title, "slug": slug.current, summary, category, publish_date, source, risk_note,
-  is_featured, status, chart_url, pdf_resource, video_link, body, mainImage
+const ALL_QUERY = `*[_type == "insight"] | order(publish_date desc) {
+  _id, title, "slug": slug.current, excerpt, category, publish_date, source, risk_note,
+  is_featured, chart_url, pdf_resource, video_link, body, mainImage
 }`;
 
-const FEATURED_QUERY = `*[_type == "insight" && (status == "PUBLISHED" || !defined(status)) && is_featured == true] | order(publish_date desc) {
-  _id, title, "slug": slug.current, summary, category, publish_date, source, risk_note,
-  is_featured, status, chart_url, pdf_resource, video_link
+const FEATURED_QUERY = `*[_type == "insight" && is_featured == true] | order(publish_date desc) {
+  _id, title, "slug": slug.current, excerpt, category, publish_date, source, risk_note,
+  is_featured, chart_url, pdf_resource, video_link
 }`;
 
 const SLUG_QUERY = `*[_type == "insight" && slug.current == $slug][0] {
-  _id, title, "slug": slug.current, summary, category, publish_date, source, risk_note,
-  is_featured, status, chart_url, pdf_resource, video_link, body, mainImage
+  _id, title, "slug": slug.current, excerpt, category, publish_date, source, risk_note,
+  is_featured, chart_url, pdf_resource, video_link, body, mainImage
 }`;
 
-const CATEGORY_QUERY = `*[_type == "insight" && (status == "PUBLISHED" || !defined(status)) && category == $category] | order(publish_date desc) {
-  _id, title, "slug": slug.current, summary, category, publish_date, source, risk_note,
-  is_featured, status, chart_url, pdf_resource, video_link
+const CATEGORY_QUERY = `*[_type == "insight" && category == $category] | order(publish_date desc) {
+  _id, title, "slug": slug.current, excerpt, category, publish_date, source, risk_note,
+  is_featured, chart_url, pdf_resource, video_link
 }`;
 
 function sanityToInsight(doc: Record<string, unknown>): Insight {
@@ -33,14 +33,13 @@ function sanityToInsight(doc: Record<string, unknown>): Insight {
     id: (doc._id as string) || "",
     title: (doc.title as string) || "",
     slug: (doc.slug as string) || "",
-    summary: (doc.summary as string) || "",
+    summary: (doc.excerpt as string) || "",   // <-- updated to use excerpt
     category: (doc.category as string) || "",
     publish_date: (doc.publish_date as string) || "",
     insight_url: "",
     source: (doc.source as string) || "",
     risk_note: (doc.risk_note as string) || "",
     is_featured: (doc.is_featured as boolean) || false,
-    status: (doc.status as Insight["status"]) || "DRAFT",
     chart_url: (doc.chart_url as string) || undefined,
     pdf_resource: (doc.pdf_resource as string) || undefined,
     video_link: (doc.video_link as string) || undefined,
