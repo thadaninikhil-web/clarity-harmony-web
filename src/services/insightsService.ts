@@ -8,24 +8,52 @@ import {
 import type { Insight } from "@/types/insight";
 
 // Sanity GROQ queries
-const ALL_QUERY = `*[_type == "insight"] | order(publish_date desc) {
-  _id, title, "slug": slug.current, excerpt, category, publish_date, source, risk_note,
-  is_featured, chart_url, pdf_resource, video_link, body, mainImage
+const ALL_QUERY = `*[_type == "insight"] | order(publishedAt desc) {
+  _id,
+  title,
+  "slug": slug.current,
+  category,
+  excerpt,
+  content,
+  coverImage,
+  publishedAt,
+  readTime
 }`;
 
-const FEATURED_QUERY = `*[_type == "insight" && is_featured == true] | order(publish_date desc) {
-  _id, title, "slug": slug.current, excerpt, category, publish_date, source, risk_note,
-  is_featured, chart_url, pdf_resource, video_link
+const FEATURED_QUERY = `*[_type == "insight" && is_featured == true] | order(publishedAt desc) {
+  _id,
+  title,
+  "slug": slug.current,
+  category,
+  excerpt,
+  content,
+  coverImage,
+  publishedAt,
+  readTime
 }`;
 
 const SLUG_QUERY = `*[_type == "insight" && slug.current == $slug][0] {
-  _id, title, "slug": slug.current, excerpt, category, publish_date, source, risk_note,
-  is_featured, chart_url, pdf_resource, video_link, body, mainImage
+  _id,
+  title,
+  "slug": slug.current,
+  category,
+  excerpt,
+  content,
+  coverImage,
+  publishedAt,
+  readTime
 }`;
 
-const CATEGORY_QUERY = `*[_type == "insight" && category == $category] | order(publish_date desc) {
-  _id, title, "slug": slug.current, excerpt, category, publish_date, source, risk_note,
-  is_featured, chart_url, pdf_resource, video_link
+const CATEGORY_QUERY = `*[_type == "insight" && category == $category] | order(publishedAt desc) {
+  _id,
+  title,
+  "slug": slug.current,
+  category,
+  excerpt,
+  content,
+  coverImage,
+  publishedAt,
+  readTime
 }`;
 
 function sanityToInsight(doc: Record<string, unknown>): Insight {
@@ -33,9 +61,13 @@ function sanityToInsight(doc: Record<string, unknown>): Insight {
     id: (doc._id as string) || "",
     title: (doc.title as string) || "",
     slug: (doc.slug as string) || "",
-    summary: (doc.excerpt as string) || "",   // <-- updated to use excerpt
+    summary: (doc.excerpt as string) || "",   // excerpt → summary
+    content: (doc.content as string) || "",
     category: (doc.category as string) || "",
-    publish_date: (doc.publish_date as string) || "",
+    publish_date: (doc.publishedAt as string) || "",
+    read_time: (doc.readTime as string) || "",
+    coverImage: doc.coverImage as Insight["coverImage"],
+    // keep optional legacy fields if needed
     insight_url: "",
     source: (doc.source as string) || "",
     risk_note: (doc.risk_note as string) || "",

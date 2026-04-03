@@ -3,8 +3,13 @@ export interface Insight {
   title: string;
   slug: string;               // flattened from slug.current
   summary: string;            // mapped from excerpt in Sanity
+  content?: string;           // rich text / body content
   category: string;
-  publish_date: string;
+  publish_date: string;       // maps from publishedAt
+  read_time?: string;         // maps from readTime
+  coverImage?: any;           // Sanity image reference for cover image
+
+  // Legacy / optional fields
   insight_url?: string;
   source?: string;
   risk_note?: string;
@@ -12,11 +17,8 @@ export interface Insight {
   chart_url?: string;
   pdf_resource?: string;
   video_link?: string;
-  content?: string;           // legacy plain text content
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   body?: any[];               // Sanity Portable Text blocks
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  mainImage?: any;            // Sanity image reference
+  mainImage?: any;            // additional image reference
 }
 
 export const INSIGHT_CATEGORIES = [
