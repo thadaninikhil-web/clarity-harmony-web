@@ -8,12 +8,12 @@ import {
 import type { Insight } from "@/types/insight";
 
 // Sanity GROQ queries
-const ALL_QUERY = `*[_type == "insight" && status == "PUBLISHED"] | order(publish_date desc) {
+const ALL_QUERY = `*[_type == "insight" && (status == "PUBLISHED" || !defined(status))] | order(publish_date desc) {
   _id, title, "slug": slug.current, summary, category, publish_date, source, risk_note,
   is_featured, status, chart_url, pdf_resource, video_link, body, mainImage
 }`;
 
-const FEATURED_QUERY = `*[_type == "insight" && status == "PUBLISHED" && is_featured == true] | order(publish_date desc) {
+const FEATURED_QUERY = `*[_type == "insight" && (status == "PUBLISHED" || !defined(status)) && is_featured == true] | order(publish_date desc) {
   _id, title, "slug": slug.current, summary, category, publish_date, source, risk_note,
   is_featured, status, chart_url, pdf_resource, video_link
 }`;
@@ -23,7 +23,7 @@ const SLUG_QUERY = `*[_type == "insight" && slug.current == $slug][0] {
   is_featured, status, chart_url, pdf_resource, video_link, body, mainImage
 }`;
 
-const CATEGORY_QUERY = `*[_type == "insight" && status == "PUBLISHED" && category == $category] | order(publish_date desc) {
+const CATEGORY_QUERY = `*[_type == "insight" && (status == "PUBLISHED" || !defined(status)) && category == $category] | order(publish_date desc) {
   _id, title, "slug": slug.current, summary, category, publish_date, source, risk_note,
   is_featured, status, chart_url, pdf_resource, video_link
 }`;
