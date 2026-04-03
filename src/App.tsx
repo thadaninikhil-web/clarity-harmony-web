@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -25,23 +25,20 @@ const App = () => (
       <Toaster />
       <Sonner />
       <ScrollToTop />
-      {/* ✅ Root-level BrowserRouter, no basename */}
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/process" element={<Process />} />
-          <Route path="/who-we-work-with" element={<WhoWeWorkWith />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/insights" element={<Insights />} />
-          <Route path="/insights/:slug" element={<InsightDetail />} />
-          <Route path="/client-stories" element={<ClientStories />} />
-          <Route path="/book" element={<Book />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/process" element={<Process />} />
+        <Route path="/who-we-work-with" element={<WhoWeWorkWith />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/insights" element={<Insights />} />
+        <Route path="/insights/:slug" element={<InsightDetail />} />
+        <Route path="/client-stories" element={<ClientStories />} />
+        <Route path="/book" element={<Book />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
     </TooltipProvider>
   </QueryClientProvider>
 );
