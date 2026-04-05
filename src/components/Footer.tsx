@@ -84,7 +84,7 @@ export const Footer = () => {
         </div>
 
         <div className="mt-12 pt-8 border-t border-gold/15 flex flex-col md:flex-row justify-between items-center gap-4">
-          <img src={logo} alt="Balancing Act" className="h-10 w-auto brightness-0 invert opacity-80" />
+          <span className="font-display text-lg text-primary-foreground/80">Balancing Act</span>
           <p className="text-xs text-primary-foreground/40">
             &copy; {new Date().getFullYear()} Balancing Act. All rights reserved.
           </p>

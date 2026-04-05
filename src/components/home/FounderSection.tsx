@@ -26,7 +26,7 @@ export const FounderSection = () => (
             Why I Started Balancing Act
           </h2>
           <p className="text-lg text-muted-foreground mb-10 max-w-xl text-justify">
-            With over two decades of investing experience and having achieved financial independence at the age of 43, I founded Balancing Act with a simple conviction: financial planning should be about life goals, not products.
+            With over two decades of investing experience and having achieved financial independence at the age of 43, I founded Balancing Act with a simple conviction: investment decisions should be about life goals, not products.
           </p>
         </ScrollReveal>
 

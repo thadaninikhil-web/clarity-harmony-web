@@ -27,7 +27,7 @@ export const HeroSection = () => (
               Human Financial Wisdom in the Age of AI.
             </p>
             <p className="text-base md:text-lg text-muted-foreground max-w-lg">
-              Balancing Act helps clients discover their financial goals, understand their financial position, and build disciplined investment strategies that stand the test of time.
+              Balancing Act works with clients to discover their goals, understand their financial position, and build disciplined investment strategies that stand the test of time.
             </p>
             <p className="text-sm text-muted-foreground/80 max-w-lg italic">
               We harness AI for research and tools — but your financial journey is guided by human understanding, because money is deeply personal.

@@ -42,10 +42,10 @@ const About = () => (
               Balancing Act was created from that experience.
             </p>
             <p className="text-lg text-muted-foreground leading-relaxed mb-6 text-justify">
-              It is built on a simple belief: financial advice should begin with a person's life — their goals, responsibilities, and aspirations — not with a product to sell.
+              It is built on a simple belief: the starting point should always be a person's life — their goals, responsibilities, and aspirations — not a product to sell.
             </p>
             <p className="text-lg text-muted-foreground leading-relaxed mb-10 text-justify">
-              Because when planning is thoughtful, disciplined, and aligned with the client's interests, better financial decisions naturally follow.
+              Because when the process is thoughtful, disciplined, and aligned with the client's interests, better financial decisions naturally follow.
             </p>
           </ScrollReveal>
 
