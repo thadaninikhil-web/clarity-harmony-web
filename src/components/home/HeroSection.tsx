@@ -58,8 +58,5 @@ export const HeroSection = () => (
         </div>
       </div>
     </div>
-    <div className="mt-16">
-      <MutualFundDisclaimer variant="banner" />
-    </div>
   </section>
 );
