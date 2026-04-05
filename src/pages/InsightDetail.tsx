@@ -1,15 +1,26 @@
 import { useParams, Link } from "react-router-dom";
+import { useEffect, useMemo } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { EducationalDisclaimer, SourceAttribution } from "@/components/MutualFundDisclaimer";
+import {
+  EducationalDisclaimer,
+  SourceAttribution,
+} from "@/components/MutualFundDisclaimer";
 import { useInsightBySlug } from "@/hooks/useInsights";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, FileText, Video, BarChart3 } from "lucide-react";
-import { useEffect } from "react";
+import {
+  ArrowLeft,
+  FileText,
+  Video,
+  BarChart3,
+  Share2,
+} from "lucide-react";
 import { PortableText } from "@portabletext/react";
 import { urlFor } from "@/lib/sanity";
+
+/* ---------------- PortableText Config ---------------- */
 
 const portableTextComponents = {
   types: {
@@ -33,70 +44,94 @@ const portableTextComponents = {
     },
   },
   block: {
-    h2: ({ children }: { children?: React.ReactNode }) => (
-      <h2 className="font-display text-2xl font-semibold text-primary mt-10 mb-4">{children}</h2>
+    h2: ({ children }: any) => (
+      <h2 className="text-2xl font-semibold text-primary mt-10 mb-4">
+        {children}
+      </h2>
     ),
-    h3: ({ children }: { children?: React.ReactNode }) => (
-      <h3 className="font-display text-xl font-semibold text-primary mt-8 mb-4">{children}</h3>
+    h3: ({ children }: any) => (
+      <h3 className="text-xl font-semibold text-primary mt-8 mb-4">
+        {children}
+      </h3>
     ),
-    h4: ({ children }: { children?: React.ReactNode }) => (
-      <h4 className="font-display text-lg font-semibold text-primary mt-6 mb-3">{children}</h4>
-    ),
-    normal: ({ children }: { children?: React.ReactNode }) => (
+    normal: ({ children }: any) => (
       <p className="text-foreground/80 leading-relaxed my-4">{children}</p>
-    ),
-    blockquote: ({ children }: { children?: React.ReactNode }) => (
-      <blockquote className="border-l-2 border-gold/40 pl-6 my-6 italic text-muted-foreground">
-        {children}
-      </blockquote>
-    ),
-  },
-  marks: {
-    strong: ({ children }: { children?: React.ReactNode }) => (
-      <strong className="font-semibold text-primary">{children}</strong>
-    ),
-    em: ({ children }: { children?: React.ReactNode }) => (
-      <em className="italic">{children}</em>
-    ),
-    link: ({ value, children }: { value?: { href?: string }; children?: React.ReactNode }) => (
-      <a
-        href={value?.href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-accent hover:text-gold underline underline-offset-2"
-      >
-        {children}
-      </a>
     ),
   },
 };
+
+/* ---------------- Component ---------------- */
 
 const InsightDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   const { data: insight, isLoading } = useInsightBySlug(slug || "");
 
+  /* ---------------- Reading Time ---------------- */
+
+  const readingTime = useMemo(() => {
+    if (!insight?.content) return null;
+
+    const text = insight.content
+      .map((block: any) =>
+        block.children?.map((child: any) => child.text).join("")
+      )
+      .join(" ");
+
+    const words = text.split(/\s+/).length;
+    return Math.ceil(words / 200); // 200 wpm
+  }, [insight]);
+
+  /* ---------------- SEO ---------------- */
+
   useEffect(() => {
-    if (insight) {
-      document.title = `${insight.title} | Balancing Act Insights`;
-      const metaDesc = document.querySelector('meta[name="description"]');
-      if (metaDesc) metaDesc.setAttribute("content", insight.summary);
+    if (!insight) return;
+
+    document.title = `${insight.title} | Balancing Act`;
+
+    const setMeta = (name: string, content: string) => {
+      let tag = document.querySelector(`meta[name="${name}"]`);
+      if (!tag) {
+        tag = document.createElement("meta");
+        tag.setAttribute("name", name);
+        document.head.appendChild(tag);
+      }
+      tag.setAttribute("content", content);
+    };
+
+    setMeta("description", insight.excerpt || "");
+
+    // Open Graph
+    setMeta("og:title", insight.title);
+    setMeta("og:description", insight.excerpt || "");
+
+    if (insight?.coverImage) {
+      setMeta("og:image", urlFor(insight.coverImage).width(1200).url());
     }
+
     return () => {
       document.title =
         "Balancing Act — Financial Planning Built on Discipline, Clarity and Trust";
     };
   }, [insight]);
 
+  /* ---------------- Share ---------------- */
+
+  const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+
+  const handleShare = () => {
+    navigator.clipboard.writeText(shareUrl);
+    alert("Link copied!");
+  };
+
+  /* ---------------- Loading ---------------- */
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
         <section className="pt-32 pb-24">
-          <div className="container mx-auto px-6 lg:px-8 max-w-3xl">
-            <Skeleton className="h-4 w-32 mb-8" />
-            <Skeleton className="h-10 w-full mb-4" />
-            <Skeleton className="h-10 w-3/4 mb-8" />
-            <Skeleton className="h-4 w-48 mb-12" />
+          <div className="container mx-auto max-w-3xl px-6">
+            <Skeleton className="h-10 w-full mb-6" />
             <Skeleton className="h-40 w-full" />
           </div>
         </section>
@@ -105,129 +140,104 @@ const InsightDetail = () => {
     );
   }
 
+  /* ---------------- Not Found ---------------- */
+
   if (!insight) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <section className="pt-32 pb-24">
-          <div className="container mx-auto px-6 lg:px-8 max-w-3xl text-center py-20">
-            <h1 className="font-display text-3xl font-semibold text-primary mb-4">
-              Insight Not Found
-            </h1>
-            <p className="text-muted-foreground mb-8 text-center">
-              The insight you're looking for doesn't exist or has been removed.
-            </p>
-            <Button variant="gold" asChild>
-              <Link to="/insights">Browse All Insights</Link>
-            </Button>
-          </div>
+        <section className="pt-32 pb-24 text-center">
+          <h1 className="text-3xl font-semibold mb-4">Insight Not Found</h1>
+          <Button asChild>
+            <Link to="/insights">Back</Link>
+          </Button>
         </section>
         <Footer />
       </div>
     );
   }
 
+  /* ---------------- UI ---------------- */
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
 
       {/* Header */}
-      <section className="pt-32 pb-8">
-        <div className="container mx-auto px-6 lg:px-8 max-w-3xl">
+      <section className="pt-32 pb-10">
+        <div className="container mx-auto max-w-3xl px-6">
           <ScrollReveal>
-            <Link
-              to="/insights"
-              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-accent transition-colors mb-8"
-            >
-              <ArrowLeft className="w-4 h-4" /> Back to Insights
+            <Link to="/insights" className="flex items-center gap-2 mb-6">
+              <ArrowLeft size={16} /> Back
             </Link>
 
-            <p className="label-caps text-accent tracking-[0.15em] mb-4 text-left">
+            <p className="text-accent uppercase text-sm mb-3">
               {insight.category}
             </p>
 
-            <h1 className="font-display text-3xl md:text-5xl font-semibold text-primary leading-[1.15] tracking-tight mb-6 text-balance">
+            <h1 className="text-4xl md:text-5xl font-semibold mb-4">
               {insight.title}
             </h1>
 
-            <p className="text-sm text-muted-foreground text-left">
-              {insight.publish_date}
-            </p>
+            <div className="text-sm text-muted-foreground flex gap-4">
+              <span>{insight.publish_date}</span>
+              {readingTime && <span>{readingTime} min read</span>}
+            </div>
+
+            {/* Share */}
+            <button
+              onClick={handleShare}
+              className="mt-4 flex items-center gap-2 text-sm text-accent"
+            >
+              <Share2 size={16} /> Share
+            </button>
           </ScrollReveal>
         </div>
       </section>
 
-      {/* Article Body */}
-      <section className="py-12 md:py-16">
-        <div className="container mx-auto px-6 lg:px-8 max-w-3xl">
+      {/* Body */}
+      <section className="py-12">
+        <div className="container mx-auto max-w-3xl px-6">
           <ScrollReveal>
-            {insight.body && insight.body.length > 0 ? (
-              <div className="prose-custom">
-                <PortableText
-                  value={insight.body}
-                  components={portableTextComponents}
-                />
-              </div>
-            ) : insight.content ? (
-              <p className="text-lg text-foreground/80 leading-relaxed">
-                {insight.content}
-              </p>
+            {insight.content ? (
+              <PortableText
+                value={insight.content}
+                components={portableTextComponents}
+              />
             ) : (
-              <p className="text-lg text-foreground/80 leading-relaxed">
-                {insight.summary}
-              </p>
+              <p>{insight.excerpt}</p>
             )}
 
+            {/* Resources */}
             {(insight.chart_url ||
               insight.pdf_resource ||
               insight.video_link) && (
-              <div className="mt-10 p-6 border border-gold/20 bg-card">
-                <p className="label-caps text-accent mb-4 text-left">
-                  Resources
-                </p>
+              <div className="mt-10 p-6 border">
+                <p className="mb-4 font-semibold">Resources</p>
 
-                <div className="flex flex-wrap gap-4">
+                <div className="flex gap-4 flex-wrap">
                   {insight.chart_url && (
-                    <a
-                      href={insight.chart_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-sm text-primary hover:text-accent transition-colors"
-                    >
-                      <BarChart3 className="w-4 h-4" /> View Chart
+                    <a href={insight.chart_url} target="_blank">
+                      <BarChart3 size={16} /> Chart
                     </a>
                   )}
-
                   {insight.pdf_resource && (
-                    <a
-                      href={insight.pdf_resource}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-sm text-primary hover:text-accent transition-colors"
-                    >
-                      <FileText className="w-4 h-4" /> Download PDF
+                    <a href={insight.pdf_resource} target="_blank">
+                      <FileText size={16} /> PDF
                     </a>
                   )}
-
                   {insight.video_link && (
-                    <a
-                      href={insight.video_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-sm text-primary hover:text-accent transition-colors"
-                    >
-                      <Video className="w-4 h-4" /> Watch Video
+                    <a href={insight.video_link} target="_blank">
+                      <Video size={16} /> Video
                     </a>
                   )}
                 </div>
               </div>
             )}
 
-            <div className="mt-10 pt-8 border-t border-gold/15">
-              <SourceAttribution
-                source={insight.source}
-                className="text-xs text-muted-foreground/60"
-              />
+            {/* Source */}
+            <div className="mt-10">
+              <SourceAttribution source={insight.source} />
             </div>
 
             <EducationalDisclaimer className="mt-8" />
@@ -236,22 +246,16 @@ const InsightDetail = () => {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-card border-y border-gold/20">
-        <div className="container mx-auto px-6 lg:px-8 max-w-3xl text-center">
-          <ScrollReveal>
-            <h2 className="font-display text-2xl md:text-3xl font-semibold text-primary mb-4">
-              Want help building a disciplined financial plan?
-            </h2>
-
-            <p className="text-muted-foreground mb-8 text-center">
-              Speak with us to align your investments with your life goals.
-            </p>
-
-            <Button variant="gold" asChild>
-              <Link to="/contact">Get in Touch</Link>
-            </Button>
-          </ScrollReveal>
-        </div>
+      <section className="py-16 text-center border-t">
+        <h2 className="text-2xl font-semibold mb-4">
+          Want help building a disciplined financial plan?
+        </h2>
+        <p className="mb-6 text-muted-foreground">
+          Speak with us to align your investments with your life goals.
+        </p>
+        <Button asChild>
+          <Link to="/contact">Get in Touch</Link>
+        </Button>
       </section>
 
       <Footer />
