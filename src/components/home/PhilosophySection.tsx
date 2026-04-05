@@ -26,10 +26,10 @@ export const PhilosophySection = () => (
           <ScrollReveal direction="right">
             <p className="label-caps text-accent tracking-[0.15em] mb-4 text-left">Our Philosophy</p>
             <h2 className="font-display text-3xl md:text-5xl font-semibold text-primary mb-8 text-balance">
-              Financial Planning Without Product Bias
+              Disciplined Investing Without Product Bias
             </h2>
             <p className="text-lg text-muted-foreground mb-10 max-w-xl">
-              Much of the financial industry today is driven by product distribution — income is often linked to the products being sold. Balancing Act is built differently. Our only commitment is to your financial well-being through clarity and disciplined execution.
+              Every investor deserves guidance that puts their goals first — not products. Balancing Act exists to help you build clarity around your financial life and execute with discipline.
             </p>
           </ScrollReveal>
           <div className="space-y-4">

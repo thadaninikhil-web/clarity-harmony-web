@@ -9,7 +9,7 @@ const steps = [
   { num: "01", title: "Discover Your Goals", desc: "We begin every engagement by listening deeply. What do you want your money to do for you? What does financial success look like in your life? We help you discover and articulate goals you may not even have considered." },
   { num: "02", title: "Assess Your Financial Position", desc: "A comprehensive review of your income, expenses, assets, liabilities, insurance, and tax situation. We build a complete picture of where you stand today." },
   { num: "03", title: "Portfolio & Risk Analysis", desc: "We analyze your existing investments for diversification, cost efficiency, and alignment with your goals. We assess your risk capacity — not just your risk tolerance." },
-  { num: "04", title: "Personalized Financial Strategy", desc: "Based on your goals and current position, we design a clear, actionable financial plan. This includes asset allocation, investment strategy, tax optimization, and insurance review." },
+  { num: "04", title: "Personalized Financial Strategy", desc: "Based on your goals and current position, we design a clear, actionable investment strategy. This includes asset allocation, instrument selection, tax optimization, and insurance review." },
   { num: "05", title: "Execution Support", desc: "We guide you through implementing the strategy with discipline. We don't sell products — we help you execute through the platforms and instruments that best serve your interests." },
   { num: "06", title: "Ongoing Monitoring", desc: "Markets change. Life changes. We provide regular reviews, portfolio rebalancing, and continuous feedback to keep your plan on track through every season." },
 ];
@@ -22,10 +22,10 @@ const Process = () => (
         <ScrollReveal>
           <p className="label-caps text-gold mb-4">How We Work</p>
           <h1 className="font-display text-4xl md:text-6xl font-semibold text-primary leading-[1.1] tracking-tight mb-6 text-balance max-w-3xl">
-            The Financial Planning Process
+            How We Work Together
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed">
-            Financial planning is not a one-time event. It's a structured, ongoing process that evolves with your life.
+            Building financial clarity is not a one-time event. It's a structured, ongoing process that evolves with your life.
           </p>
         </ScrollReveal>
       </div>

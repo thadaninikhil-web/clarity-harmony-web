@@ -4,13 +4,13 @@ import {
 } from "lucide-react";
 
 const services = [
-  { icon: Target, title: "Goal Based Financial Planning", desc: "Align your investments with your life's most meaningful milestones." },
+  { icon: Target, title: "Goal Based Investment Strategy", desc: "Align your investments with your life's most meaningful milestones." },
   { icon: PieChart, title: "Portfolio Review & Asset Allocation", desc: "Evaluate your existing portfolio for appropriate risk-adjusted allocation." },
   { icon: Globe, title: "Global Investing", desc: "Access international markets with a disciplined, diversified approach." },
   { icon: Shield, title: "Insurance Planning", desc: "Ensure adequate protection without over-insuring or under-insuring." },
   { icon: Calculator, title: "Tax Planning", desc: "Minimize tax liability through strategic, compliant planning." },
   { icon: Users, title: "Succession & Estate Planning", desc: "Preserve and transfer wealth across generations with clarity." },
-  { icon: BarChart3, title: "Ongoing Financial Life Management", desc: "Continuous review as your life, markets, and goals evolve." },
+  { icon: BarChart3, title: "Ongoing Review & Guidance", desc: "Continuous review as your life, markets, and goals evolve." },
 ];
 
 export const ServicesSection = () => (
@@ -20,7 +20,7 @@ export const ServicesSection = () => (
         <div className="max-w-2xl mb-20">
           <p className="label-caps text-accent tracking-[0.15em] mb-4 text-left">What We Do</p>
           <h2 className="font-display text-3xl md:text-5xl font-semibold text-primary text-balance">
-            Comprehensive Financial Planning
+            What We Do For You
           </h2>
           <p className="text-muted-foreground mt-4 max-w-xl">
             Every engagement is built on the principle that financial decisions should be unbiased, disciplined, and deeply personal.
