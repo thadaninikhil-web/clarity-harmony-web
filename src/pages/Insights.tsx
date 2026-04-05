@@ -8,7 +8,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Search, FileText, Video, BarChart3, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 
 const Insights = () => {
   const { insights, isLoading, category, setCategory, search, setSearch, categories } = useFilteredInsights();

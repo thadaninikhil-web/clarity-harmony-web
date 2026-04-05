@@ -77,7 +77,8 @@ const InsightDetail = () => {
   const readingTime = useMemo(() => {
     if (!insight?.content) return null;
 
-    const text = insight.content
+    const contentArr = Array.isArray(insight.content) ? insight.content : [];
+    const text = contentArr
       .map((b: any) => b.children?.map((c: any) => c.text).join(""))
       .join(" ");
 
