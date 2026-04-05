@@ -97,26 +97,23 @@ const CATEGORY_QUERY = `*[_type == "insight" && category == $category] | order(p
 
 function sanityToInsight(doc: any): Insight {
   return {
-    id: doc._id || "",
-    title: doc.title || "",
-    slug: doc.slug || "",
-    summary: doc.excerpt || "",
-
-    // ✅ FINAL FIX: USE content (NOT body)
+    id: doc._id ?? "",
+    title: doc.title ?? "",
+    slug: doc.slug ?? "",
+    summary: doc.excerpt ?? "",
     content: Array.isArray(doc.content) ? doc.content : [],
-
-    category: doc.category || "",
-    publish_date: doc.publishedAt || "",
-    read_time: doc.readTime || "",
-    coverImage: doc.coverImage || null,
-
+    category: doc.category ?? "",
+    publish_date: doc.publishedAt ?? "",
+    read_time: doc.readTime ?? "",
+    source: doc.source ?? "",
+    coverImage: doc.coverImage ?? null,
+    // Optional / legacy
     insight_url: "",
-    source: doc.source || "",
-    risk_note: doc.risk_note || "",
-    is_featured: doc.is_featured || false,
-    chart_url: doc.chart_url || undefined,
-    pdf_resource: doc.pdf_resource || undefined,
-    video_link: doc.video_link || undefined,
+    risk_note: doc.risk_note ?? "",
+    is_featured: doc.is_featured ?? false,
+    chart_url: doc.chart_url ?? undefined,
+    pdf_resource: doc.pdf_resource ?? undefined,
+    video_link: doc.video_link ?? undefined,
   };
 }
 

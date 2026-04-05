@@ -13,10 +13,13 @@ export const SITE_CONFIG = {
   linkedinUrl: "https://www.linkedin.com/in/thadaninikhil",
   url: "https://balancingact.co.in",
 
-  /**
-   * Web3Forms access key for contact/booking form submissions.
-   * Get a free key at https://web3forms.com — paste it here.
-   * Until configured, forms fall back to mailto.
-   */
   web3formsKey: "29cc8b83-9f23-4b80-b8b5-3b96628a6377",
+
+  // ✅ NEW AUTHOR BLOCK
+  author: {
+    name: "Nikhil Thadani",
+    role: "Financial Planner",
+    bio: "Nikhil Thadani works with clients to discover their financial goals and build disciplined, goal-oriented investment strategies grounded in long-term thinking.",
+    image: "/author.jpg", // optional (add later if needed)
+  },
 } as const;
