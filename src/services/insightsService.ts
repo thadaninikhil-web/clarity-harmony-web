@@ -15,7 +15,7 @@ const ALL_QUERY = `*[_type == "insight"] | order(publishedAt desc) {
   "slug": slug.current,
   category,
   excerpt,
-  body[]{
+  content[]{
     ...,
     children[]{
       ...
@@ -36,7 +36,7 @@ const FEATURED_QUERY = `*[_type == "insight" && is_featured == true] | order(pub
   "slug": slug.current,
   category,
   excerpt,
-  body[]{
+  content[]{
     ...,
     children[]{
       ...
@@ -57,7 +57,7 @@ const SLUG_QUERY = `*[_type == "insight" && slug.current == $slug][0] {
   "slug": slug.current,
   category,
   excerpt,
-  body[]{
+  content[]{
     ...,
     children[]{
       ...
@@ -78,7 +78,7 @@ const CATEGORY_QUERY = `*[_type == "insight" && category == $category] | order(p
   "slug": slug.current,
   category,
   excerpt,
-  body[]{
+  content[]{
     ...,
     children[]{
       ...
@@ -102,15 +102,13 @@ function sanityToInsight(doc: any): Insight {
     slug: doc.slug || "",
     summary: doc.excerpt || "",
 
-    // 🔥 CRITICAL FIX: USE BODY AS CONTENT
-    content: Array.isArray(doc.body) ? doc.body : [],
+    // ✅ FINAL FIX: USE content (NOT body)
+    content: Array.isArray(doc.content) ? doc.content : [],
 
     category: doc.category || "",
     publish_date: doc.publishedAt || "",
     read_time: doc.readTime || "",
     coverImage: doc.coverImage || null,
-
-    body: Array.isArray(doc.body) ? doc.body : [],
 
     insight_url: "",
     source: doc.source || "",
@@ -119,11 +117,10 @@ function sanityToInsight(doc: any): Insight {
     chart_url: doc.chart_url || undefined,
     pdf_resource: doc.pdf_resource || undefined,
     video_link: doc.video_link || undefined,
-    mainImage: doc.mainImage || null,
   };
 }
 
-/* ---------------- FETCH FUNCTIONS ---------------- */
+/* ---------------- FETCH ---------------- */
 
 export async function fetchInsights(): Promise<Insight[]> {
   try {
