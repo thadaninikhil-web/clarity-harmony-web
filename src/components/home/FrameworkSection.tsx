@@ -35,7 +35,7 @@ export const FrameworkSection = () => (
         <div className="mt-20 text-center">
           <div className="w-16 h-px bg-accent/30 mx-auto mb-8" />
           <p className="font-display italic text-xl md:text-2xl text-accent/70 max-w-2xl mx-auto">
-            Financial planning is not a one-time activity. It is a continuous journey.
+            Building financial clarity is not a one-time activity. It is a continuous journey.
           </p>
         </div>
       </ScrollReveal>

@@ -68,7 +68,7 @@ const ClientStories = () => {
           <ScrollReveal delay={300}>
             <div className="text-center mt-8">
               <p className="text-lg text-muted-foreground mb-6 text-center">Your story begins with a conversation.</p>
-              <Button variant="gold" size="xl" asChild>
+              <Button variant="hero" size="xl" asChild>
                 <Link to="/book">Book a Discovery Call <ArrowRight className="w-4 h-4 ml-1" /></Link>
               </Button>
             </div>

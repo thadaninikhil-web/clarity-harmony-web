@@ -78,7 +78,7 @@ const Book = () => {
                   {[
                     "Understanding your financial goals and priorities",
                     "Reviewing your current financial situation at a high level",
-                    "Discussing potential planning strategies",
+                    "Discussing potential investment strategies",
                     "Determining if the partnership is a good fit for both sides",
                   ].map((item, i) => (
                     <div key={i} className="flex items-start gap-3">

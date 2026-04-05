@@ -7,6 +7,7 @@ import { useFilteredInsights } from "@/hooks/useInsights";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Search, FileText, Video, BarChart3, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Insights = () => {
   const { insights, isLoading, category, setCategory, search, setSearch, categories } = useFilteredInsights();
@@ -22,7 +23,7 @@ const Insights = () => {
               Insights
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed">
-              Perspectives on investing, financial planning, and building long-term wealth.
+              Perspectives on investing, disciplined decision-making, and building long-term wealth.
             </p>
           </ScrollReveal>
         </div>
@@ -125,9 +126,16 @@ const Insights = () => {
         </div>
       </section>
 
-      {/* Disclaimer at bottom */}
+      {/* CTA + Disclaimer */}
       <section className="pb-24 md:pb-32">
         <div className="container mx-auto px-6 lg:px-8">
+          <ScrollReveal>
+            <div className="text-center mb-12">
+              <Button variant="hero" size="xl" asChild>
+                <Link to="/book">Book a Discovery Call <ArrowRight className="w-4 h-4 ml-1" /></Link>
+              </Button>
+            </div>
+          </ScrollReveal>
           <EducationalDisclaimer className="max-w-2xl mx-auto" />
         </div>
       </section>

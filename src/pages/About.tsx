@@ -87,7 +87,7 @@ const About = () => (
             <div className="border-t border-border pt-10 space-y-8">
               <h2 className="font-display text-2xl font-semibold text-primary">Core Beliefs</h2>
               {[
-                "Financial planning is about life goals, never about products",
+                "Financial decisions should be driven by life goals, never by products",
                 "Asset allocation is the foundation of investment success",
                 "Discipline and patience matter more than market timing",
                 "Trust and integrity build lifelong partnerships",
@@ -104,9 +104,9 @@ const About = () => (
           <ScrollReveal delay={500}>
             <div className="mt-16 p-8 bg-cream-dark">
               <p className="font-display text-xl text-primary mb-1">Nikhil Thadani</p>
-              <p className="text-sm text-muted-foreground mb-6">Founder & Financial Planner</p>
+              <p className="text-sm text-muted-foreground mb-6">Founder, Balancing Act</p>
               <p className="text-muted-foreground leading-relaxed mb-6 text-justify">
-                22+ years of investing experience. SEBI Registered Mutual Fund Distributor. Committed to helping individuals and families achieve financial clarity through unbiased, disciplined planning.
+                22+ years of investing experience. SEBI Registered Mutual Fund Distributor. Committed to helping individuals and families achieve financial clarity through unbiased, disciplined investing.
               </p>
               <Button variant="hero" size="lg" asChild>
                 <Link to="/book">Book a Discovery Call <ArrowRight className="w-4 h-4 ml-1" /></Link>

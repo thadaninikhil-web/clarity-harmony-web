@@ -18,7 +18,7 @@ export const SITE_CONFIG = {
   // ✅ NEW AUTHOR BLOCK
   author: {
     name: "Nikhil Thadani",
-    role: "Financial Planner",
+    role: "Founder, Balancing Act",
     bio: "Nikhil Thadani works with clients to discover their financial goals and build disciplined, goal-oriented investment strategies grounded in long-term thinking.",
     image: "/author.jpg", // optional (add later if needed)
   },
