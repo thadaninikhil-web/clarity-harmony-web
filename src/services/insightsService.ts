@@ -14,10 +14,11 @@ const ALL_QUERY = `*[_type == "insight"] | order(publishedAt desc) {
   "slug": slug.current,
   category,
   excerpt,
-  content,
+  body,
   coverImage,
   publishedAt,
-  readTime
+  readTime,
+  "plainText": pt::text(body)
 }`;
 
 const FEATURED_QUERY = `*[_type == "insight" && is_featured == true] | order(publishedAt desc) {
@@ -26,10 +27,11 @@ const FEATURED_QUERY = `*[_type == "insight" && is_featured == true] | order(pub
   "slug": slug.current,
   category,
   excerpt,
-  content,
+  body,
   coverImage,
   publishedAt,
-  readTime
+  readTime,
+  "plainText": pt::text(body)
 }`;
 
 const SLUG_QUERY = `*[_type == "insight" && slug.current == $slug][0] {
@@ -38,10 +40,11 @@ const SLUG_QUERY = `*[_type == "insight" && slug.current == $slug][0] {
   "slug": slug.current,
   category,
   excerpt,
-  content,
+  body,
   coverImage,
   publishedAt,
-  readTime
+  readTime,
+  "plainText": pt::text(body)
 }`;
 
 const CATEGORY_QUERY = `*[_type == "insight" && category == $category] | order(publishedAt desc) {
@@ -50,33 +53,34 @@ const CATEGORY_QUERY = `*[_type == "insight" && category == $category] | order(p
   "slug": slug.current,
   category,
   excerpt,
-  content,
+  body,
   coverImage,
   publishedAt,
-  readTime
+  readTime,
+  "plainText": pt::text(body)
 }`;
 
 function sanityToInsight(doc: Record<string, unknown>): Insight {
   return {
-    id: (doc._id as string) || "",
-    title: (doc.title as string) || "",
-    slug: (doc.slug as string) || "",
-    summary: (doc.excerpt as string) || "",   // excerpt → summary
-    content: (doc.content as string) || "",
-    category: (doc.category as string) || "",
-    publish_date: (doc.publishedAt as string) || "",
-    read_time: (doc.readTime as string) || "",
-    coverImage: doc.coverImage as Insight["coverImage"],
-    // keep optional legacy fields if needed
+    id: typeof doc._id === "string" ? doc._id : "",
+    title: typeof doc.title === "string" ? doc.title : "",
+    slug: typeof doc.slug === "string" ? doc.slug : "",
+    summary: typeof doc.excerpt === "string" ? doc.excerpt : "",
+    content: typeof doc.plainText === "string" ? doc.plainText : "", // safe plain text
+    category: typeof doc.category === "string" ? doc.category : "",
+    publish_date: typeof doc.publishedAt === "string" ? doc.publishedAt : "",
+    read_time: typeof doc.readTime === "string" ? doc.readTime : "",
+    coverImage: doc.coverImage ?? null,
+    body: Array.isArray(doc.body) ? doc.body : [],
+    // optional legacy fields
     insight_url: "",
-    source: (doc.source as string) || "",
-    risk_note: (doc.risk_note as string) || "",
-    is_featured: (doc.is_featured as boolean) || false,
-    chart_url: (doc.chart_url as string) || undefined,
-    pdf_resource: (doc.pdf_resource as string) || undefined,
-    video_link: (doc.video_link as string) || undefined,
-    body: doc.body as Insight["body"],
-    mainImage: doc.mainImage as Insight["mainImage"],
+    source: typeof doc.source === "string" ? doc.source : "",
+    risk_note: typeof doc.risk_note === "string" ? doc.risk_note : "",
+    is_featured: typeof doc.is_featured === "boolean" ? doc.is_featured : false,
+    chart_url: typeof doc.chart_url === "string" ? doc.chart_url : undefined,
+    pdf_resource: typeof doc.pdf_resource === "string" ? doc.pdf_resource : undefined,
+    video_link: typeof doc.video_link === "string" ? doc.video_link : undefined,
+    mainImage: doc.mainImage ?? null,
   };
 }
 
