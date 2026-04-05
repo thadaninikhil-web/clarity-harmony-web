@@ -101,13 +101,16 @@ function sanityToInsight(doc: any): Insight {
     title: doc.title ?? "",
     slug: doc.slug ?? "",
     summary: doc.excerpt ?? "",
+
     content: Array.isArray(doc.content) ? doc.content : [],
+
     category: doc.category ?? "",
     publish_date: doc.publishedAt ?? "",
     read_time: doc.readTime ?? "",
     source: doc.source ?? "",
+
     coverImage: doc.coverImage ?? null,
-    // Optional / legacy
+
     insight_url: "",
     risk_note: doc.risk_note ?? "",
     is_featured: doc.is_featured ?? false,
