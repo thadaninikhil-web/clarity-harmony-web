@@ -3,10 +3,7 @@ import { useEffect, useMemo } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import {
-  EducationalDisclaimer,
-  SourceAttribution,
-} from "@/components/MutualFundDisclaimer";
+import { EducationalDisclaimer } from "@/components/MutualFundDisclaimer";
 import { useInsightBySlug } from "@/hooks/useInsights";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -78,7 +75,7 @@ const InsightDetail = () => {
       .join(" ");
 
     const words = text.split(/\s+/).length;
-    return Math.ceil(words / 200); // 200 wpm
+    return Math.ceil(words / 200);
   }, [insight]);
 
   /* ---------------- SEO ---------------- */
@@ -98,11 +95,9 @@ const InsightDetail = () => {
       tag.setAttribute("content", content);
     };
 
-    setMeta("description", insight.excerpt || "");
-
-    // Open Graph
+    setMeta("description", insight.summary || "");
     setMeta("og:title", insight.title);
-    setMeta("og:description", insight.excerpt || "");
+    setMeta("og:description", insight.summary || "");
 
     if (insight?.coverImage) {
       setMeta("og:image", urlFor(insight.coverImage).width(1200).url());
@@ -179,8 +174,29 @@ const InsightDetail = () => {
               {insight.title}
             </h1>
 
+            {/* ✅ COVER IMAGE */}
+            {insight.coverImage && (
+              <img
+                src={urlFor(insight.coverImage).width(1200).url()}
+                alt={insight.title}
+                className="w-full rounded-lg my-6"
+              />
+            )}
+
+            {/* ✅ DATE + READ TIME */}
             <div className="text-sm text-muted-foreground flex gap-4">
-              <span>{insight.publish_date}</span>
+              <span>
+                {insight.publish_date
+                  ? new Date(insight.publish_date).toLocaleDateString(
+                      "en-IN",
+                      {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      }
+                    )
+                  : ""}
+              </span>
               {readingTime && <span>{readingTime} min read</span>}
             </div>
 
@@ -199,14 +215,14 @@ const InsightDetail = () => {
       <section className="py-12">
         <div className="container mx-auto max-w-3xl px-6">
           <ScrollReveal>
-			{Array.isArray(insight.content) && insight.content.length > 0 ? (
-			  <PortableText
-				value={insight.content}
-				components={portableTextComponents}
-			  />
-			) : (
-			  <p className="text-red-500">No content available</p>
-			)}
+            {Array.isArray(insight.content) && insight.content.length > 0 ? (
+              <PortableText
+                value={insight.content}
+                components={portableTextComponents}
+              />
+            ) : (
+              <p className="text-red-500">No content available</p>
+            )}
 
             {/* Resources */}
             {(insight.chart_url ||
@@ -235,11 +251,6 @@ const InsightDetail = () => {
               </div>
             )}
 
-            {/* Source */}
-            <div className="mt-10">
-              <SourceAttribution source={insight.source} />
-            </div>
-
             <EducationalDisclaimer className="mt-8" />
           </ScrollReveal>
         </div>
@@ -250,9 +261,6 @@ const InsightDetail = () => {
         <h2 className="text-2xl font-semibold mb-4">
           Want help building a disciplined financial plan?
         </h2>
-        <p className="mb-6 text-muted-foreground">
-          Speak with us to align your investments with your life goals.
-        </p>
         <Button asChild>
           <Link to="/contact">Get in Touch</Link>
         </Button>
