@@ -193,14 +193,9 @@ const InsightDetail = () => {
       </section>
 
       <section className="py-16 bg-card border-y border-gold/20">
-        <div className="container mx-auto px-6 lg:px-8 max-w-3xl text-center">
-          <ScrollReveal>
-            <h2 className="font-display text-2xl md:text-3xl font-semibold text-primary mb-4">
-              WantHere’s the **cleaned‑up `InsightDetail.tsx` file** that works seamlessly with the updated `insightsService.ts` (which now provides both `body` and `plainText`). This version removes the fragile `renderContent` function entirely and uses `PortableText` for rich content or `insight.content` (the safe plain string) as a fallback.
+        <div className="container mx-auto px-6 lg:px-8 maxHere’s the **fully corrected `InsightDetail.tsx` file** — all braces are properly closed, the `portableTextComponents` object ends cleanly, and the rendering logic is simplified to use either rich Portable Text (`body`) or the safe plain string (`content`) you now project in your queries. This version will compile without the “Expected `}` but found `:`” error:
 
 ---
-
-## 📄 Corrected `src/pages/InsightDetail.tsx`
 
 ```tsx
 import { useParams, Link } from "react-router-dom";
@@ -400,4 +395,4 @@ const InsightDetail = () => {
       <section className="py-16 bg-card border-y border-gold/20">
         <div className="container mx-auto px-6 lg:px-8 max-w-3xl text-center">
           <ScrollReveal>
-            <h2 className="font-display text
+            <h2 className="font-display text-2xl md:text-3xl font-semibold text-primary
