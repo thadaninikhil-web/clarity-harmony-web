@@ -199,14 +199,14 @@ const InsightDetail = () => {
       <section className="py-12">
         <div className="container mx-auto max-w-3xl px-6">
           <ScrollReveal>
-            {insight.content ? (
-              <PortableText
-                value={insight.content}
-                components={portableTextComponents}
-              />
-            ) : (
-              <p>{insight.excerpt}</p>
-            )}
+			{Array.isArray(insight.content) && insight.content.length > 0 ? (
+			  <PortableText
+				value={insight.content}
+				components={portableTextComponents}
+			  />
+			) : (
+			  <p className="text-red-500">No content available</p>
+			)}
 
             {/* Resources */}
             {(insight.chart_url ||

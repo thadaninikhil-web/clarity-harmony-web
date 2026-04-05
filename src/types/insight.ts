@@ -3,7 +3,7 @@ export interface Insight {
   title: string;
   slug: string;               // flattened from slug.current
   summary: string;            // mapped from excerpt in Sanity
-  content?: string;           // rich text / body content
+  content?: any[]; // ✅ PortableText blocks from Sanity
   category: string;
   publish_date: string;       // maps from publishedAt
   read_time?: string;         // maps from readTime
