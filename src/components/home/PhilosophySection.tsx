@@ -29,7 +29,7 @@ export const PhilosophySection = () => (
               Disciplined Investing Without Product Bias
             </h2>
             <p className="text-lg text-muted-foreground mb-10 max-w-xl">
-              Every investor deserves guidance that puts their goals first — not products. Balancing Act exists to help you build clarity around your financial life and execute with discipline.
+              Every investor deserves a process that puts their goals first — not products. Balancing Act exists to help you build clarity around your financial life and execute with discipline.
             </p>
           </ScrollReveal>
           <div className="space-y-4">
