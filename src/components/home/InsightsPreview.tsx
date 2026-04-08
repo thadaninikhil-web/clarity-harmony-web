@@ -44,7 +44,7 @@ export const InsightsPreview = () => {
                         {article.title}
                       </h3>
                       <div className="flex items-center justify-between">
-                        <p className="text-xs text-muted-foreground text-left">{article.publish_date}</p>
+                        <p className="text-xs text-muted-foreground text-left">{article.publishedAt}</p>
                         <ArrowRight className="w-4 h-4 text-accent/0 group-hover:text-accent transition-all duration-300 translate-x-0 group-hover:translate-x-1" />
                       </div>
                     </div>
