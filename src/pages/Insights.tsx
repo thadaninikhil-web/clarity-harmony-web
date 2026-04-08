@@ -112,7 +112,7 @@ const Insights = () => {
                       )}
 
                       <div className="flex items-center justify-between">
-                        <p className="text-xs text-muted-foreground/60">{a.publish_date}</p>
+                        <p className="text-xs text-muted-foreground/60">{a.publishedAt}</p>
                         <span className="flex items-center gap-1 text-xs text-accent/0 group-hover:text-accent transition-colors duration-300">
                           Read Insight <ArrowRight className="w-3 h-3" />
                         </span>

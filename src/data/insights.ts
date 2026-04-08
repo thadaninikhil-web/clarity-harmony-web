@@ -25,7 +25,7 @@ export const insights: Insight[] = [
     summary:
       "Decades of Indian market data confirm that deciding how to divide wealth across equities, debt, and gold generates far more of your long-term return than which individual stock you pick. Here is the evidence — and a framework built for Indian families.",
     category: "Financial Planning",
-    publish_date: "March 2026",
+    publishedAt: "March 2026",
     insight_url: "",
     source: "AMFI / NSE / FundsIndia Research / Mirae Asset MF",
     risk_note:
@@ -111,7 +111,7 @@ Begin with the allocation. Let it compound. That is the work.
     summary:
       "Market downturns trigger powerful emotional responses that can lead even experienced investors to make impulsive decisions. Understanding the psychological forces at play during market declines is crucial for maintaining a disciplined investment strategy and avoiding costly mistakes.",
     category: "Behavioral Finance",
-    publish_date: "March 2026",
+    publishedAt: "March 2026",
     insight_url: "",
     source: "Behavioral Finance Research / Public Data",
     risk_note:
@@ -168,7 +168,7 @@ By preparing psychologically for inevitable downturns, creating systematic strat
     summary:
       "The question of when to start retirement planning has a simple answer: as early as possible. However, the complexity lies in understanding why early planning matters so profoundly and how the strategies differ across various life stages.",
     category: "Financial Planning",
-    publish_date: "March 2026",
+    publishedAt: "March 2026",
     insight_url: "",
     source: "AMFI / Public Data",
     risk_note:
@@ -261,7 +261,7 @@ Regardless of your age, start where you are. Calculate your retirement needs, un
     summary:
       "For decades, Indian investors primarily limited their portfolios to domestic assets. However, the investment landscape has evolved dramatically. Global investing, once accessible only to the ultra-wealthy, is now available to everyday Indian investors through multiple channels.",
     category: "Financial Planning",
-    publish_date: "March 2026",
+    publishedAt: "March 2026",
     insight_url: "",
     source: "AMFI / Public Data",
     risk_note:
