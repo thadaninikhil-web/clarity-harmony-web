@@ -9,6 +9,7 @@ export interface Insight {
   publishedAt: string;        // maps directly from Sanity publishedAt
   readTime?: string;          // maps directly from Sanity readTime
   coverImage?: any;           // Sanity image reference for cover image
+  content?: string;           // plain-text content for local/fallback articles
 
   // Legacy / optional fields
   insight_url?: string;
