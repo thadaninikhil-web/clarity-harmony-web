@@ -73,13 +73,14 @@ const InsightDetail = () => {
   const [progress, setProgress] = useState(0);
   const [showShare, setShowShare] = useState(true);
 
-  /* Reading Time */
+  /* Reading Time (fallback if readTime not provided) */
   const readingTime = useMemo(() => {
-    if (!insight?.content) return null;
+    if (!insight?.body) return null;
 
-    const contentArr = Array.isArray(insight.content) ? insight.content : [];
-    const text = contentArr
-      .map((b: any) => b.children?.map((c: any) => c.text).join(""))
+    const text = insight.body
+      .map((b: any) =>
+        b.children?.map((c: any) => c.text).join("")
+      )
       .join(" ");
 
     return Math.ceil(text.split(/\s+/).length / 200);
@@ -172,23 +173,24 @@ const InsightDetail = () => {
 
         <div className="text-sm text-muted-foreground flex gap-4">
           <span>
-            {new Date(insight.publish_date).toLocaleDateString(
-              "en-IN"
-            )}
+            {new Date(insight.publishedAt).toLocaleDateString("en-IN")}
           </span>
 
-          {readingTime && <span>{readingTime} min read</span>}
+          <span>
+            {insight.readTime
+              ? `${insight.readTime} min read`
+              : readingTime
+              ? `${readingTime} min read`
+              : null}
+          </span>
         </div>
       </section>
 
       {/* BODY */}
-      <section
-        id="article-body"
-        className="max-w-3xl mx-auto px-6"
-      >
+      <section id="article-body" className="max-w-3xl mx-auto px-6">
         <div className="prose prose-lg max-w-none">
           <PortableText
-            value={insight.content}
+            value={insight.body}
             components={portableTextComponents}
           />
         </div>

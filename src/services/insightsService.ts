@@ -15,10 +15,11 @@ const ALL_QUERY = `*[_type == "insight"] | order(publishedAt desc) {
   "slug": slug.current,
   category,
   excerpt,
-  content[]{
+  body[]{
     ...,
-    children[]{
-      ...
+    asset->{
+      _id,
+      url
     }
   },
   coverImage,
@@ -36,10 +37,11 @@ const FEATURED_QUERY = `*[_type == "insight" && is_featured == true] | order(pub
   "slug": slug.current,
   category,
   excerpt,
-  content[]{
+  body[]{
     ...,
-    children[]{
-      ...
+    asset->{
+      _id,
+      url
     }
   },
   coverImage,
@@ -57,10 +59,11 @@ const SLUG_QUERY = `*[_type == "insight" && slug.current == $slug][0] {
   "slug": slug.current,
   category,
   excerpt,
-  content[]{
+  body[]{
     ...,
-    children[]{
-      ...
+    asset->{
+      _id,
+      url
     }
   },
   coverImage,
@@ -78,10 +81,11 @@ const CATEGORY_QUERY = `*[_type == "insight" && category == $category] | order(p
   "slug": slug.current,
   category,
   excerpt,
-  content[]{
+  body[]{
     ...,
-    children[]{
-      ...
+    asset->{
+      _id,
+      url
     }
   },
   coverImage,
@@ -102,11 +106,11 @@ function sanityToInsight(doc: any): Insight {
     slug: doc.slug ?? "",
     summary: doc.excerpt ?? "",
 
-    content: Array.isArray(doc.content) ? doc.content : [],
+    body: Array.isArray(doc.body) ? doc.body : [], // ✅ use body instead of content
 
     category: doc.category ?? "",
-    publish_date: doc.publishedAt ?? "",
-    read_time: doc.readTime ?? "",
+    publishedAt: doc.publishedAt ?? "",
+    readTime: doc.readTime ?? "",
     source: doc.source ?? "",
 
     coverImage: doc.coverImage ?? null,
