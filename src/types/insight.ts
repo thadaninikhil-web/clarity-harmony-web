@@ -3,7 +3,7 @@ export interface Insight {
   title: string;
   slug: string;               // flattened from slug.current
   summary: string;            // mapped from excerpt in Sanity
-  body: any[];                // PortableText blocks from Sanity (rich text + images)
+  body?: any[];               // PortableText blocks from Sanity (rich text + images)
   status?: string;
   category: string;
   publishedAt: string;        // maps directly from Sanity publishedAt
