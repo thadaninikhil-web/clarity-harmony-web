@@ -93,7 +93,7 @@ export const Footer = () => {
         {/* SEBI Registration & Compliance */}
         <div className="mt-6 pt-6 border-t border-gold/15">
           <p className="text-xs text-primary-foreground/60 leading-relaxed text-center max-w-4xl mx-auto">
-            SEBI Registered Mutual Fund Distributor | ARN-346988 | Date of Initial Registration: 23-Nov-2025 | Current Validity: 25-Nov-2026
+            AMFI Registered Mutual Fund Distributor | ARN-346988 | Date of Initial Registration: 23-Nov-2025 | Current Validity: 25-Nov-2026
           </p>
           <p className="text-xs text-primary-foreground/55 leading-relaxed text-center max-w-4xl mx-auto mt-3">
             Disclaimer: Mutual fund investments are subject to market risks. Please read all scheme related documents carefully before investing. Past performance is not indicative of future results. The information provided on this website is for general informational purposes only and should not be construed as investment advice. Please consult your advisor before making any investment decisions.
