@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ScrollReveal } from "@/components/ScrollReveal";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { SITE_CONFIG } from "@/config/site";
 import { ArrowRight, Building2, GraduationCap } from "lucide-react";
 
 const credentials = [
@@ -64,10 +66,21 @@ export const FounderSection = () => (
 
         <ScrollReveal delay={500} direction="right">
           <div className="flex items-center gap-6 mb-10">
-            <div className="w-px h-12 bg-accent/30" />
+            <a
+              href={SITE_CONFIG.linkedinUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 group"
+              aria-label="View Nikhil Thadani on LinkedIn"
+            >
+              <Avatar className="h-20 w-20 rounded-none border border-border group-hover:border-accent transition-colors">
+                <AvatarImage src={SITE_CONFIG.author.image} alt={SITE_CONFIG.author.name} className="object-cover" />
+                <AvatarFallback className="rounded-none bg-primary text-primary-foreground font-display text-xl">NT</AvatarFallback>
+              </Avatar>
+            </a>
             <div>
-              <p className="font-display text-xl font-semibold text-primary">Nikhil Thadani</p>
-              <p className="text-sm text-muted-foreground">Founder, Balancing Act</p>
+              <p className="font-display text-xl font-semibold text-primary">{SITE_CONFIG.author.name}</p>
+              <p className="text-sm text-muted-foreground">{SITE_CONFIG.author.role}</p>
             </div>
           </div>
           <Button variant="hero" size="lg" asChild>
