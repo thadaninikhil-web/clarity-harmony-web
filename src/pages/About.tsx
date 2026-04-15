@@ -3,6 +3,8 @@ import { Footer } from "@/components/Footer";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { SITE_CONFIG } from "@/config/site";
 import { ArrowRight, Building2, GraduationCap } from "lucide-react";
 
 const About = () => (
