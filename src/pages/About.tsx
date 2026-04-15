@@ -103,7 +103,7 @@ const About = () => (
             </div>
           </ScrollReveal>
 
-          <ScrollReveal delay={500}>
+          <ScrollReveal delay={500} className="mt-16">
             <div className="p-8 bg-cream-dark">
               <div className="flex items-center gap-5 mb-6">
                 <a
