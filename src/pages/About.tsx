@@ -104,9 +104,25 @@ const About = () => (
           </ScrollReveal>
 
           <ScrollReveal delay={500}>
-            <div className="mt-16 p-8 bg-cream-dark">
-              <p className="font-display text-xl text-primary mb-1">Nikhil Thadani</p>
-              <p className="text-sm text-muted-foreground mb-6">Founder, Balancing Act</p>
+            <div className="p-8 bg-cream-dark">
+              <div className="flex items-center gap-5 mb-6">
+                <a
+                  href={SITE_CONFIG.linkedinUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 group"
+                  aria-label="View Nikhil Thadani on LinkedIn"
+                >
+                  <Avatar className="h-24 w-24 rounded-none border border-border group-hover:border-gold transition-colors">
+                    <AvatarImage src={SITE_CONFIG.author.image} alt={SITE_CONFIG.author.name} className="object-cover" />
+                    <AvatarFallback className="rounded-none bg-primary text-primary-foreground font-display text-2xl">NT</AvatarFallback>
+                  </Avatar>
+                </a>
+                <div>
+                  <p className="font-display text-xl text-primary mb-1">{SITE_CONFIG.author.name}</p>
+                  <p className="text-sm text-muted-foreground">{SITE_CONFIG.author.role}</p>
+                </div>
+              </div>
               <p className="text-muted-foreground leading-relaxed mb-6 text-justify">
                 22+ years of investing experience. SEBI Registered Mutual Fund Distributor. Committed to helping individuals and families achieve financial clarity through unbiased, disciplined investing.
               </p>
