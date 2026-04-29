@@ -60,11 +60,6 @@ export default {
           DEFAULT: "hsl(var(--cream))",
           dark: "hsl(var(--cream-dark))",
         },
-        bucket: {
-          accumulation: "hsl(var(--bucket-accumulation))",
-          preparation: "hsl(var(--bucket-preparation))",
-          withdrawal: "hsl(var(--bucket-withdrawal))",
-        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

@@ -56,21 +56,6 @@
     --surface: 0 0% 100%;
     --text-primary: 0 0% 10%;
     --text-secondary: 0 0% 29%;
-
-    /* Calculator three-bucket palette (derived from navy/gold/cream).
-       HSL channel vars feed Tailwind utilities; resolved colour vars are
-       used directly inside chart string props (Recharts fill/stroke). */
-    --bucket-accumulation: 216 56% 10%;     /* navy */
-    --bucket-preparation: 37 45% 55%;       /* gold */
-    --bucket-withdrawal: 220 18% 50%;       /* dusty blue */
-    --bucket-accumulation-color: hsl(216 56% 10%);
-    --bucket-preparation-color: hsl(37 45% 55%);
-    --bucket-withdrawal-color: hsl(220 18% 50%);
-    --accent-color: hsl(37 45% 55%);
-    --border-color: hsl(216 56% 10% / 0.15);
-    --popover-color: hsl(0 0% 100%);
-    --muted-foreground-color: hsl(0 0% 29%);
-    --shadow-card: 0 1px 2px 0 hsl(216 56% 10% / 0.06), 0 1px 3px 0 hsl(216 56% 10% / 0.04);
   }
 }
 
