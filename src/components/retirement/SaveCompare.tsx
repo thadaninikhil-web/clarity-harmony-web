@@ -144,24 +144,24 @@ export function SaveCompare({ inputs, result, onLoad }: Props) {
               <div className="h-[260px] w-full pt-2">
                 <ResponsiveContainer>
                   <BarChart data={compareData} margin={{ left: 0, right: 8, top: 8, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                    <XAxis dataKey="name" tick={{ fill: "var(--muted-foreground)", fontSize: 11 }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="name" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }} />
                     <YAxis
-                      tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
+                      tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
                       tickFormatter={(v) => formatINR(Number(v))}
                       width={80}
                     />
                     <Tooltip
                       contentStyle={{
-                        background: "var(--popover)",
-                        border: "1px solid var(--border)",
+                        background: "hsl(var(--popover))",
+                        border: "1px solid hsl(var(--border))",
                         borderRadius: 4,
                       }}
                       formatter={(v) => formatINR(Number(v))}
                     />
                     <Legend />
-                    <Bar dataKey="Corpus" fill="var(--bucket-accumulation)" />
-                    <Bar dataKey="Final" fill="var(--bucket-preparation)" />
+                    <Bar dataKey="Corpus" fill="var(--color-bucket-accumulation)" />
+                    <Bar dataKey="Final" fill="var(--color-bucket-preparation)" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

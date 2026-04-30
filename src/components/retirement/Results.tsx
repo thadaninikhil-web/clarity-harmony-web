@@ -188,51 +188,51 @@ export function Results({
               <ComposedChart data={data} margin={{ left: 0, right: 16, top: 8, bottom: 0 }}>
                 <defs>
                   <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--bucket-accumulation)" stopOpacity={0.8} />
-                    <stop offset="95%" stopColor="var(--bucket-accumulation)" stopOpacity={0.15} />
+                    <stop offset="5%" stopColor="var(--color-bucket-accumulation)" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="var(--color-bucket-accumulation)" stopOpacity={0.15} />
                   </linearGradient>
                   <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--bucket-preparation)" stopOpacity={0.8} />
-                    <stop offset="95%" stopColor="var(--bucket-preparation)" stopOpacity={0.15} />
+                    <stop offset="5%" stopColor="var(--color-bucket-preparation)" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="var(--color-bucket-preparation)" stopOpacity={0.15} />
                   </linearGradient>
                   <linearGradient id="g3" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--bucket-withdrawal)" stopOpacity={0.8} />
-                    <stop offset="95%" stopColor="var(--bucket-withdrawal)" stopOpacity={0.15} />
+                    <stop offset="5%" stopColor="var(--color-bucket-withdrawal)" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="var(--color-bucket-withdrawal)" stopOpacity={0.15} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                <XAxis dataKey="age" tick={{ fill: "var(--muted-foreground)", fontSize: 12 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="age" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
                 <YAxis
                   yAxisId="left"
-                  tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+                  tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
                   tickFormatter={(v) => formatINR(safeNum(v))}
                   width={80}
                 />
                 <YAxis
                   yAxisId="right"
                   orientation="right"
-                  tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
+                  tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
                   tickFormatter={(v) => `${v}%`}
                   width={48}
                   domain={rightDomain}
                 />
                 <Tooltip
-                  contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 4 }}
+                  contentStyle={{ background: "hsl(var(--popover))", border: "1px solid hsl(var(--border))", borderRadius: 4 }}
                   formatter={(v, n) =>
                     n === "Acc return %" ? `${Number(v).toFixed(2)}%` : formatINR(Number(v))
                   }
                   labelFormatter={(l) => `Age ${l}`}
                 />
                 <Legend />
-                <Area yAxisId="left" type="monotone" dataKey="Accumulation" stackId="1" stroke="var(--bucket-accumulation)" fill="url(#g1)" />
-                {!isTwoBucket && <Area yAxisId="left" type="monotone" dataKey="Preparation" stackId="1" stroke="var(--bucket-preparation)" fill="url(#g2)" />}
-                <Area yAxisId="left" type="monotone" dataKey="Withdrawal" stackId="1" stroke="var(--bucket-withdrawal)" fill="url(#g3)" />
+                <Area yAxisId="left" type="monotone" dataKey="Accumulation" stackId="1" stroke="var(--color-bucket-accumulation)" fill="url(#g1)" />
+                {!isTwoBucket && <Area yAxisId="left" type="monotone" dataKey="Preparation" stackId="1" stroke="var(--color-bucket-preparation)" fill="url(#g2)" />}
+                <Area yAxisId="left" type="monotone" dataKey="Withdrawal" stackId="1" stroke="var(--color-bucket-withdrawal)" fill="url(#g3)" />
                 <Line
                   yAxisId="right"
                   type="monotone"
                   dataKey="AccReturnPct"
                   name="Acc return %"
-                  stroke="var(--accent)"
+                  stroke="var(--color-accent-raw)"
                   strokeWidth={2}
                   dot={false}
                   connectNulls
