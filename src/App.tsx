@@ -14,6 +14,7 @@ import ClientStories from "./pages/ClientStories";
 import Book from "./pages/Book";
 import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import RetirementSimulator from "./pages/RetirementSimulator";
 import NotFound from "./pages/NotFound";
 import { ScrollToTop } from "./components/ScrollToTop";
 
@@ -37,6 +38,7 @@ const App = () => (
         <Route path="/book" element={<Book />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/calculators/retirementsimulator" element={<RetirementSimulator />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </TooltipProvider>
