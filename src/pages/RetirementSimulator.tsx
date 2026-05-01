@@ -8,6 +8,7 @@ import { Methodology } from "@/components/retirement/Methodology";
 import { HowToUse } from "@/components/retirement/HowToUse";
 import { SaveCompare } from "@/components/retirement/SaveCompare";
 import { ValidationBanner } from "@/components/retirement/ValidationBanner";
+import { StrategySwitcher } from "@/components/retirement/StrategySwitcher";
 import { project, validateInputs, type RetirementInputs } from "@/lib/retirement";
 import { readShared, subscribeShared, writeShared } from "@/lib/sharedInputs";
 
@@ -116,6 +117,7 @@ const RetirementSimulator = () => {
             withdrawal bucket framework — with sequence-of-returns stress
             testing and a year-by-year projection.
           </p>
+          <StrategySwitcher activeTab="three" />
         </div>
       </section>
 
