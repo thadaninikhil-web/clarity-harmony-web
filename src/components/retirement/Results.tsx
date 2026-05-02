@@ -146,16 +146,58 @@ export function Results({
         </div>
       </div>
 
-      <Tabs defaultValue="summary" className="w-full">
-        <TabsList className="flex flex-wrap h-auto">
-          <TabsTrigger value="summary">Summary</TabsTrigger>
-          <TabsTrigger value="montecarlo">Monte Carlo</TabsTrigger>
-          <TabsTrigger value="schedule">Year-by-year</TabsTrigger>
-        </TabsList>
+      {/* INPUT SUMMARY */}
+      <Card className="shadow-[var(--shadow-card)]">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium">Input summary</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-x-6 gap-y-2 text-xs sm:grid-cols-2 lg:grid-cols-4">
+            <SummaryRow label="Current monthly expenses" value={formatINR(inputs.currentMonthlyExpenses)} />
+            <SummaryRow label="Inflation" value={`${(inputs.inflationRate * 100).toFixed(1)}%`} />
+            <SummaryRow label="Current corpus" value={formatINR(inputs.currentCorpus)} />
+            <SummaryRow label="Monthly SIP" value={formatINR(inputs.monthlyInvestment)} />
+            <SummaryRow label="SIP step-up" value={`${(inputs.sipStepUpRate * 100).toFixed(0)}%`} />
+            <SummaryRow label="Retirement age" value={String(inputs.retirementAge)} />
+            <SummaryRow label="Life expectancy" value={String(inputs.lifeExpectancyAge ?? inputs.retirementAge + inputs.lifeExpectancyYears)} />
+            <SummaryRow label="Emergency fund" value={`${inputs.emergencyFundMonths ?? 0} mo`} />
+            <SummaryRow label="Equity CAGR" value={`${(inputs.sequenceCagr * 100).toFixed(1)}%`} />
+            <SummaryRow label="Return range" value={`${(inputs.sequenceMinReturn * 100).toFixed(0)}% to ${(inputs.sequenceMaxReturn * 100).toFixed(0)}%`} />
+            {!isTwoBucket && (
+              <>
+                <SummaryRow label="Prep equity" value={`${(inputs.prepEquityPct * 100).toFixed(0)}%`} />
+                <SummaryRow label="Withdrawal years" value={String(inputs.withdrawalYears)} />
+              </>
+            )}
+            <SummaryRow label="Monte Carlo runs" value={inputs.monteCarloRuns.toLocaleString("en-IN")} />
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* SUMMARY TAB */}
-        <TabsContent value="summary" className="space-y-4 mt-4">
-          <div className="grid gap-4 sm:grid-cols-2">
+      {/* MONTE CARLO */}
+      <Card className="shadow-[var(--shadow-card)]">
+        <CardHeader>
+          <CardTitle>Monte Carlo aggregate results</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Summary across all{" "}
+            <span className="font-semibold">{inputs.monteCarloRuns.toLocaleString("en-IN")}</span>{" "}
+            sequence-of-returns scenarios.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <MonteCarloPanel
+            inputs={inputs}
+            result={result}
+            strategy={strategy}
+            onReshuffle={onReshuffleSequence}
+            onSipSolved={onSipSolved}
+          />
+        </CardContent>
+      </Card>
+
+      {/* SCENARIO HEADLINE — Chart + Year-by-year together (one of N) */}
+      <div className="space-y-4">
+        <div className="grid gap-4 sm:grid-cols-2">
             <Card className="shadow-[var(--shadow-card)]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm text-muted-foreground font-medium">
@@ -185,7 +227,7 @@ export function Results({
 
           <Card className="shadow-[var(--shadow-card)]">
             <CardHeader>
-              <CardTitle>Corpus over time</CardTitle>
+              <CardTitle>Corpus over time — single scenario</CardTitle>
               {scenarioBanner}
             </CardHeader>
             <CardContent>
@@ -267,34 +309,9 @@ export function Results({
               </div>
             </div>
           )}
-        </TabsContent>
 
-        {/* MONTE CARLO TAB */}
-        <TabsContent value="montecarlo" className="space-y-4 mt-4">
-          <Card className="shadow-[var(--shadow-card)]">
-            <CardHeader>
-              <CardTitle>Monte Carlo aggregate results</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Summary across all{" "}
-                <span className="font-semibold">{inputs.monteCarloRuns.toLocaleString("en-IN")}</span>{" "}
-                sequence-of-returns scenarios.
-              </p>
-            </CardHeader>
-            <CardContent>
-              <MonteCarloPanel
-                inputs={inputs}
-                result={result}
-                strategy={strategy}
-                onReshuffle={onReshuffleSequence}
-                onSipSolved={onSipSolved}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* YEAR-BY-YEAR TAB */}
-        <TabsContent value="schedule" className="space-y-4 mt-4">
-          <Card className="shadow-[var(--shadow-card)]">
+        {/* YEAR-BY-YEAR */}
+        <Card className="shadow-[var(--shadow-card)]">
             <CardHeader className="space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <CardTitle>Year-by-year</CardTitle>
