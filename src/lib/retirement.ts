@@ -327,6 +327,57 @@ export const formatINRExactPdf = (n: number): string => {
 
 const emptyTransfers = () => ({ accToPrep: 0, prepToWithd: 0, accToWithd: 0 });
 
+// Build a short, scannable bullet list describing what happened in a single
+// year. Used by both the on-screen table and the PDF/XLSX exports so the
+// "Note" column stays consistent across surfaces.
+export function buildYearBullets(
+  r: YearRow,
+  strategy: "three-bucket" | "two-bucket" = "three-bucket",
+): string[] {
+  const lines: string[] = [];
+  const fmt = (n: number) => formatINR(n);
+  if (r.phase === "accumulation") {
+    if (r.contribution > 0) lines.push(`SIP contribution: ${fmt(r.contribution)}`);
+    if (r.accGrowth) lines.push(`Accumulation growth (${(r.accReturnApplied * 100).toFixed(1)}%): ${fmt(r.accGrowth)}`);
+    if (strategy === "three-bucket") {
+      if (r.prepGrowth) lines.push(`Preparation growth: ${fmt(r.prepGrowth)}`);
+      if (r.accToPrep) lines.push(`Glide-path Acc → Prep: ${fmt(r.accToPrep)}`);
+    } else if (r.withdGrowth) {
+      lines.push(`Debt sleeve growth: ${fmt(r.withdGrowth)}`);
+    }
+  } else {
+    // retirement
+    lines.push(`Expense: ${fmt(r.expense)}${r.withdrawn < r.expense - 1 ? ` · withdrawn ${fmt(r.withdrawn)} (shortfall)` : ""}`);
+    if (r.accGrowth) lines.push(`Accumulation growth (${(r.accReturnApplied * 100).toFixed(1)}%): ${fmt(r.accGrowth)}`);
+    if (strategy === "three-bucket") {
+      if (r.prepGrowth) lines.push(`Preparation growth: ${fmt(r.prepGrowth)}`);
+      if (r.withdGrowth) lines.push(`Withdrawal growth: ${fmt(r.withdGrowth)}`);
+      if (r.prepToWithd) lines.push(`Refill Prep → Withd: ${fmt(r.prepToWithd)}`);
+      if (r.accToPrep) lines.push(`Refill Acc → Prep: ${fmt(r.accToPrep)}`);
+      if (r.accToWithd) lines.push(`Last-resort Acc → spend: ${fmt(r.accToWithd)}`);
+    } else {
+      if (r.withdGrowth) lines.push(`Debt sleeve growth: ${fmt(r.withdGrowth)}`);
+      if (r.accToWithd) lines.push(`Rebalance: ${fmt(r.accToWithd)} equity → debt`);
+    }
+    if (r.emergencyUsed > 0) lines.push(`⚠ Emergency reserve used: ${fmt(r.emergencyUsed)}`);
+  }
+  return lines;
+}
+
+// Attach `notes[]` to every row in a result. Idempotent; safe to call
+// multiple times.
+export function attachBullets(
+  result: ProjectionResult,
+  strategy: "three-bucket" | "two-bucket" = "three-bucket",
+): ProjectionResult {
+  for (const r of result.rows) {
+    if (!r.notes || r.notes.length === 0) {
+      r.notes = buildYearBullets(r, strategy);
+    }
+  }
+  return result;
+}
+
 function mulberry32(seed: number) {
   let t = seed >>> 0;
   return () => {
