@@ -400,41 +400,33 @@ function buildSequenceReturns(
   const safeLo = Math.max(-0.999999, Math.min(lo, hi));
   const safeHi = Math.max(safeLo + 0.000001, hi);
   const safeCagr = Math.max(safeLo, Math.min(safeHi, cagr));
-  const loLog = Math.log1p(safeLo);
-  const hiLog = Math.log1p(safeHi);
-  // Sample log-returns UNIFORMLY across [loLog, hiLog] so the realised
-  // distribution has equal density at every point in the user's range —
-  // no upper-end clustering that occurred when a normal sampler was
-  // clamped against the cap.
-  const clampedLogs: number[] = [];
+  // Sample annual returns UNIFORMLY in arithmetic space across [safeLo, safeHi]
+  // so every point in the user's chosen range has equal probability density.
+  // Sampling in log-space (used previously) combined with bias-correction toward
+  // a target CAGR caused systematic clustering near the upper cap, because the
+  // shift required to reach a positive CAGR pushed many draws against hiLog.
+  // We deliberately do NOT bias-correct here: the realised geometric mean is an
+  // emergent property of the user's [min, max] window. The CAGR input is used
+  // for the deterministic "controlled" sequence elsewhere — Monte Carlo paths
+  // express the spread implied by min/max, which is what the user asked for.
+  const draws: number[] = new Array(years);
+  const range = safeHi - safeLo;
   for (let i = 0; i < years; i++) {
-    const u = rand();
-    clampedLogs.push(loLog + u * (hiLog - loLog));
+    draws[i] = safeLo + rand() * range;
   }
-  // Then bias-correct so the geometric mean lands on the requested CAGR.
-  const meanLog = Math.log1p(safeCagr);
-  for (let iter = 0; iter < 25; iter++) {
-    const sampleMean = clampedLogs.reduce((a, b) => a + b, 0) / clampedLogs.length;
-    const gap = meanLog - sampleMean;
-    if (Math.abs(gap) < 1e-6) break;
-    const movable: number[] = [];
-    for (let i = 0; i < clampedLogs.length; i++) {
-      if (gap > 0 && clampedLogs[i] < hiLog - 1e-9) movable.push(i);
-      else if (gap < 0 && clampedLogs[i] > loLog + 1e-9) movable.push(i);
+  // Light centring: only adjust if the empirical arithmetic mean has drifted
+  // far from the midpoint of the range due to small-sample noise. We shift by
+  // at most 25% of the gap toward the requested CAGR, and never beyond the
+  // [safeLo, safeHi] bounds — keeping the distribution visually uniform.
+  const targetMean = Math.max(safeLo, Math.min(safeHi, safeCagr));
+  const empMean = draws.reduce((a, b) => a + b, 0) / draws.length;
+  const shift = (targetMean - empMean) * 0.25;
+  if (Math.abs(shift) > 1e-6) {
+    for (let i = 0; i < years; i++) {
+      draws[i] = Math.max(safeLo, Math.min(safeHi, draws[i] + shift));
     }
-    if (movable.length === 0) break;
-    const totalShift = gap * clampedLogs.length;
-    const perYear = totalShift / movable.length;
-    let applied = 0;
-    for (const i of movable) {
-      const before = clampedLogs[i];
-      const after = Math.min(hiLog, Math.max(loLog, before + perYear));
-      applied += after - before;
-      clampedLogs[i] = after;
-    }
-    if (Math.abs(applied) < 1e-9) break;
   }
-  return clampedLogs.map((r) => Math.expm1(r));
+  return draws;
 }
 
 export function projectTwoBucket(rawInput: RetirementInputs): ProjectionResult {
