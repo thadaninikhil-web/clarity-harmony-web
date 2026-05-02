@@ -12,9 +12,17 @@ import { StrategySwitcher } from "@/components/retirement/StrategySwitcher";
 import {
   projectTwoBucket,
   validateInputs,
+  attachBullets,
   type RetirementInputs,
 } from "@/lib/retirement";
 import { readShared, subscribeShared, writeShared } from "@/lib/sharedInputs";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Button } from "@/components/ui/button";
+import { ChevronDown, Settings2 } from "lucide-react";
 
 const defaultMonthlyExpenses = 80000;
 const defaultRetireAge = 60;
@@ -74,9 +82,13 @@ const TwoBucketSimulator = () => {
   const validation = useMemo(() => validateInputs(safeValues), [safeValues]);
   const result = useMemo(
     () =>
-      validation.ok ? projectTwoBucket(safeValues) : projectTwoBucket(defaults),
+      attachBullets(
+        validation.ok ? projectTwoBucket(safeValues) : projectTwoBucket(defaults),
+        "two-bucket",
+      ),
     [safeValues, validation.ok],
   );
+  const [inputsOpen, setInputsOpen] = useState(true);
 
   const reshuffleSequence = useCallback(() => {
     setValues((v) => ({
@@ -147,34 +159,47 @@ const TwoBucketSimulator = () => {
         </div>
       </section>
 
-      <main className="container mx-auto px-6 lg:px-8 py-10 space-y-6">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 max-w-full overflow-x-hidden">
         <HowToUse strategy="two-bucket" />
-        <div className="grid gap-6 lg:grid-cols-[420px_1fr]">
-          <aside>
-            <InputsErrorBoundary>
-              <TwoBucketInputsForm
-                values={values}
-                onChange={setValues}
-                onReset={resetToDefaults}
-              />
-            </InputsErrorBoundary>
-          </aside>
-          <section className="space-y-6">
-            <ValidationBanner issues={validation.errors} />
-            <Results
-              result={result}
-              name={values.name}
-              inputs={safeValues}
-              strategy="two-bucket"
-              onReshuffleSequence={reshuffleSequence}
-              onSipSolved={(sip) =>
-                setValues((v) => ({ ...v, monthlyInvestment: sip }))
-              }
-            />
-            <SaveCompare inputs={safeValues} result={result} onLoad={setValues} />
-            <Methodology strategy="two-bucket" />
-          </section>
-        </div>
+        <Collapsible open={inputsOpen} onOpenChange={setInputsOpen}>
+          <div className="rounded-xl border bg-card shadow-[var(--shadow-card)]">
+            <CollapsibleTrigger asChild>
+              <Button
+                variant="ghost"
+                className="w-full justify-between h-auto py-4 px-6 hover:bg-muted/40"
+              >
+                <span className="flex items-center gap-2 font-medium">
+                  <Settings2 className="size-4" />
+                  {inputsOpen ? "Inputs & assumptions" : "Show inputs & assumptions"}
+                </span>
+                <ChevronDown className={`size-4 transition-transform ${inputsOpen ? "rotate-180" : ""}`} />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="px-6 pb-6 pt-2">
+              <InputsErrorBoundary>
+                <TwoBucketInputsForm
+                  values={values}
+                  onChange={setValues}
+                  onReset={resetToDefaults}
+                />
+              </InputsErrorBoundary>
+            </CollapsibleContent>
+          </div>
+        </Collapsible>
+
+        <ValidationBanner issues={validation.errors} />
+        <Results
+          result={result}
+          name={values.name}
+          inputs={safeValues}
+          strategy="two-bucket"
+          onReshuffleSequence={reshuffleSequence}
+          onSipSolved={(sip) =>
+            setValues((v) => ({ ...v, monthlyInvestment: sip }))
+          }
+        />
+        <SaveCompare inputs={safeValues} result={result} onLoad={setValues} />
+        <Methodology strategy="two-bucket" />
         <p className="mt-12 text-center text-xs text-muted-foreground">
           Educational calculator — not investment advice. Returns shown are
           nominal and assume constant rates apart from the configured stress
