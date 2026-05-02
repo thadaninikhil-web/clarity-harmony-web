@@ -67,12 +67,9 @@ export function TwoBucketInputsForm({ values, onChange, onReset }: Props) {
               value={values.dob}
               onChange={(e) => {
                 const v = e.target.value;
-                const yr = Number(v.slice(0, 4));
-                if (
-                  v &&
-                  (!Number.isFinite(yr) || yr < 1900 || yr > new Date().getFullYear())
-                ) {
-                  return;
+                if (v) {
+                  const yr = Number(v.slice(0, 4));
+                  if (!Number.isFinite(yr) || yr > 9999) return;
                 }
                 set("dob", v);
               }}

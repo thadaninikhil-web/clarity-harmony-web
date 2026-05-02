@@ -55,11 +55,13 @@ export function InputsForm({ values, onChange, onReset }: Props) {
               value={values.dob}
               onChange={(e) => {
                 const v = e.target.value;
-                // Reject pathological year inputs (e.g. 19761) before they
-                // hit the engine and produce thousands of rows.
-                const yr = Number(v.slice(0, 4));
-                if (v && (!Number.isFinite(yr) || yr < 1900 || yr > new Date().getFullYear())) {
-                  return;
+                // Allow free typing — the browser only emits a value once
+                // the date parses, so "1" or partial entries never reach
+                // here. Only guard against a fully formed but out-of-range
+                // year (e.g. 19761) which the browser would still emit.
+                if (v) {
+                  const yr = Number(v.slice(0, 4));
+                  if (!Number.isFinite(yr) || yr > 9999) return;
                 }
                 set("dob", v);
               }}
