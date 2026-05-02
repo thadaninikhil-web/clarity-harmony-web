@@ -221,7 +221,11 @@ export function exportRetirementPDF(input: RetirementInputs, result: ProjectionR
       r.withdrawn ? formatINRPdf(r.withdrawn) : "-",
       r.emergencyReserve ? formatINRPdf(r.emergencyReserve) : "-",
     ];
-    return options.showCalculation ? [...base, ...detail, sanitizeForPdf(r.note ?? "")] : [...base, sanitizeForPdf(r.note ?? "")];
+    const noteBullets = (r.notes && r.notes.length > 0
+      ? r.notes
+      : buildYearBullets(r, isTwoBucket ? "two-bucket" : "three-bucket")
+    ).map((s) => `- ${s}`).join("\n");
+    return options.showCalculation ? [...base, ...detail, noteBullets] : [...base, noteBullets];
   });
 
   autoTable(doc, {
