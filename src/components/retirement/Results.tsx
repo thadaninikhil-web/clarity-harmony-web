@@ -436,7 +436,7 @@ export function Results({
                           ) : null}
 
                           {/* Notes (bullets) */}
-                          <td className="p-2 align-middle text-xs text-muted-foreground min-w-[260px]">
+                          <td className="p-2 align-top text-xs text-muted-foreground min-w-[260px]">
                             <ul className="list-disc list-inside space-y-0.5">
                               {bullets.map((b, idx) => (
                                 <li key={idx}>{b}</li>
