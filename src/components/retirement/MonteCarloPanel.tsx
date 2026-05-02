@@ -44,6 +44,10 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
     const ctrl = new AbortController();
     abortRef.current = ctrl;
     setProgress({ done: 0, total: inputs.monteCarloRuns, running: true });
+    // Inputs changed — any prior solver output is no longer valid.
+    setSolverResult(null);
+    setSolverProgress(null);
+    solverAbortRef.current?.abort();
     const runner = strategy === "two-bucket" ? projectTwoBucket : project;
     // Force MC-mode inputs for the runner regardless of saved state.
     const mcInputs = {

@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Download, Shuffle, FileSpreadsheet, Info, AlertTriangle } from "lucide-react";
 import {
   Area,
@@ -147,16 +146,58 @@ export function Results({
         </div>
       </div>
 
-      <Tabs defaultValue="summary" className="w-full">
-        <TabsList className="flex flex-wrap h-auto">
-          <TabsTrigger value="summary">Summary</TabsTrigger>
-          <TabsTrigger value="montecarlo">Monte Carlo</TabsTrigger>
-          <TabsTrigger value="schedule">Year-by-year</TabsTrigger>
-        </TabsList>
+      {/* INPUT SUMMARY */}
+      <Card className="shadow-[var(--shadow-card)]">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium">Input summary</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-x-6 gap-y-2 text-xs sm:grid-cols-2 lg:grid-cols-4">
+            <SummaryRow label="Current monthly expenses" value={formatINR(inputs.currentMonthlyExpenses)} />
+            <SummaryRow label="Inflation" value={`${(inputs.inflationRate * 100).toFixed(1)}%`} />
+            <SummaryRow label="Current corpus" value={formatINR(inputs.currentCorpus)} />
+            <SummaryRow label="Monthly SIP" value={formatINR(inputs.monthlyInvestment)} />
+            <SummaryRow label="SIP step-up" value={`${(inputs.sipStepUpRate * 100).toFixed(0)}%`} />
+            <SummaryRow label="Retirement age" value={String(inputs.retirementAge)} />
+            <SummaryRow label="Life expectancy" value={String(inputs.lifeExpectancyAge ?? inputs.retirementAge + inputs.lifeExpectancyYears)} />
+            <SummaryRow label="Emergency fund" value={`${inputs.emergencyFundMonths ?? 0} mo`} />
+            <SummaryRow label="Equity CAGR" value={`${(inputs.sequenceCagr * 100).toFixed(1)}%`} />
+            <SummaryRow label="Return range" value={`${(inputs.sequenceMinReturn * 100).toFixed(0)}% to ${(inputs.sequenceMaxReturn * 100).toFixed(0)}%`} />
+            {!isTwoBucket && (
+              <>
+                <SummaryRow label="Prep equity" value={`${(inputs.prepEquityPct * 100).toFixed(0)}%`} />
+                <SummaryRow label="Withdrawal years" value={String(inputs.withdrawalYears)} />
+              </>
+            )}
+            <SummaryRow label="Monte Carlo runs" value={inputs.monteCarloRuns.toLocaleString("en-IN")} />
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* SUMMARY TAB */}
-        <TabsContent value="summary" className="space-y-4 mt-4">
-          <div className="grid gap-4 sm:grid-cols-2">
+      {/* MONTE CARLO */}
+      <Card className="shadow-[var(--shadow-card)]">
+        <CardHeader>
+          <CardTitle>Monte Carlo aggregate results</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Summary across all{" "}
+            <span className="font-semibold">{inputs.monteCarloRuns.toLocaleString("en-IN")}</span>{" "}
+            sequence-of-returns scenarios.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <MonteCarloPanel
+            inputs={inputs}
+            result={result}
+            strategy={strategy}
+            onReshuffle={onReshuffleSequence}
+            onSipSolved={onSipSolved}
+          />
+        </CardContent>
+      </Card>
+
+      {/* SCENARIO HEADLINE — Chart + Year-by-year together (one of N) */}
+      <div className="space-y-4">
+        <div className="grid gap-4 sm:grid-cols-2">
             <Card className="shadow-[var(--shadow-card)]">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm text-muted-foreground font-medium">
@@ -186,7 +227,7 @@ export function Results({
 
           <Card className="shadow-[var(--shadow-card)]">
             <CardHeader>
-              <CardTitle>Corpus over time</CardTitle>
+              <CardTitle>Corpus over time — single scenario</CardTitle>
               {scenarioBanner}
             </CardHeader>
             <CardContent>
@@ -268,34 +309,9 @@ export function Results({
               </div>
             </div>
           )}
-        </TabsContent>
 
-        {/* MONTE CARLO TAB */}
-        <TabsContent value="montecarlo" className="space-y-4 mt-4">
-          <Card className="shadow-[var(--shadow-card)]">
-            <CardHeader>
-              <CardTitle>Monte Carlo aggregate results</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Summary across all{" "}
-                <span className="font-semibold">{inputs.monteCarloRuns.toLocaleString("en-IN")}</span>{" "}
-                sequence-of-returns scenarios.
-              </p>
-            </CardHeader>
-            <CardContent>
-              <MonteCarloPanel
-                inputs={inputs}
-                result={result}
-                strategy={strategy}
-                onReshuffle={onReshuffleSequence}
-                onSipSolved={onSipSolved}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* YEAR-BY-YEAR TAB */}
-        <TabsContent value="schedule" className="space-y-4 mt-4">
-          <Card className="shadow-[var(--shadow-card)]">
+        {/* YEAR-BY-YEAR */}
+        <Card className="shadow-[var(--shadow-card)]">
             <CardHeader className="space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <CardTitle>Year-by-year</CardTitle>
@@ -314,7 +330,7 @@ export function Results({
                   {showDetails ? (
                     <DetailedHead isTwoBucket={isTwoBucket} stickyColHead={stickyColHead} />
                   ) : (
-                    <SimpleHead stickyColHead={stickyColHead} />
+                    <SimpleHead stickyColHead={stickyColHead} isTwoBucket={isTwoBucket} />
                   )}
                   <tbody>
                     {result.rows.map((r) => {
@@ -332,9 +348,9 @@ export function Results({
                       return (
                         <tr key={r.year} className={rowCls}>
                           {/* Summary block */}
-                          <td className={`${stickyCol} p-2 align-top`}>{r.year}</td>
-                          <td className="p-2 align-top">{r.age}</td>
-                          <td className="p-2 align-top">
+                          <td className={`${stickyCol} p-2 align-middle`}>{r.year}</td>
+                          <td className="p-2 align-middle">{r.age}</td>
+                          <td className="p-2 align-middle">
                             <Badge variant={r.phase === "retirement" ? "secondary" : "outline"} className="text-[10px]">
                               {r.phase}
                             </Badge>
@@ -344,68 +360,78 @@ export function Results({
                               <Badge className="ml-1 text-[10px] bg-amber-500 text-white hover:bg-amber-500">emergency</Badge>
                             ) : null}
                           </td>
-                          <td className="p-2 align-top text-right tabular-nums font-medium">{formatINR(r.total)}</td>
-                          <td className="p-2 align-top text-right tabular-nums text-muted-foreground">
+                          <td className="p-2 align-middle text-right tabular-nums font-medium">{formatINR(r.total)}</td>
+                          <td className="p-2 align-middle text-right tabular-nums text-muted-foreground">
                             {r.expense ? formatINR(r.expense) : "—"}
                           </td>
-                          <td className="p-2 align-top text-right tabular-nums text-muted-foreground">
+                          <td className="p-2 align-middle text-right tabular-nums text-muted-foreground">
                             {r.withdrawn ? formatINR(r.withdrawn) : "—"}
                           </td>
+
+                          {!showDetails && (
+                            <>
+                              <td className="p-2 align-middle text-right tabular-nums bg-bucket-accumulation/5">{formatINR(r.accumulation)}</td>
+                              {!isTwoBucket && (
+                                <td className="p-2 align-middle text-right tabular-nums bg-bucket-preparation/5">{formatINR(r.preparation)}</td>
+                              )}
+                              <td className="p-2 align-middle text-right tabular-nums bg-bucket-withdrawal/5">{formatINR(r.withdrawal)}</td>
+                            </>
+                          )}
 
                           {showDetails ? (
                             <>
                               {/* Accumulation block */}
-                              <td className="p-2 align-top text-right tabular-nums bg-bucket-accumulation/5">{formatINR(r.accOpening)}</td>
-                              <td className="p-2 align-top text-right tabular-nums bg-bucket-accumulation/5">
+                              <td className="p-2 align-middle text-right tabular-nums bg-bucket-accumulation/5">{formatINR(r.accOpening)}</td>
+                              <td className="p-2 align-middle text-right tabular-nums bg-bucket-accumulation/5">
                                 {r.contribution ? formatINR(r.contribution) : "—"}
                               </td>
-                              <td className="p-2 align-top text-right tabular-nums text-muted-foreground bg-bucket-accumulation/5">
+                              <td className="p-2 align-middle text-right tabular-nums text-muted-foreground bg-bucket-accumulation/5">
                                 {r.year === result.rows[0].year ? "—" : `${(safeNum(r.accReturnApplied) * 100).toFixed(1)}%`}
                               </td>
-                              <td className="p-2 align-top text-right tabular-nums bg-bucket-accumulation/5">
+                              <td className="p-2 align-middle text-right tabular-nums bg-bucket-accumulation/5">
                                 {r.accGrowth ? formatINR(r.accGrowth) : "—"}
                               </td>
-                              <td className="p-2 align-top text-right tabular-nums font-medium bg-bucket-accumulation/5">{formatINR(r.accumulation)}</td>
+                              <td className="p-2 align-middle text-right tabular-nums font-medium bg-bucket-accumulation/5">{formatINR(r.accumulation)}</td>
 
                               {/* Preparation block (3-bucket only) */}
                               {!isTwoBucket && (
                                 <>
-                                  <td className="p-2 align-top text-right tabular-nums bg-bucket-preparation/5">{formatINR(r.prepOpening)}</td>
-                                  <td className="p-2 align-top text-right tabular-nums bg-bucket-preparation/5">
+                                  <td className="p-2 align-middle text-right tabular-nums bg-bucket-preparation/5">{formatINR(r.prepOpening)}</td>
+                                  <td className="p-2 align-middle text-right tabular-nums bg-bucket-preparation/5">
                                     {r.accToPrep ? formatINR(r.accToPrep) : "—"}
                                   </td>
-                                  <td className="p-2 align-top text-right tabular-nums text-muted-foreground bg-bucket-preparation/5">
+                                  <td className="p-2 align-middle text-right tabular-nums text-muted-foreground bg-bucket-preparation/5">
                                     {(inputs.prepReturn * 100).toFixed(1)}%
                                   </td>
-                                  <td className="p-2 align-top text-right tabular-nums bg-bucket-preparation/5">
+                                  <td className="p-2 align-middle text-right tabular-nums bg-bucket-preparation/5">
                                     {r.prepGrowth ? formatINR(r.prepGrowth) : "—"}
                                   </td>
-                                  <td className="p-2 align-top text-right tabular-nums font-medium bg-bucket-preparation/5">{formatINR(r.preparation)}</td>
+                                  <td className="p-2 align-middle text-right tabular-nums font-medium bg-bucket-preparation/5">{formatINR(r.preparation)}</td>
                                 </>
                               )}
 
                               {/* Withdrawal / Debt block */}
-                              <td className="p-2 align-top text-right tabular-nums bg-bucket-withdrawal/5">{formatINR(r.withdOpening)}</td>
-                              <td className="p-2 align-top text-right tabular-nums bg-bucket-withdrawal/5">
+                              <td className="p-2 align-middle text-right tabular-nums bg-bucket-withdrawal/5">{formatINR(r.withdOpening)}</td>
+                              <td className="p-2 align-middle text-right tabular-nums bg-bucket-withdrawal/5">
                                 {(isTwoBucket ? r.accToWithd : r.prepToWithd + r.accToWithd) > 0
                                   ? formatINR(isTwoBucket ? r.accToWithd : r.prepToWithd + r.accToWithd)
                                   : "—"}
                               </td>
-                              <td className="p-2 align-top text-right tabular-nums text-muted-foreground bg-bucket-withdrawal/5">
+                              <td className="p-2 align-middle text-right tabular-nums text-muted-foreground bg-bucket-withdrawal/5">
                                 {(inputs.withdrawalReturn * 100).toFixed(2)}%
                               </td>
-                              <td className="p-2 align-top text-right tabular-nums bg-bucket-withdrawal/5">
+                              <td className="p-2 align-middle text-right tabular-nums bg-bucket-withdrawal/5">
                                 {r.withdGrowth ? formatINR(r.withdGrowth) : "—"}
                               </td>
                               {!isTwoBucket && (
-                                <td className="p-2 align-top text-right tabular-nums bg-bucket-withdrawal/5">
+                                <td className="p-2 align-middle text-right tabular-nums bg-bucket-withdrawal/5">
                                   {r.emergencyReserve ? formatINR(r.emergencyReserve) : "—"}
                                   {r.emergencyUsed > 0 && (
                                     <span className="block text-[10px] text-destructive">used {formatINR(r.emergencyUsed)}</span>
                                   )}
                                 </td>
                               )}
-                              <td className="p-2 align-top text-right tabular-nums font-medium bg-bucket-withdrawal/5">{formatINR(r.withdrawal)}</td>
+                              <td className="p-2 align-middle text-right tabular-nums font-medium bg-bucket-withdrawal/5">{formatINR(r.withdrawal)}</td>
                             </>
                           ) : null}
 
@@ -431,13 +457,21 @@ export function Results({
               </p>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+      </div>
     </div>
   );
 }
 
-function SimpleHead({ stickyColHead }: { stickyColHead: string }) {
+function SummaryRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-2 border-b border-border/40 py-1">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="font-medium text-foreground tabular-nums">{value}</span>
+    </div>
+  );
+}
+
+function SimpleHead({ stickyColHead, isTwoBucket }: { stickyColHead: string; isTwoBucket: boolean }) {
   return (
     <thead className="sticky top-0 z-30 bg-card shadow-[0_1px_0_0_var(--border)] [&_th]:bg-card">
       <tr className="border-b">
@@ -447,6 +481,11 @@ function SimpleHead({ stickyColHead }: { stickyColHead: string }) {
         <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground">Total corpus</th>
         <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground">Expense</th>
         <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground">Withdrawn</th>
+        <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground bg-bucket-accumulation/5">Accumulation</th>
+        {!isTwoBucket && (
+          <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground bg-bucket-preparation/5">Preparation</th>
+        )}
+        <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground bg-bucket-withdrawal/5">{isTwoBucket ? "Debt sleeve" : "Withdrawal"}</th>
         <th className="h-10 px-2 text-left align-middle font-medium text-muted-foreground min-w-[260px]">What happened</th>
       </tr>
     </thead>
