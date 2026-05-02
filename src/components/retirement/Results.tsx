@@ -447,8 +447,16 @@ export function Results({
               </p>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+      </div>
+    </div>
+  );
+}
+
+function SummaryRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-2 border-b border-border/40 py-1">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="font-medium text-foreground tabular-nums">{value}</span>
     </div>
   );
 }
