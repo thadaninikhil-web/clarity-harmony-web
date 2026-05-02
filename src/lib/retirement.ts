@@ -355,15 +355,19 @@ function buildSequenceReturns(
   const safeLo = Math.max(-0.999999, Math.min(lo, hi));
   const safeHi = Math.max(safeLo + 0.000001, hi);
   const safeCagr = Math.max(safeLo, Math.min(safeHi, cagr));
-  const meanLog = Math.log1p(safeCagr);
   const loLog = Math.log1p(safeLo);
   const hiLog = Math.log1p(safeHi);
-  const stdDev = Math.max(0.000001, (hiLog - loLog) / 4);
+  // Sample log-returns UNIFORMLY across [loLog, hiLog] so the realised
+  // distribution has equal density at every point in the user's range —
+  // no upper-end clustering that occurred when a normal sampler was
+  // clamped against the cap.
   const clampedLogs: number[] = [];
   for (let i = 0; i < years; i++) {
-    const logReturn = meanLog + stdDev * randomNormal(rand);
-    clampedLogs.push(Math.min(hiLog, Math.max(loLog, logReturn)));
+    const u = rand();
+    clampedLogs.push(loLog + u * (hiLog - loLog));
   }
+  // Then bias-correct so the geometric mean lands on the requested CAGR.
+  const meanLog = Math.log1p(safeCagr);
   for (let iter = 0; iter < 25; iter++) {
     const sampleMean = clampedLogs.reduce((a, b) => a + b, 0) / clampedLogs.length;
     const gap = meanLog - sampleMean;
