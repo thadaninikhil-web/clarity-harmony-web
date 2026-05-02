@@ -330,7 +330,7 @@ export function Results({
                   {showDetails ? (
                     <DetailedHead isTwoBucket={isTwoBucket} stickyColHead={stickyColHead} />
                   ) : (
-                    <SimpleHead stickyColHead={stickyColHead} />
+                    <SimpleHead stickyColHead={stickyColHead} isTwoBucket={isTwoBucket} />
                   )}
                   <tbody>
                     {result.rows.map((r) => {
@@ -471,7 +471,7 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function SimpleHead({ stickyColHead }: { stickyColHead: string }) {
+function SimpleHead({ stickyColHead, isTwoBucket }: { stickyColHead: string; isTwoBucket: boolean }) {
   return (
     <thead className="sticky top-0 z-30 bg-card shadow-[0_1px_0_0_var(--border)] [&_th]:bg-card">
       <tr className="border-b">
@@ -481,6 +481,11 @@ function SimpleHead({ stickyColHead }: { stickyColHead: string }) {
         <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground">Total corpus</th>
         <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground">Expense</th>
         <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground">Withdrawn</th>
+        <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground bg-bucket-accumulation/5">Accumulation</th>
+        {!isTwoBucket && (
+          <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground bg-bucket-preparation/5">Preparation</th>
+        )}
+        <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground bg-bucket-withdrawal/5">{isTwoBucket ? "Debt sleeve" : "Withdrawal"}</th>
         <th className="h-10 px-2 text-left align-middle font-medium text-muted-foreground min-w-[260px]">What happened</th>
       </tr>
     </thead>
