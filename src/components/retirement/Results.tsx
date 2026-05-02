@@ -368,6 +368,16 @@ export function Results({
                             {r.withdrawn ? formatINR(r.withdrawn) : "—"}
                           </td>
 
+                          {!showDetails && (
+                            <>
+                              <td className="p-2 align-middle text-right tabular-nums bg-bucket-accumulation/5">{formatINR(r.accumulation)}</td>
+                              {!isTwoBucket && (
+                                <td className="p-2 align-middle text-right tabular-nums bg-bucket-preparation/5">{formatINR(r.preparation)}</td>
+                              )}
+                              <td className="p-2 align-middle text-right tabular-nums bg-bucket-withdrawal/5">{formatINR(r.withdrawal)}</td>
+                            </>
+                          )}
+
                           {showDetails ? (
                             <>
                               {/* Accumulation block */}
