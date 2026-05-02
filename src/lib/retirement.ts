@@ -87,6 +87,7 @@ export interface YearRow {
   emergencyReserve: number;
   emergencyUsed: number;
   note?: string;
+  notes?: string[];
 }
 
 export interface ProjectionResult {
@@ -326,6 +327,57 @@ export const formatINRExactPdf = (n: number): string => {
 
 const emptyTransfers = () => ({ accToPrep: 0, prepToWithd: 0, accToWithd: 0 });
 
+// Build a short, scannable bullet list describing what happened in a single
+// year. Used by both the on-screen table and the PDF/XLSX exports so the
+// "Note" column stays consistent across surfaces.
+export function buildYearBullets(
+  r: YearRow,
+  strategy: "three-bucket" | "two-bucket" = "three-bucket",
+): string[] {
+  const lines: string[] = [];
+  const fmt = (n: number) => formatINR(n);
+  if (r.phase === "accumulation") {
+    if (r.contribution > 0) lines.push(`SIP contribution: ${fmt(r.contribution)}`);
+    if (r.accGrowth) lines.push(`Accumulation growth (${(r.accReturnApplied * 100).toFixed(1)}%): ${fmt(r.accGrowth)}`);
+    if (strategy === "three-bucket") {
+      if (r.prepGrowth) lines.push(`Preparation growth: ${fmt(r.prepGrowth)}`);
+      if (r.accToPrep) lines.push(`Glide-path Acc → Prep: ${fmt(r.accToPrep)}`);
+    } else if (r.withdGrowth) {
+      lines.push(`Debt sleeve growth: ${fmt(r.withdGrowth)}`);
+    }
+  } else {
+    // retirement
+    lines.push(`Expense: ${fmt(r.expense)}${r.withdrawn < r.expense - 1 ? ` · withdrawn ${fmt(r.withdrawn)} (shortfall)` : ""}`);
+    if (r.accGrowth) lines.push(`Accumulation growth (${(r.accReturnApplied * 100).toFixed(1)}%): ${fmt(r.accGrowth)}`);
+    if (strategy === "three-bucket") {
+      if (r.prepGrowth) lines.push(`Preparation growth: ${fmt(r.prepGrowth)}`);
+      if (r.withdGrowth) lines.push(`Withdrawal growth: ${fmt(r.withdGrowth)}`);
+      if (r.prepToWithd) lines.push(`Refill Prep → Withd: ${fmt(r.prepToWithd)}`);
+      if (r.accToPrep) lines.push(`Refill Acc → Prep: ${fmt(r.accToPrep)}`);
+      if (r.accToWithd) lines.push(`Last-resort Acc → spend: ${fmt(r.accToWithd)}`);
+    } else {
+      if (r.withdGrowth) lines.push(`Debt sleeve growth: ${fmt(r.withdGrowth)}`);
+      if (r.accToWithd) lines.push(`Rebalance: ${fmt(r.accToWithd)} equity → debt`);
+    }
+    if (r.emergencyUsed > 0) lines.push(`⚠ Emergency reserve used: ${fmt(r.emergencyUsed)}`);
+  }
+  return lines;
+}
+
+// Attach `notes[]` to every row in a result. Idempotent; safe to call
+// multiple times.
+export function attachBullets(
+  result: ProjectionResult,
+  strategy: "three-bucket" | "two-bucket" = "three-bucket",
+): ProjectionResult {
+  for (const r of result.rows) {
+    if (!r.notes || r.notes.length === 0) {
+      r.notes = buildYearBullets(r, strategy);
+    }
+  }
+  return result;
+}
+
 function mulberry32(seed: number) {
   let t = seed >>> 0;
   return () => {
@@ -334,12 +386,6 @@ function mulberry32(seed: number) {
     r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
     return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
   };
-}
-
-function randomNormal(rand: () => number): number {
-  const u1 = Math.max(Number.EPSILON, rand());
-  const u2 = rand();
-  return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
 }
 
 function buildSequenceReturns(
@@ -354,15 +400,19 @@ function buildSequenceReturns(
   const safeLo = Math.max(-0.999999, Math.min(lo, hi));
   const safeHi = Math.max(safeLo + 0.000001, hi);
   const safeCagr = Math.max(safeLo, Math.min(safeHi, cagr));
-  const meanLog = Math.log1p(safeCagr);
   const loLog = Math.log1p(safeLo);
   const hiLog = Math.log1p(safeHi);
-  const stdDev = Math.max(0.000001, (hiLog - loLog) / 4);
+  // Sample log-returns UNIFORMLY across [loLog, hiLog] so the realised
+  // distribution has equal density at every point in the user's range —
+  // no upper-end clustering that occurred when a normal sampler was
+  // clamped against the cap.
   const clampedLogs: number[] = [];
   for (let i = 0; i < years; i++) {
-    const logReturn = meanLog + stdDev * randomNormal(rand);
-    clampedLogs.push(Math.min(hiLog, Math.max(loLog, logReturn)));
+    const u = rand();
+    clampedLogs.push(loLog + u * (hiLog - loLog));
   }
+  // Then bias-correct so the geometric mean lands on the requested CAGR.
+  const meanLog = Math.log1p(safeCagr);
   for (let iter = 0; iter < 25; iter++) {
     const sampleMean = clampedLogs.reduce((a, b) => a + b, 0) / clampedLogs.length;
     const gap = meanLog - sampleMean;
