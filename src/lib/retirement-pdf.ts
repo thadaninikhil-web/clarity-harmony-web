@@ -6,6 +6,7 @@ import {
   type ProjectionResult,
   type RetirementInputs,
 } from "@/lib/retirement";
+import { buildYearBullets } from "@/lib/retirement";
 
 const INK: [number, number, number] = [20, 20, 20];
 const HEAD: [number, number, number] = [40, 40, 40];
@@ -161,6 +162,20 @@ export function exportRetirementPDF(input: RetirementInputs, result: ProjectionR
   doc.setFontSize(16);
   doc.text("Year-by-year projection", 40, 44);
 
+  // Scenario disclaimer at top of the year-by-year section.
+  const isMC = input.stressEnabled && input.stressMode === "sequence" && input.sequenceMode === "montecarlo";
+  if (isMC) {
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(9);
+    doc.setTextColor(90);
+    doc.text(
+      `Showing one of ${input.monteCarloRuns.toLocaleString("en-IN")} Monte Carlo scenarios. See the Monte Carlo summary on the next page for aggregate results.`,
+      40,
+      58,
+    );
+    doc.setTextColor(...INK);
+  }
+
   const baseColumns = isTwoBucket
     ? ["Year", "Age", "Phase", "Eq Ret", "Equity", "Debt", "Total", "Contribution", "Expense", "Eq>Debt", "Note"]
     : ["Year", "Age", "Phase", "Acc Ret", "Accumulation", "Preparation", "Withdrawal", "Total", "Contribution", "Expense", "Acc>Prep", "Prep>Withd", "Acc>Withd", "Note"];
@@ -210,9 +225,11 @@ export function exportRetirementPDF(input: RetirementInputs, result: ProjectionR
   });
 
   autoTable(doc, {
-    startY: 60,
+    startY: isMC ? 70 : 60,
     head: [[...head]],
-    body,
+    body: body.map((row) => row.map((cell, i) =>
+      i === row.length - 1 ? sanitizeForPdf((cell as string) ?? "") : cell,
+    )),
     theme: "striped",
     showHead: "everyPage",
     rowPageBreak: "avoid",
@@ -232,6 +249,52 @@ export function exportRetirementPDF(input: RetirementInputs, result: ProjectionR
       doc.setTextColor(...INK);
     },
   });
+
+  // Monte Carlo aggregate page — separate section, only when MC is on.
+  if (isMC && result.monteCarlo) {
+    const mc = result.monteCarlo;
+    doc.addPage();
+    doc.setFont("times", "bold");
+    doc.setFontSize(16);
+    doc.text("Monte Carlo aggregate results", 40, 44);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text(
+      `These figures summarise all ${mc.runs.toLocaleString("en-IN")} sequence-of-returns scenarios — not just the one shown in the year-by-year table.`,
+      40,
+      64,
+    );
+    autoTable(doc, {
+      startY: 84,
+      head: [["Metric", "Value"]],
+      body: [
+        ["Scenarios run", mc.runs.toLocaleString("en-IN")],
+        ["Survived to life expectancy", `${mc.successCount.toLocaleString("en-IN")} (${(mc.successProbability * 100).toFixed(2)}%)`],
+        ["Depleted before life expectancy", mc.failureCount.toLocaleString("en-IN")],
+        ["Median depletion age (failed runs)", mc.medianDepletionAge !== undefined ? String(mc.medianDepletionAge) : "n/a"],
+      ],
+      theme: "grid",
+      headStyles: { fillColor: HEAD, textColor: 255 },
+      styles: { fontSize: 10, cellPadding: 5, font: "helvetica" },
+      columnStyles: { 0: { cellWidth: 280 }, 1: { cellWidth: 220 } },
+      margin: { left: 40 },
+    });
+    autoTable(doc, {
+      head: [["Percentile", "Final corpus"]],
+      body: [
+        ["P10 (10% ended below)", formatINRExactPdf(mc.p10FinalCorpus)],
+        ["P25 (lower quartile)", formatINRExactPdf(mc.p25FinalCorpus)],
+        ["P50 (median)", formatINRExactPdf(mc.p50FinalCorpus)],
+        ["P75 (upper quartile)", formatINRExactPdf(mc.p75FinalCorpus)],
+        ["P90 (10% ended above)", formatINRExactPdf(mc.p90FinalCorpus)],
+      ],
+      theme: "grid",
+      headStyles: { fillColor: HEAD, textColor: 255 },
+      styles: { fontSize: 10, cellPadding: 5, font: "helvetica" },
+      columnStyles: { 0: { cellWidth: 280 }, 1: { cellWidth: 220 } },
+      margin: { left: 40 },
+    });
+  }
 
   const fname = `${input.name ? input.name.replace(/\s+/g, "_") + "_" : ""}retirement_plan.pdf`;
   doc.save(fname);
