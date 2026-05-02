@@ -348,9 +348,9 @@ export function Results({
                       return (
                         <tr key={r.year} className={rowCls}>
                           {/* Summary block */}
-                          <td className={`${stickyCol} p-2 align-top`}>{r.year}</td>
-                          <td className="p-2 align-top">{r.age}</td>
-                          <td className="p-2 align-top">
+                          <td className={`${stickyCol} p-2 align-middle`}>{r.year}</td>
+                          <td className="p-2 align-middle">{r.age}</td>
+                          <td className="p-2 align-middle">
                             <Badge variant={r.phase === "retirement" ? "secondary" : "outline"} className="text-[10px]">
                               {r.phase}
                             </Badge>
@@ -360,73 +360,73 @@ export function Results({
                               <Badge className="ml-1 text-[10px] bg-amber-500 text-white hover:bg-amber-500">emergency</Badge>
                             ) : null}
                           </td>
-                          <td className="p-2 align-top text-right tabular-nums font-medium">{formatINR(r.total)}</td>
-                          <td className="p-2 align-top text-right tabular-nums text-muted-foreground">
+                          <td className="p-2 align-middle text-right tabular-nums font-medium">{formatINR(r.total)}</td>
+                          <td className="p-2 align-middle text-right tabular-nums text-muted-foreground">
                             {r.expense ? formatINR(r.expense) : "—"}
                           </td>
-                          <td className="p-2 align-top text-right tabular-nums text-muted-foreground">
+                          <td className="p-2 align-middle text-right tabular-nums text-muted-foreground">
                             {r.withdrawn ? formatINR(r.withdrawn) : "—"}
                           </td>
 
                           {showDetails ? (
                             <>
                               {/* Accumulation block */}
-                              <td className="p-2 align-top text-right tabular-nums bg-bucket-accumulation/5">{formatINR(r.accOpening)}</td>
-                              <td className="p-2 align-top text-right tabular-nums bg-bucket-accumulation/5">
+                              <td className="p-2 align-middle text-right tabular-nums bg-bucket-accumulation/5">{formatINR(r.accOpening)}</td>
+                              <td className="p-2 align-middle text-right tabular-nums bg-bucket-accumulation/5">
                                 {r.contribution ? formatINR(r.contribution) : "—"}
                               </td>
-                              <td className="p-2 align-top text-right tabular-nums text-muted-foreground bg-bucket-accumulation/5">
+                              <td className="p-2 align-middle text-right tabular-nums text-muted-foreground bg-bucket-accumulation/5">
                                 {r.year === result.rows[0].year ? "—" : `${(safeNum(r.accReturnApplied) * 100).toFixed(1)}%`}
                               </td>
-                              <td className="p-2 align-top text-right tabular-nums bg-bucket-accumulation/5">
+                              <td className="p-2 align-middle text-right tabular-nums bg-bucket-accumulation/5">
                                 {r.accGrowth ? formatINR(r.accGrowth) : "—"}
                               </td>
-                              <td className="p-2 align-top text-right tabular-nums font-medium bg-bucket-accumulation/5">{formatINR(r.accumulation)}</td>
+                              <td className="p-2 align-middle text-right tabular-nums font-medium bg-bucket-accumulation/5">{formatINR(r.accumulation)}</td>
 
                               {/* Preparation block (3-bucket only) */}
                               {!isTwoBucket && (
                                 <>
-                                  <td className="p-2 align-top text-right tabular-nums bg-bucket-preparation/5">{formatINR(r.prepOpening)}</td>
-                                  <td className="p-2 align-top text-right tabular-nums bg-bucket-preparation/5">
+                                  <td className="p-2 align-middle text-right tabular-nums bg-bucket-preparation/5">{formatINR(r.prepOpening)}</td>
+                                  <td className="p-2 align-middle text-right tabular-nums bg-bucket-preparation/5">
                                     {r.accToPrep ? formatINR(r.accToPrep) : "—"}
                                   </td>
-                                  <td className="p-2 align-top text-right tabular-nums text-muted-foreground bg-bucket-preparation/5">
+                                  <td className="p-2 align-middle text-right tabular-nums text-muted-foreground bg-bucket-preparation/5">
                                     {(inputs.prepReturn * 100).toFixed(1)}%
                                   </td>
-                                  <td className="p-2 align-top text-right tabular-nums bg-bucket-preparation/5">
+                                  <td className="p-2 align-middle text-right tabular-nums bg-bucket-preparation/5">
                                     {r.prepGrowth ? formatINR(r.prepGrowth) : "—"}
                                   </td>
-                                  <td className="p-2 align-top text-right tabular-nums font-medium bg-bucket-preparation/5">{formatINR(r.preparation)}</td>
+                                  <td className="p-2 align-middle text-right tabular-nums font-medium bg-bucket-preparation/5">{formatINR(r.preparation)}</td>
                                 </>
                               )}
 
                               {/* Withdrawal / Debt block */}
-                              <td className="p-2 align-top text-right tabular-nums bg-bucket-withdrawal/5">{formatINR(r.withdOpening)}</td>
-                              <td className="p-2 align-top text-right tabular-nums bg-bucket-withdrawal/5">
+                              <td className="p-2 align-middle text-right tabular-nums bg-bucket-withdrawal/5">{formatINR(r.withdOpening)}</td>
+                              <td className="p-2 align-middle text-right tabular-nums bg-bucket-withdrawal/5">
                                 {(isTwoBucket ? r.accToWithd : r.prepToWithd + r.accToWithd) > 0
                                   ? formatINR(isTwoBucket ? r.accToWithd : r.prepToWithd + r.accToWithd)
                                   : "—"}
                               </td>
-                              <td className="p-2 align-top text-right tabular-nums text-muted-foreground bg-bucket-withdrawal/5">
+                              <td className="p-2 align-middle text-right tabular-nums text-muted-foreground bg-bucket-withdrawal/5">
                                 {(inputs.withdrawalReturn * 100).toFixed(2)}%
                               </td>
-                              <td className="p-2 align-top text-right tabular-nums bg-bucket-withdrawal/5">
+                              <td className="p-2 align-middle text-right tabular-nums bg-bucket-withdrawal/5">
                                 {r.withdGrowth ? formatINR(r.withdGrowth) : "—"}
                               </td>
                               {!isTwoBucket && (
-                                <td className="p-2 align-top text-right tabular-nums bg-bucket-withdrawal/5">
+                                <td className="p-2 align-middle text-right tabular-nums bg-bucket-withdrawal/5">
                                   {r.emergencyReserve ? formatINR(r.emergencyReserve) : "—"}
                                   {r.emergencyUsed > 0 && (
                                     <span className="block text-[10px] text-destructive">used {formatINR(r.emergencyUsed)}</span>
                                   )}
                                 </td>
                               )}
-                              <td className="p-2 align-top text-right tabular-nums font-medium bg-bucket-withdrawal/5">{formatINR(r.withdrawal)}</td>
+                              <td className="p-2 align-middle text-right tabular-nums font-medium bg-bucket-withdrawal/5">{formatINR(r.withdrawal)}</td>
                             </>
                           ) : null}
 
                           {/* Notes (bullets) */}
-                          <td className="p-2 align-top text-xs text-muted-foreground min-w-[260px]">
+                          <td className="p-2 align-middle text-xs text-muted-foreground min-w-[260px]">
                             <ul className="list-disc list-inside space-y-0.5">
                               {bullets.map((b, idx) => (
                                 <li key={idx}>{b}</li>
