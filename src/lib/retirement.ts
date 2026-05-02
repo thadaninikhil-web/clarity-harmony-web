@@ -87,6 +87,7 @@ export interface YearRow {
   emergencyReserve: number;
   emergencyUsed: number;
   note?: string;
+  notes?: string[];
 }
 
 export interface ProjectionResult {
