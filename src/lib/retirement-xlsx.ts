@@ -2,13 +2,16 @@
 
 import * as XLSX from "xlsx";
 import type { ProjectionResult, RetirementInputs } from "@/lib/retirement";
+import { buildYearBullets } from "@/lib/retirement";
 
 interface Options {
   strategy?: "three-bucket" | "two-bucket";
 }
 
-const moneyFmt = '_-₹* #,##0_-;-₹* #,##0_-;_-₹* "-"_-;_-@_-';
-const pctFmt = "0.00%";
+// Full-precision rupee format — no lakh/crore truncation. Two decimals so
+// the on-screen detailed table values reconcile to the rupee.
+const moneyFmt = '_-₹* #,##0.00_-;-₹* #,##0.00_-;_-₹* "-"_-;_-@_-';
+const pctFmt = "0.0000%";
 
 export function exportRetirementXLSX(
   input: RetirementInputs,
@@ -16,6 +19,7 @@ export function exportRetirementXLSX(
   options: Options = {},
 ) {
   const isTwoBucket = options.strategy === "two-bucket";
+  const strategy = isTwoBucket ? "two-bucket" : "three-bucket";
   const wb = XLSX.utils.book_new();
 
   const assumptions: (string | number)[][] = [
@@ -76,62 +80,118 @@ export function exportRetirementXLSX(
   ws1["!cols"] = [{ wch: 38 }, { wch: 24 }];
   XLSX.utils.book_append_sheet(wb, ws1, "Assumptions");
 
+  // Year-by-year sheet — grouped per bucket (Start → Addition → Returns →
+  // Transfer → Closing) so it scans the way the user reads the on-screen
+  // detailed table. Raw rupee precision, no rounding.
+  const summaryGroup = ["Summary", "Summary", "Summary", "Summary", "Summary", "Summary"];
+  const accGroup = ["Accumulation", "Accumulation", "Accumulation", "Accumulation", "Accumulation"];
+  const prepGroup = ["Preparation", "Preparation", "Preparation", "Preparation", "Preparation"];
+  const withdGroup = isTwoBucket
+    ? ["Debt sleeve", "Debt sleeve", "Debt sleeve", "Debt sleeve", "Debt sleeve"]
+    : ["Withdrawal", "Withdrawal", "Withdrawal", "Withdrawal", "Withdrawal", "Withdrawal"];
+  const groupRow = isTwoBucket
+    ? [...summaryGroup, ...accGroup, ...withdGroup, "Notes"]
+    : [...summaryGroup, ...accGroup, ...prepGroup, ...withdGroup, "Notes"];
+
+  const summaryHeaders = ["Year", "Age", "Phase", "Total corpus (₹)", "Expense (₹)", "Withdrawn (₹)"];
+  const accHeaders = ["Acc start (₹)", "Acc addition (₹)", "Acc return %", "Acc growth (₹)", "Acc closing (₹)"];
+  const prepHeaders = ["Prep start (₹)", "Prep addition (Acc→Prep) (₹)", "Prep return %", "Prep growth (₹)", "Prep closing (₹)"];
+  const withdHeadersTwo = ["Debt start (₹)", "Rebalance (Eq→Debt) (₹)", "Debt return %", "Debt growth (₹)", "Debt closing (₹)"];
+  const withdHeadersThree = ["Withd start (₹)", "Inflow (Prep→Withd / Acc→Withd) (₹)", "Withd return %", "Withd growth (₹)", "Emergency reserve (₹)", "Withd closing (₹)"];
   const headers = isTwoBucket
-    ? [
-        "Year", "Age", "Phase", "Eq Return", "Equity (₹)", "Debt (₹)", "Total (₹)",
-        "Contribution (₹)", "Expense (₹)", "Eq → Debt rebalance (₹)",
-        "Eq opening (₹)", "Eq growth (₹)", "Debt opening (₹)", "Debt growth (₹)",
-        "Withdrawn (₹)", "Emergency reserve (₹)", "Note",
-      ]
-    : [
-        "Year", "Age", "Phase", "Acc Return",
-        "Accumulation (₹)", "Preparation (₹)", "Withdrawal (₹)", "Total (₹)",
-        "Contribution (₹)", "Expense (₹)",
-        "Acc → Prep (₹)", "Prep → Withd (₹)", "Acc → Withd (₹)",
-        "Acc opening (₹)", "Acc growth (₹)",
-        "Prep opening (₹)", "Prep growth (₹)",
-        "Withd opening (₹)", "Withd growth (₹)",
-        "Withdrawn (₹)", "Emergency reserve (₹)", "Note",
+    ? [...summaryHeaders, ...accHeaders, ...withdHeadersTwo, "Notes"]
+    : [...summaryHeaders, ...accHeaders, ...prepHeaders, ...withdHeadersThree, "Notes"];
+
+  const dataRows = result.rows.map((r) => {
+    const bullets = (r.notes && r.notes.length > 0 ? r.notes : buildYearBullets(r, strategy)).join(" \n");
+    if (isTwoBucket) {
+      return [
+        r.year, r.age, r.phase, r.total, r.expense, r.withdrawn,
+        // Accumulation (= equity sleeve)
+        r.accOpening, r.contribution, r.accReturnApplied, r.accGrowth, r.accumulation,
+        // Debt sleeve (stored under withdrawal fields in two-bucket)
+        r.withdOpening, r.accToWithd, input.withdrawalReturn, r.withdGrowth, r.withdrawal,
+        bullets,
       ];
+    }
+    return [
+      r.year, r.age, r.phase, r.total, r.expense, r.withdrawn,
+      // Accumulation
+      r.accOpening, r.contribution, r.accReturnApplied, r.accGrowth, r.accumulation,
+      // Preparation
+      r.prepOpening, r.accToPrep, input.prepReturn, r.prepGrowth, r.preparation,
+      // Withdrawal
+      r.withdOpening, r.prepToWithd + r.accToWithd, input.withdrawalReturn, r.withdGrowth, r.emergencyReserve, r.withdrawal,
+      bullets,
+    ];
+  });
 
-  const dataRows = result.rows.map((r) =>
-    isTwoBucket
-      ? [
-          r.year, r.age, r.phase, r.accReturnApplied,
-          Math.round(r.accumulation), Math.round(r.withdrawal), Math.round(r.total),
-          Math.round(r.contribution), Math.round(r.expense), Math.round(r.accToWithd),
-          Math.round(r.accOpening), Math.round(r.accGrowth),
-          Math.round(r.withdOpening), Math.round(r.withdGrowth),
-          Math.round(r.withdrawn), Math.round(r.emergencyReserve),
-          r.note ?? "",
-        ]
-      : [
-          r.year, r.age, r.phase, r.accReturnApplied,
-          Math.round(r.accumulation), Math.round(r.preparation), Math.round(r.withdrawal),
-          Math.round(r.total),
-          Math.round(r.contribution), Math.round(r.expense),
-          Math.round(r.accToPrep), Math.round(r.prepToWithd), Math.round(r.accToWithd),
-          Math.round(r.accOpening), Math.round(r.accGrowth),
-          Math.round(r.prepOpening), Math.round(r.prepGrowth),
-          Math.round(r.withdOpening), Math.round(r.withdGrowth),
-          Math.round(r.withdrawn), Math.round(r.emergencyReserve),
-          r.note ?? "",
-        ],
-  );
-
-  const ws2 = XLSX.utils.aoa_to_sheet([headers, ...dataRows]);
+  const ws2 = XLSX.utils.aoa_to_sheet([groupRow, headers, ...dataRows]);
   const moneyColIdx = headers.map((h, i) => (h.includes("(₹)") ? i : -1)).filter((i) => i >= 0);
-  for (let r = 1; r <= dataRows.length; r++) {
-    const retCell = ws2[XLSX.utils.encode_cell({ r, c: 3 })];
-    if (retCell && typeof retCell.v === "number") retCell.z = pctFmt;
+  const pctColIdx = headers.map((h, i) => (h.toLowerCase().includes("return %") ? i : -1)).filter((i) => i >= 0);
+  for (let r = 2; r < dataRows.length + 2; r++) {
+    for (const c of pctColIdx) {
+      const cell = ws2[XLSX.utils.encode_cell({ r, c })];
+      if (cell && typeof cell.v === "number") cell.z = pctFmt;
+    }
     for (const c of moneyColIdx) {
       const cell = ws2[XLSX.utils.encode_cell({ r, c })];
       if (cell && typeof cell.v === "number") cell.z = moneyFmt;
     }
   }
-  ws2["!cols"] = headers.map((h) => ({ wch: h === "Note" ? 60 : Math.max(12, h.length + 2) }));
+  ws2["!cols"] = headers.map((h) => ({ wch: h === "Notes" ? 80 : Math.max(14, h.length + 2) }));
   ws2["!autofilter"] = { ref: XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: dataRows.length, c: headers.length - 1 } }) };
+  // Merge group-header cells across each section.
+  const merges: XLSX.Range[] = [];
+  let cursor = 0;
+  const groupSizes = isTwoBucket
+    ? [summaryHeaders.length, accHeaders.length, withdHeadersTwo.length, 1]
+    : [summaryHeaders.length, accHeaders.length, prepHeaders.length, withdHeadersThree.length, 1];
+  for (const size of groupSizes) {
+    if (size > 1) merges.push({ s: { r: 0, c: cursor }, e: { r: 0, c: cursor + size - 1 } });
+    cursor += size;
+  }
+  ws2["!merges"] = merges;
+
+  // Scenario disclaimer for the year-by-year sheet (sequence + Monte Carlo).
+  const isMC = input.stressEnabled && input.stressMode === "sequence" && input.sequenceMode === "montecarlo";
+  if (isMC) {
+    XLSX.utils.sheet_add_aoa(
+      ws2,
+      [[`This year-by-year schedule reflects ONE of ${input.monteCarloRuns.toLocaleString("en-IN")} Monte Carlo scenarios. See the "Monte Carlo" sheet for aggregate results across all runs.`]],
+      { origin: { r: dataRows.length + 3, c: 0 } },
+    );
+  }
   XLSX.utils.book_append_sheet(wb, ws2, "Year-by-year");
+
+  // Monte Carlo sheet (only present if MC mode is on).
+  const mc = result.monteCarlo;
+  if (mc) {
+    const mcRows: (string | number)[][] = [
+      ["Monte Carlo aggregate results"],
+      [`Scenarios run: ${mc.runs.toLocaleString("en-IN")}`],
+      [`Survived to life expectancy: ${mc.successCount.toLocaleString("en-IN")} (${(mc.successProbability * 100).toFixed(2)}%)`],
+      [`Depleted before life expectancy: ${mc.failureCount.toLocaleString("en-IN")}`],
+      [`Median depletion age (failed runs): ${mc.medianDepletionAge ?? "n/a"}`],
+      [],
+      ["Final corpus distribution across all runs"],
+      ["Percentile", "Final corpus (₹)"],
+      ["P10", mc.p10FinalCorpus],
+      ["P25", mc.p25FinalCorpus],
+      ["P50 (median)", mc.p50FinalCorpus],
+      ["P75", mc.p75FinalCorpus],
+      ["P90", mc.p90FinalCorpus],
+      [],
+      ["Note: the Year-by-year sheet shows ONE of these scenarios. Re-running or reshuffling will produce a different draw with the same aggregate distribution."],
+    ];
+    const wsMc = XLSX.utils.aoa_to_sheet(mcRows);
+    for (let r = 8; r <= 12; r++) {
+      const cell = wsMc[XLSX.utils.encode_cell({ r, c: 1 })];
+      if (cell && typeof cell.v === "number") cell.z = moneyFmt;
+    }
+    wsMc["!cols"] = [{ wch: 28 }, { wch: 28 }];
+    XLSX.utils.book_append_sheet(wb, wsMc, "Monte Carlo");
+  }
 
   const fname = `${input.name ? input.name.replace(/\s+/g, "_") + "_" : ""}retirement_plan.xlsx`;
   XLSX.writeFile(wb, fname);
