@@ -337,12 +337,6 @@ function mulberry32(seed: number) {
   };
 }
 
-function randomNormal(rand: () => number): number {
-  const u1 = Math.max(Number.EPSILON, rand());
-  const u2 = rand();
-  return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
-}
-
 function buildSequenceReturns(
   years: number,
   cagr: number,
