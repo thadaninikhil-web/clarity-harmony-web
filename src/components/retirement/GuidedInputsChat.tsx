@@ -34,6 +34,23 @@ function parseNumber(raw: string): number {
   return Number.isFinite(n) ? n : NaN;
 }
 
+function inputWidthClass(type: FieldType): string {
+  switch (type) {
+    case "age":
+    case "number":
+    case "percent":
+    case "signed-percent":
+      return "w-32";
+    case "date":
+      return "w-44";
+    case "money":
+      return "w-56 sm:w-64";
+    case "text":
+    default:
+      return "flex-1 max-w-md";
+  }
+}
+
 function buildQuestions(): Question[] {
   return [
     {
