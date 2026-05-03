@@ -505,71 +505,66 @@ export function GuidedInputsChat({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="text-xs text-muted-foreground">
-          {isSummary
-            ? "Review your answers"
-            : `Question ${stepIdx + 1} of ${questions.length}`}
+      {/* Sticky progress header — visible while scrolling */}
+      <div className="sticky top-24 z-30 -mx-2 px-2 py-2 bg-background/90 backdrop-blur border-b">
+        <div className="flex items-center justify-between gap-3">
+          <div className="text-xs font-medium text-muted-foreground">
+            {isSummary
+              ? `Review your ${questions.length} answers`
+              : `Step ${stepIdx + 1} of ${questions.length}`}
+          </div>
+          {(turns.length > 0 || isSummary) && (
+            <Button variant="ghost" size="sm" onClick={restart} className="gap-2 h-8">
+              <RotateCcw className="size-3.5" />
+              Start over
+            </Button>
+          )}
         </div>
-        {(turns.length > 0 || isSummary) && (
-          <Button variant="ghost" size="sm" onClick={restart} className="gap-2 h-8">
-            <RotateCcw className="size-3.5" />
-            Start over
-          </Button>
-        )}
-      </div>
-
-      {/* Progress bar */}
-      <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-        <div
-          className="h-full bg-primary transition-all"
-          style={{ width: `${Math.min(100, (stepIdx / questions.length) * 100)}%` }}
-        />
+        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+          <div
+            className="h-full bg-primary transition-all"
+            style={{ width: `${Math.min(100, ((isSummary ? questions.length : stepIdx) / questions.length) * 100)}%` }}
+          />
+        </div>
       </div>
 
       <Card className="p-4 sm:p-6 shadow-[var(--shadow-card)] max-h-[60vh] overflow-y-auto" ref={scrollRef as any}>
         {/* Past turns */}
         <div className="space-y-4">
           {turns.map((t, i) => (
-            <div key={i} className="space-y-2">
-              <div className="flex items-start gap-2">
-                <div className="rounded-2xl rounded-tl-sm bg-muted/60 px-4 py-2.5 text-sm max-w-[85%]">
-                  {t.question}
-                </div>
+            <div key={i} className="group flex items-start justify-between gap-3 rounded-md px-2 py-1.5 hover:bg-muted/40">
+              <div className="flex-1 min-w-0">
+                <div className="text-sm">{t.question}</div>
+                <div className="text-sm font-medium text-primary mt-0.5">{t.answer}</div>
               </div>
-              <div className="flex items-start justify-end gap-2">
-                <button
-                  onClick={() => editField(t.qid)}
-                  className="opacity-0 group-hover:opacity-100 hover:opacity-100 text-muted-foreground hover:text-foreground"
-                  title="Edit"
-                >
-                  <Pencil className="size-3.5" />
-                </button>
-                <div className="rounded-2xl rounded-tr-sm bg-primary text-primary-foreground px-4 py-2.5 text-sm max-w-[85%] font-medium">
-                  {t.answer}
-                </div>
-              </div>
+              <button
+                onClick={() => editField(t.qid)}
+                className="shrink-0 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground opacity-60 group-hover:opacity-100"
+                title="Edit this answer"
+              >
+                <Pencil className="size-3.5" /> Edit
+              </button>
             </div>
           ))}
 
           {/* Current question */}
           {currentQ && (
-            <div className="space-y-3 pt-2">
-              <div className="flex items-start gap-2">
-                <div className="rounded-2xl rounded-tl-sm bg-muted/60 px-4 py-2.5 text-sm max-w-[85%]">
-                  {currentQ.prompt(values)}
-                  {editingId === currentQ.id && (
-                    <span className="ml-2 text-xs text-muted-foreground">(editing)</span>
-                  )}
-                </div>
+            <div className="space-y-2 pt-2 border-t">
+              <div className="text-sm font-medium">
+                {currentQ.prompt(values)}
+                {editingId === currentQ.id && (
+                  <span className="ml-2 text-xs text-muted-foreground">(editing)</span>
+                )}
               </div>
-              <div className="flex items-end gap-2 pt-1">
+              <div className="flex items-end gap-2">
                 <div className={inputWidthClass(currentQ.type)}>{renderInput()}</div>
-                <Button onClick={submit} size="icon" className="shrink-0">
+                <Button onClick={submit} size="icon" className="shrink-0" disabled={submitDisabled}>
                   <ArrowRight className="size-4" />
                 </Button>
               </div>
-              {error && <p className="text-xs text-destructive">{error}</p>}
+              {(error || liveError) && (
+                <p className="text-xs text-destructive">{error || liveError}</p>
+              )}
               <p className="text-[11px] text-muted-foreground">Press Enter or → to continue. Default is pre-filled.</p>
             </div>
           )}
