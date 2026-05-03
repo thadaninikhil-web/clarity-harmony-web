@@ -344,6 +344,7 @@ interface Props {
   onComplete: () => void;
   completed: boolean;
   onRestart: () => void;
+  startInSummary?: boolean;
 }
 
 interface ChatTurn {
@@ -352,28 +353,48 @@ interface ChatTurn {
   answer: string;
 }
 
-export function GuidedInputsChat({ values, onChange, onComplete, completed, onRestart }: Props) {
+export function GuidedInputsChat({
+  values,
+  onChange,
+  onComplete,
+  completed,
+  onRestart,
+  startInSummary = false,
+}: Props) {
   const questions = useMemo(buildQuestions, []);
-  const [stepIdx, setStepIdx] = useState(0);
-  const [turns, setTurns] = useState<ChatTurn[]>([]);
+  const [stepIdx, setStepIdx] = useState(startInSummary ? questions.length : 0);
+  const [turns, setTurns] = useState<ChatTurn[]>(() =>
+    startInSummary
+      ? questions.map((q) => ({ qid: q.id, question: q.prompt(values), answer: q.format(values) }))
+      : [],
+  );
   const [draft, setDraft] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [returnToSummary, setReturnToSummary] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const isSummary = stepIdx >= questions.length;
   const currentQ = !isSummary ? questions[stepIdx] : null;
 
-  // Pre-fill draft when question changes
+  // Pre-fill draft when question changes & live-validate
   useEffect(() => {
     if (currentQ) {
-      setDraft(currentQ.defaultFrom(values));
+      const d = currentQ.defaultFrom(values);
+      setDraft(d);
       setError(null);
       setTimeout(() => inputRef.current?.focus(), 50);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stepIdx]);
+
+  // Live validation as user types (without showing error before they touch it)
+  const liveError = useMemo(() => {
+    if (!currentQ) return null;
+    return currentQ.validate?.(draft, values) ?? null;
+  }, [currentQ, draft, values]);
+  const submitDisabled = !!liveError;
 
   // Scroll to bottom on new turn
   useEffect(() => {
@@ -389,22 +410,38 @@ export function GuidedInputsChat({ values, onChange, onComplete, completed, onRe
     }
     const next = currentQ.apply(values, draft);
     onChange(next);
-    setTurns((t) => [
-      ...t,
-      { qid: currentQ.id, question: currentQ.prompt(values), answer: currentQ.format(next) },
-    ]);
+    const newTurn: ChatTurn = {
+      qid: currentQ.id,
+      question: currentQ.prompt(values),
+      answer: currentQ.format(next),
+    };
+    setTurns((t) => {
+      const existing = t.findIndex((tt) => tt.qid === currentQ.id);
+      if (existing >= 0) {
+        const copy = [...t];
+        copy[existing] = newTurn;
+        return copy;
+      }
+      return [...t, newTurn];
+    });
     setDraft("");
     setError(null);
-    setStepIdx((i) => i + 1);
+    setEditingId(null);
+    if (returnToSummary) {
+      setReturnToSummary(false);
+      setStepIdx(questions.length);
+    } else {
+      setStepIdx((i) => i + 1);
+    }
   };
 
   const editField = (qid: string) => {
     const idx = questions.findIndex((q) => q.id === qid);
     if (idx < 0) return;
     setEditingId(qid);
+    setReturnToSummary(true);
     setStepIdx(idx);
-    // Drop turns after this one
-    setTurns((t) => t.filter((tt) => questions.findIndex((q) => q.id === tt.qid) < idx));
+    // Keep all other turns intact — only this one will be updated on submit
   };
 
   const restart = () => {
@@ -413,6 +450,7 @@ export function GuidedInputsChat({ values, onChange, onComplete, completed, onRe
     setDraft("");
     setError(null);
     setEditingId(null);
+    setReturnToSummary(false);
     onRestart();
   };
 
