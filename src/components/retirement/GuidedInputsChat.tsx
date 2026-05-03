@@ -34,6 +34,23 @@ function parseNumber(raw: string): number {
   return Number.isFinite(n) ? n : NaN;
 }
 
+function inputWidthClass(type: FieldType): string {
+  switch (type) {
+    case "age":
+    case "number":
+    case "percent":
+    case "signed-percent":
+      return "w-32";
+    case "date":
+      return "w-44";
+    case "money":
+      return "w-56 sm:w-64";
+    case "text":
+    default:
+      return "flex-1 max-w-md";
+  }
+}
+
 function buildQuestions(): Question[] {
   return [
     {
@@ -220,25 +237,27 @@ function buildQuestions(): Question[] {
       },
       format: (v) => pct(v.sequenceMaxReturn, 0),
     },
-    // Bucket 2 — Preparation
+    // Preparation — de-risking glide path
     {
-      id: "prepEquityPct",
-      label: "Preparation: equity allocation",
-      prompt: () => "Now your Preparation bucket — what % should be in equity? (default 30%)",
-      type: "percent",
-      defaultFrom: (v) => String(Math.round((v.prepEquityPct ?? 0.3) * 100)),
-      apply: (v, raw) => ({ ...v, prepEquityPct: (parseNumber(raw) || 0) / 100 }),
+      id: "prepYearsBeforeRetirement",
+      label: "Years before retirement to start de-risking",
+      prompt: () =>
+        "As you approach retirement, you'll want to gradually move money out of equity into safer options. How many years before retirement should this shift begin? (e.g. 3)",
+      type: "number",
+      defaultFrom: (v) => String(v.prepYearsBeforeRetirement ?? 3),
+      apply: (v, raw) => ({ ...v, prepYearsBeforeRetirement: Math.round(parseNumber(raw) || 0) }),
       validate: (raw) => {
         const n = parseNumber(raw);
-        if (!Number.isFinite(n) || n < 0 || n > 100) return "Enter 0–100";
+        if (!Number.isFinite(n) || n < 1 || n > 20) return "Enter 1–20";
         return null;
       },
-      format: (v) => pct(v.prepEquityPct, 0),
+      format: (v) => `${v.prepYearsBeforeRetirement} yrs`,
     },
     {
       id: "prepReturn",
-      label: "Preparation: expected return",
-      prompt: () => "What return do you expect from your Preparation bucket? (e.g. 7%)",
+      label: "Return on de-risked money",
+      prompt: () =>
+        "During this de-risking period, what return do you expect on this money? (mostly debt with a bit of equity, e.g. 7%)",
       type: "percent",
       defaultFrom: (v) => String(Math.round((v.prepReturn ?? 0.07) * 1000) / 10),
       apply: (v, raw) => ({ ...v, prepReturn: (parseNumber(raw) || 0) / 100 }),
@@ -250,38 +269,26 @@ function buildQuestions(): Question[] {
       format: (v) => pct(v.prepReturn, 1),
     },
     {
-      id: "prepYearsBeforeRetirement",
-      label: "Preparation: years before retirement",
-      prompt: () => "How many years before retirement should we start filling the Preparation bucket? (e.g. 3)",
-      type: "number",
-      defaultFrom: (v) => String(v.prepYearsBeforeRetirement ?? 3),
-      apply: (v, raw) => ({ ...v, prepYearsBeforeRetirement: Math.round(parseNumber(raw) || 0) }),
-      validate: (raw) => {
-        const n = parseNumber(raw);
-        if (!Number.isFinite(n) || n < 1 || n > 20) return "Enter 1–20";
-        return null;
-      },
-      format: (v) => `${v.prepYearsBeforeRetirement} yrs`,
-    },
-    // Bucket 3 — Withdrawal
-    {
-      id: "withdrawalReturn",
-      label: "Withdrawal: expected return",
-      prompt: () => "What return do you expect from your Withdrawal bucket? (e.g. 5.5%)",
+      id: "prepEquityPct",
+      label: "Equity % during de-risking",
+      prompt: () =>
+        "What % of this de-risked money should still stay in equity? (default 30%)",
       type: "percent",
-      defaultFrom: (v) => String(Math.round((v.withdrawalReturn ?? 0.055) * 1000) / 10),
-      apply: (v, raw) => ({ ...v, withdrawalReturn: (parseNumber(raw) || 0) / 100 }),
+      defaultFrom: (v) => String(Math.round((v.prepEquityPct ?? 0.3) * 100)),
+      apply: (v, raw) => ({ ...v, prepEquityPct: (parseNumber(raw) || 0) / 100 }),
       validate: (raw) => {
         const n = parseNumber(raw);
-        if (!Number.isFinite(n) || n < 0 || n > 20) return "Enter 0–20";
+        if (!Number.isFinite(n) || n < 0 || n > 100) return "Enter 0–100";
         return null;
       },
-      format: (v) => pct(v.withdrawalReturn, 2),
+      format: (v) => pct(v.prepEquityPct, 0),
     },
+    // Withdrawal — safe income reserve
     {
       id: "withdrawalYears",
-      label: "Withdrawal: years of expenses",
-      prompt: () => "How many years of expenses should sit in the Withdrawal bucket? (e.g. 3)",
+      label: "Years of expenses in safe instruments",
+      prompt: () =>
+        "Once retired, you'll want a few years' worth of expenses parked in risk-free / minimal-risk instruments so market dips don't force you to sell. How many years of expenses should sit there? (e.g. 3)",
       type: "number",
       defaultFrom: (v) => String(v.withdrawalYears ?? 3),
       apply: (v, raw) => ({ ...v, withdrawalYears: Math.round(parseNumber(raw) || 0) }),
@@ -291,6 +298,21 @@ function buildQuestions(): Question[] {
         return null;
       },
       format: (v) => `${v.withdrawalYears} yrs`,
+    },
+    {
+      id: "withdrawalReturn",
+      label: "Return on safe withdrawal money",
+      prompt: () =>
+        "What return do you expect on this safe money? (e.g. 5.5%)",
+      type: "percent",
+      defaultFrom: (v) => String(Math.round((v.withdrawalReturn ?? 0.055) * 1000) / 10),
+      apply: (v, raw) => ({ ...v, withdrawalReturn: (parseNumber(raw) || 0) / 100 }),
+      validate: (raw) => {
+        const n = parseNumber(raw);
+        if (!Number.isFinite(n) || n < 0 || n > 20) return "Enter 0–20";
+        return null;
+      },
+      format: (v) => pct(v.withdrawalReturn, 2),
     },
     {
       id: "emergencyFundMonths",
@@ -504,7 +526,7 @@ export function GuidedInputsChat({ values, onChange, onComplete, completed, onRe
                 </div>
               </div>
               <div className="flex items-end gap-2 pt-1">
-                <div className="flex-1">{renderInput()}</div>
+                <div className={inputWidthClass(currentQ.type)}>{renderInput()}</div>
                 <Button onClick={submit} size="icon" className="shrink-0">
                   <ArrowRight className="size-4" />
                 </Button>
