@@ -558,7 +558,7 @@ export function GuidedInputsChat({
                   <span className="ml-2 text-xs text-muted-foreground">(editing)</span>
                 )}
               </div>
-              <div className="flex items-end gap-2">
+              <div className="flex items-end gap-2" onInput={() => setTouched(true)}>
                 <div className={inputWidthClass(currentQ.type)}>{renderInput()}</div>
                 <Button onClick={submit} size="icon" className="shrink-0" disabled={submitDisabled}>
                   <ArrowRight className="size-4" />
