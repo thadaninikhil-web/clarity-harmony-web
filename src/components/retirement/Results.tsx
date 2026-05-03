@@ -68,10 +68,20 @@ export function Results({
     [result.rows, isTwoBucket],
   );
 
-  const rightDomain: [number, number] = [
-    Math.floor(safeNum(inputs.sequenceMinReturn) * 100),
-    Math.ceil(safeNum(inputs.sequenceMaxReturn) * 100),
-  ];
+  // Symmetric domain centred on 0 so the right-axis 0% line sits in the middle
+  const rightDomain: [number, number] = (() => {
+    const lo = Math.abs(safeNum(inputs.sequenceMinReturn) * 100);
+    const hi = Math.abs(safeNum(inputs.sequenceMaxReturn) * 100);
+    const m = Math.max(5, Math.ceil(Math.max(lo, hi)));
+    return [-m, m];
+  })();
+  const rightTicks = (() => {
+    const m = rightDomain[1];
+    const step = m <= 10 ? 5 : m <= 30 ? 10 : 20;
+    const out: number[] = [];
+    for (let v = -m; v <= m + 0.0001; v += step) out.push(Math.round(v));
+    return out;
+  })();
 
   const tappedYears = useMemo(
     () => new Set(result.rows.filter((r) => safeNum(r.emergencyUsed) > 0).map((r) => r.year)),
@@ -263,6 +273,7 @@ export function Results({
                       tickFormatter={(v) => `${v}%`}
                       width={48}
                       domain={rightDomain}
+                      ticks={rightTicks}
                     />
                     <Tooltip
                       contentStyle={{
