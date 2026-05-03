@@ -372,6 +372,7 @@ export function GuidedInputsChat({
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [returnToSummary, setReturnToSummary] = useState(false);
+  const [touched, setTouched] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -384,6 +385,7 @@ export function GuidedInputsChat({
       const d = currentQ.defaultFrom(values);
       setDraft(d);
       setError(null);
+      setTouched(false);
       setTimeout(() => inputRef.current?.focus(), 50);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -562,9 +564,9 @@ export function GuidedInputsChat({
                   <ArrowRight className="size-4" />
                 </Button>
               </div>
-              {(error || liveError) && (
-                <p className="text-xs text-destructive">{error || liveError}</p>
-              )}
+      {(error || (touched && liveError)) && (
+        <p className="text-xs text-destructive">{error || liveError}</p>
+      )}
               <p className="text-[11px] text-muted-foreground">Press Enter or → to continue. Default is pre-filled.</p>
             </div>
           )}
