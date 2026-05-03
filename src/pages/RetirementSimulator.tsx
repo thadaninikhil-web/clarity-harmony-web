@@ -52,10 +52,11 @@ const defaults: RetirementInputs = {
 const RetirementSimulator = () => {
   // Load any previously-entered shared inputs so the user doesn't have to
   // re-answer the same questions on the two-bucket / compare tabs.
-  const [values, setValues] = useState<RetirementInputs>(() => {
-    const shared = readShared();
-    return shared ? { ...defaults, ...shared } : defaults;
-  });
+  const initialShared = useMemo(() => readShared(), []);
+  const [values, setValues] = useState<RetirementInputs>(() =>
+    initialShared ? { ...defaults, ...initialShared } : defaults,
+  );
+  const hasPrefilled = !!initialShared;
   const validation = useMemo(() => validateInputs(values), [values]);
   const result = useMemo(
     () => attachBullets(validation.ok ? project(values) : project(defaults), "three-bucket"),
@@ -133,6 +134,7 @@ const RetirementSimulator = () => {
             values={values}
             onChange={setValues}
             completed={completed}
+            startInSummary={hasPrefilled}
             onComplete={() => {
               setCompleted(true);
               setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
