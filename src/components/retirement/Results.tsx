@@ -68,10 +68,20 @@ export function Results({
     [result.rows, isTwoBucket],
   );
 
-  const rightDomain: [number, number] = [
-    Math.floor(safeNum(inputs.sequenceMinReturn) * 100),
-    Math.ceil(safeNum(inputs.sequenceMaxReturn) * 100),
-  ];
+  // Symmetric domain centred on 0 so the right-axis 0% line sits in the middle
+  const rightDomain: [number, number] = (() => {
+    const lo = Math.abs(safeNum(inputs.sequenceMinReturn) * 100);
+    const hi = Math.abs(safeNum(inputs.sequenceMaxReturn) * 100);
+    const m = Math.max(5, Math.ceil(Math.max(lo, hi)));
+    return [-m, m];
+  })();
+  const rightTicks = (() => {
+    const m = rightDomain[1];
+    const step = m <= 10 ? 5 : m <= 30 ? 10 : 20;
+    const out: number[] = [];
+    for (let v = -m; v <= m + 0.0001; v += step) out.push(Math.round(v));
+    return out;
+  })();
 
   const tappedYears = useMemo(
     () => new Set(result.rows.filter((r) => safeNum(r.emergencyUsed) > 0).map((r) => r.year)),
@@ -174,6 +184,36 @@ export function Results({
         </CardContent>
       </Card>
 
+      {/* CAGR explanation */}
+      <Card className="shadow-[var(--shadow-card)] border-accent/30">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium flex items-center gap-2">
+            <Info className="size-4 text-accent" />
+            How CAGR is computed
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="text-xs text-muted-foreground space-y-2">
+          <p>
+            Each Monte Carlo path draws a yearly equity return uniformly between{" "}
+            <span className="font-mono text-foreground">{(inputs.sequenceMinReturn * 100).toFixed(0)}%</span>{" "}
+            and{" "}
+            <span className="font-mono text-foreground">{(inputs.sequenceMaxReturn * 100).toFixed(0)}%</span>.
+            We then bias-correct the draws so the realised{" "}
+            <em>geometric mean</em> matches your target CAGR of{" "}
+            <span className="font-mono text-foreground">{(inputs.sequenceCagr * 100).toFixed(1)}%</span>.
+          </p>
+          <p className="font-mono text-foreground">
+            CAGR = (∏ (1 + rₜ))<sup>1/N</sup> − 1
+          </p>
+          <p>
+            Where <span className="font-mono">rₜ</span> is the year-t return and{" "}
+            <span className="font-mono">N</span> is the number of years. This avoids
+            the “volatility drag” that would otherwise pull the realised return below
+            the simple average of the bad-year and good-year inputs.
+          </p>
+        </CardContent>
+      </Card>
+
       {/* MONTE CARLO */}
       <Card className="shadow-[var(--shadow-card)]">
         <CardHeader>
@@ -263,6 +303,7 @@ export function Results({
                       tickFormatter={(v) => `${v}%`}
                       width={48}
                       domain={rightDomain}
+                      ticks={rightTicks}
                     />
                     <Tooltip
                       contentStyle={{
