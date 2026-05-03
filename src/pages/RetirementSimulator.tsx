@@ -50,10 +50,10 @@ const defaults: RetirementInputs = {
 };
 
 const RetirementSimulator = () => {
-  const [values, setValues] = useState<RetirementInputs>(() => {
-    const shared = readShared();
-    return shared ? { ...defaults, ...shared } : defaults;
-  });
+  // Always start fresh on a full page load — guided flow should re-collect
+  // all inputs from scratch. We still subscribe to cross-tab shared updates
+  // below so changes made in another simulator while this tab is open sync in.
+  const [values, setValues] = useState<RetirementInputs>(defaults);
   const validation = useMemo(() => validateInputs(values), [values]);
   const result = useMemo(
     () => attachBullets(validation.ok ? project(values) : project(defaults), "three-bucket"),
