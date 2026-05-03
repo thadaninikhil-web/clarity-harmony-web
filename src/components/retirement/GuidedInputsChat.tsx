@@ -509,7 +509,7 @@ export function GuidedInputsChat({ values, onChange, onComplete, completed, onRe
                 </div>
               </div>
               <div className="flex items-end gap-2 pt-1">
-                <div className="flex-1">{renderInput()}</div>
+                <div className={inputWidthClass(currentQ.type)}>{renderInput()}</div>
                 <Button onClick={submit} size="icon" className="shrink-0">
                   <ArrowRight className="size-4" />
                 </Button>
