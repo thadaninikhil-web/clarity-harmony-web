@@ -414,17 +414,26 @@ function buildSequenceReturns(
   for (let i = 0; i < years; i++) {
     draws[i] = safeLo + rand() * range;
   }
-  // Light centring: only adjust if the empirical arithmetic mean has drifted
-  // far from the midpoint of the range due to small-sample noise. We shift by
-  // at most 25% of the gap toward the requested CAGR, and never beyond the
-  // [safeLo, safeHi] bounds — keeping the distribution visually uniform.
-  const targetMean = Math.max(safeLo, Math.min(safeHi, safeCagr));
-  const empMean = draws.reduce((a, b) => a + b, 0) / draws.length;
-  const shift = (targetMean - empMean) * 0.25;
-  if (Math.abs(shift) > 1e-6) {
+  // Bias-correct so the realised geometric mean (CAGR) of each path matches the
+  // user's requested CAGR. Without this, uniform sampling produces a CAGR that
+  // is systematically lower than the arithmetic mean (volatility drag).
+  // We multiplicatively shift (1+r) for each draw, clamp into [safeLo, safeHi],
+  // and repeat a few times to absorb clamping error.
+  const targetCagr = Math.max(safeLo, Math.min(safeHi, safeCagr));
+  for (let iter = 0; iter < 8; iter++) {
+    let logSum = 0;
+    for (let i = 0; i < years; i++) logSum += Math.log(1 + draws[i]);
+    const geomMean = Math.exp(logSum / years) - 1;
+    const factor = (1 + targetCagr) / (1 + geomMean);
+    if (Math.abs(factor - 1) < 1e-6) break;
+    let changed = false;
     for (let i = 0; i < years; i++) {
-      draws[i] = Math.max(safeLo, Math.min(safeHi, draws[i] + shift));
+      const next = (1 + draws[i]) * factor - 1;
+      const clamped = Math.max(safeLo, Math.min(safeHi, next));
+      if (clamped !== draws[i]) changed = true;
+      draws[i] = clamped;
     }
+    if (!changed) break;
   }
   return draws;
 }
