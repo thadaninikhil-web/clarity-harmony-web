@@ -801,6 +801,10 @@ export function project(rawInput: RetirementInputs): ProjectionResult {
       note: notes.join(" · ") || undefined,
     });
   }
+  const appliedReturns = rows.slice(1).map((row) => row.accReturnApplied);
+  const currentRunCagr = appliedReturns.length
+    ? Math.exp(appliedReturns.reduce((sum, r) => sum + Math.log1p(r), 0) / appliedReturns.length) - 1
+    : undefined;
   const retireRow = rows[yearsToRetirement] ?? rows[rows.length - 1];
   const output: ProjectionResult = {
     rows, ageAtStart, yearsToRetirement,
@@ -809,7 +813,7 @@ export function project(rawInput: RetirementInputs): ProjectionResult {
     emergencyFundAtRetirement: emergencyAtRetirement,
     depleted, depletionAge,
     finalCorpus: rows[rows.length - 1].total,
-    emergencyUsedFirstYear, emergencyUsedFirstAge, emergencyUsedTotal,
+    emergencyUsedFirstYear, emergencyUsedFirstAge, emergencyUsedTotal, currentRunCagr,
   };
   return output;
 }
