@@ -576,7 +576,7 @@ export function GuidedInputsChat({
       <Card className="p-4 sm:p-6 shadow-[var(--shadow-card)] max-h-[60vh] overflow-y-auto" ref={scrollRef as any}>
         {/* Past turns */}
         <div className="space-y-4">
-          {turns.map((t, i) => (
+          {(!completed || showCompletedReview) && turns.map((t, i) => (
             <div key={i} className="group flex items-start justify-between gap-3 rounded-md px-2 py-1.5 hover:bg-muted/40">
               <div className="flex-1 min-w-0">
                 <div className="text-sm">{t.question}</div>
@@ -618,7 +618,7 @@ export function GuidedInputsChat({
           )}
 
           {/* Summary view */}
-          {isSummary && (
+          {isSummary && (!completed || showCompletedReview) && (
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground">
                 Here's everything you've told me. Click any value to edit, or hit Calculate to see your results.
@@ -645,11 +645,20 @@ export function GuidedInputsChat({
                   <RotateCcw className="size-4" />
                   Start over
                 </Button>
-                <Button onClick={onComplete} className="gap-2">
+                <Button onClick={() => { setShowCompletedReview(false); onComplete(); }} className="gap-2">
                   {completed ? "Recalculate" : "Calculate"}
                   <ArrowRight className="size-4" />
                 </Button>
               </div>
+            </div>
+          )}
+          {isSummary && completed && !showCompletedReview && (
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-sm text-muted-foreground">Inputs are complete and shared across all simulator tabs.</p>
+              <Button variant="outline" onClick={() => setShowCompletedReview(true)} className="gap-2">
+                <Pencil className="size-4" />
+                Edit inputs
+              </Button>
             </div>
           )}
         </div>
