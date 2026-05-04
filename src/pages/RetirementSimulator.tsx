@@ -137,6 +137,7 @@ const RetirementSimulator = () => {
             startInSummary={hasPrefilled}
             onComplete={() => {
               setCompleted(true);
+              setValues((v) => ({ ...v, sequenceSeed: Math.floor(Math.random() * 2 ** 31) || 1 }));
               setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
             }}
             onRestart={() => {
