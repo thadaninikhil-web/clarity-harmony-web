@@ -2,9 +2,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { ArrowRight, Pencil, RotateCcw } from "lucide-react";
+import { ArrowLeft, ArrowRight, Pencil, RotateCcw } from "lucide-react";
 import { IndianNumberInput } from "@/components/retirement/IndianNumberInput";
-import type { RetirementInputs } from "@/lib/retirement";
+import { formatDisplayDate, type RetirementInputs } from "@/lib/retirement";
 
 type FieldType = "text" | "date" | "money" | "age" | "percent" | "number" | "signed-percent";
 
@@ -50,6 +50,9 @@ function inputWidthClass(type: FieldType): string {
       return "flex-1 max-w-md";
   }
 }
+
+const focusInput = () => setTimeout(() => inputRefGlobal.current?.focus(), 40);
+const inputRefGlobal: { current: HTMLInputElement | null } = { current: null };
 
 function buildQuestions(): Question[] {
   return [
