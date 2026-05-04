@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { TwoBucketInputsForm } from "@/components/retirement/TwoBucketInputsForm";
+import { GuidedInputsChat } from "@/components/retirement/GuidedInputsChat";
 import { InputsErrorBoundary } from "@/components/retirement/InputsErrorBoundary";
 import { Results } from "@/components/retirement/Results";
 import { Methodology } from "@/components/retirement/Methodology";
@@ -16,13 +16,6 @@ import {
   type RetirementInputs,
 } from "@/lib/retirement";
 import { readShared, subscribeShared, writeShared } from "@/lib/sharedInputs";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { Button } from "@/components/ui/button";
-import { ChevronDown, Settings2 } from "lucide-react";
 
 const defaultMonthlyExpenses = 80000;
 const defaultRetireAge = 60;
@@ -62,11 +55,14 @@ const defaults: RetirementInputs = {
 };
 
 const TwoBucketSimulator = () => {
-  const [values, setValues] = useState<RetirementInputs>(() => {
-    const shared = readShared();
-    return shared ? { ...defaults, ...shared } : defaults;
-  });
+  const initialShared = useMemo(() => readShared(), []);
+  const [values, setValues] = useState<RetirementInputs>(() =>
+    initialShared ? { ...defaults, ...initialShared } : defaults,
+  );
+  const hasPrefilled = !!initialShared;
   const skipNextWriteRef = useRef(false);
+  const [completed, setCompleted] = useState(hasPrefilled);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   // Force prep fields off so any inputs flowing in from shared / saved
   // scenarios cannot accidentally re-introduce a third bucket.
@@ -88,8 +84,6 @@ const TwoBucketSimulator = () => {
       ),
     [safeValues, validation.ok],
   );
-  const [inputsOpen, setInputsOpen] = useState(true);
-
   const reshuffleSequence = useCallback(() => {
     setValues((v) => ({
       ...v,
@@ -114,8 +108,8 @@ const TwoBucketSimulator = () => {
       skipNextWriteRef.current = false;
       return;
     }
-    writeShared(safeValues);
-  }, [safeValues]);
+    writeShared(values);
+  }, [safeValues, values]);
 
   useEffect(() => {
     return subscribeShared(() => {
@@ -161,44 +155,40 @@ const TwoBucketSimulator = () => {
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 max-w-full overflow-x-hidden">
         <HowToUse strategy="two-bucket" />
-        <Collapsible open={inputsOpen} onOpenChange={setInputsOpen}>
-          <div className="rounded-xl border bg-card shadow-[var(--shadow-card)]">
-            <CollapsibleTrigger asChild>
-              <Button
-                variant="ghost"
-                className="w-full justify-between h-auto py-4 px-6 hover:bg-muted/40"
-              >
-                <span className="flex items-center gap-2 font-medium">
-                  <Settings2 className="size-4" />
-                  {inputsOpen ? "Inputs & assumptions" : "Show inputs & assumptions"}
-                </span>
-                <ChevronDown className={`size-4 transition-transform ${inputsOpen ? "rotate-180" : ""}`} />
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="px-6 pb-6 pt-2">
-              <InputsErrorBoundary>
-                <TwoBucketInputsForm
-                  values={values}
-                  onChange={setValues}
-                  onReset={resetToDefaults}
-                />
-              </InputsErrorBoundary>
-            </CollapsibleContent>
-          </div>
-        </Collapsible>
+        <InputsErrorBoundary>
+          <GuidedInputsChat
+            values={values}
+            onChange={setValues}
+            completed={completed}
+            startInSummary={hasPrefilled}
+            onComplete={() => {
+              setCompleted(true);
+              setValues((v) => ({ ...v, sequenceSeed: Math.floor(Math.random() * 2 ** 31) || 1 }));
+              setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+            }}
+            onRestart={() => {
+              setCompleted(false);
+              resetToDefaults();
+            }}
+          />
+        </InputsErrorBoundary>
 
-        <ValidationBanner issues={validation.errors} />
-        <Results
-          result={result}
-          name={values.name}
-          inputs={safeValues}
-          strategy="two-bucket"
-          onReshuffleSequence={reshuffleSequence}
-          onSipSolved={(sip) =>
-            setValues((v) => ({ ...v, monthlyInvestment: sip }))
-          }
-        />
-        <SaveCompare inputs={safeValues} result={result} onLoad={setValues} />
+        {completed && (
+          <div ref={resultsRef} className="space-y-6 scroll-mt-24">
+            <ValidationBanner issues={validation.errors} />
+            <Results
+              result={result}
+              name={values.name}
+              inputs={safeValues}
+              strategy="two-bucket"
+              onReshuffleSequence={reshuffleSequence}
+              onSipSolved={(sip) =>
+                setValues((v) => ({ ...v, monthlyInvestment: sip }))
+              }
+            />
+            <SaveCompare inputs={safeValues} result={result} onLoad={setValues} />
+          </div>
+        )}
         <Methodology strategy="two-bucket" />
         <p className="mt-12 text-center text-xs text-muted-foreground">
           Educational calculator — not investment advice. Returns shown are
