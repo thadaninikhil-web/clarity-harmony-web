@@ -103,6 +103,7 @@ export interface ProjectionResult {
   emergencyUsedFirstYear?: number;
   emergencyUsedFirstAge?: number;
   emergencyUsedTotal: number;
+  currentRunCagr?: number;
   monteCarlo?: MonteCarloResult;
 }
 
@@ -260,6 +261,13 @@ export function validateInputs(input: RetirementInputs): ValidationResult {
       message: "Min year return cannot be greater than max year return.",
     });
   }
+  if (input.sequenceCagr < input.sequenceMinReturn || input.sequenceCagr > input.sequenceMaxReturn) {
+    errors.push({
+      field: "sequenceCagr",
+      rule: "sequenceMinReturn <= sequenceCagr <= sequenceMaxReturn",
+      message: "Target CAGR must sit inside the bad-year / good-year return range.",
+    });
+  }
   if (input.emergencyFundMonths !== undefined && (input.emergencyFundMonths < 0 || !Number.isFinite(input.emergencyFundMonths))) {
     errors.push({
       field: "emergencyFundMonths",
@@ -308,6 +316,15 @@ export const formatINRExact = (n: number): string => {
   if (!isFinite(n)) return "—";
   const sign = n < 0 ? "-" : "";
   return `${sign}₹${indianGrouping(Math.abs(n))}`;
+};
+
+export const formatDisplayDate = (value: string): string => {
+  if (!value) return "—";
+  const [yyyy, mm, dd] = value.split("-").map(Number);
+  if (!yyyy || !mm || !dd) return value;
+  const d = new Date(Date.UTC(yyyy, mm - 1, dd));
+  if (Number.isNaN(d.getTime())) return value;
+  return d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric", timeZone: "UTC" }).toUpperCase().replace(/ /g, "-");
 };
 
 export const formatINRPdf = (n: number): string => {
@@ -400,42 +417,32 @@ function buildSequenceReturns(
   const safeLo = Math.max(-0.999999, Math.min(lo, hi));
   const safeHi = Math.max(safeLo + 0.000001, hi);
   const safeCagr = Math.max(safeLo, Math.min(safeHi, cagr));
-  // Sample annual returns UNIFORMLY in arithmetic space across [safeLo, safeHi]
-  // so every point in the user's chosen range has equal probability density.
-  // Sampling in log-space (used previously) combined with bias-correction toward
-  // a target CAGR caused systematic clustering near the upper cap, because the
-  // shift required to reach a positive CAGR pushed many draws against hiLog.
-  // We deliberately do NOT bias-correct here: the realised geometric mean is an
-  // emergent property of the user's [min, max] window. The CAGR input is used
-  // for the deterministic "controlled" sequence elsewhere — Monte Carlo paths
-  // express the spread implied by min/max, which is what the user asked for.
-  const draws: number[] = new Array(years);
-  const range = safeHi - safeLo;
-  for (let i = 0; i < years; i++) {
-    draws[i] = safeLo + rand() * range;
+  const loLog = Math.log1p(safeLo);
+  const hiLog = Math.log1p(safeHi);
+  const targetLog = Math.log1p(safeCagr);
+
+  if (targetLog <= loLog + 1e-12) return Array(years).fill(safeLo);
+  if (targetLog >= hiLog - 1e-12) return Array(years).fill(safeHi);
+
+  // Work in log-return space so the arithmetic mean of log(1+r) is exactly the
+  // requested CAGR. Pairwise random transfers keep the total log-return fixed,
+  // so every generated path has: ∏(1+rᵢ) = (1 + target CAGR)^years. Because we
+  // never clamp after the fact, values stay inside the user's min/max range
+  // without piling up at either boundary.
+  const logs = Array(years).fill(targetLog);
+  const iterations = Math.max(200, years * 80);
+  for (let iter = 0; iter < iterations; iter++) {
+    const i = Math.floor(rand() * years);
+    let j = Math.floor(rand() * (years - 1));
+    if (j >= i) j += 1;
+    const minDelta = Math.max(loLog - logs[i], logs[j] - hiLog);
+    const maxDelta = Math.min(hiLog - logs[i], logs[j] - loLog);
+    if (maxDelta <= minDelta) continue;
+    const delta = minDelta + rand() * (maxDelta - minDelta);
+    logs[i] += delta;
+    logs[j] -= delta;
   }
-  // Bias-correct so the realised geometric mean (CAGR) of each path matches the
-  // user's requested CAGR. Without this, uniform sampling produces a CAGR that
-  // is systematically lower than the arithmetic mean (volatility drag).
-  // We multiplicatively shift (1+r) for each draw, clamp into [safeLo, safeHi],
-  // and repeat a few times to absorb clamping error.
-  const targetCagr = Math.max(safeLo, Math.min(safeHi, safeCagr));
-  for (let iter = 0; iter < 8; iter++) {
-    let logSum = 0;
-    for (let i = 0; i < years; i++) logSum += Math.log(1 + draws[i]);
-    const geomMean = Math.exp(logSum / years) - 1;
-    const factor = (1 + targetCagr) / (1 + geomMean);
-    if (Math.abs(factor - 1) < 1e-6) break;
-    let changed = false;
-    for (let i = 0; i < years; i++) {
-      const next = (1 + draws[i]) * factor - 1;
-      const clamped = Math.max(safeLo, Math.min(safeHi, next));
-      if (clamped !== draws[i]) changed = true;
-      draws[i] = clamped;
-    }
-    if (!changed) break;
-  }
-  return draws;
+  return logs.map((v) => Math.exp(v) - 1);
 }
 
 export function projectTwoBucket(rawInput: RetirementInputs): ProjectionResult {
@@ -596,6 +603,10 @@ export function projectTwoBucket(rawInput: RetirementInputs): ProjectionResult {
       note: notes.join(" · ") || undefined,
     });
   }
+  const appliedReturns = rows.slice(1).map((row) => row.accReturnApplied);
+  const currentRunCagr = appliedReturns.length
+    ? Math.exp(appliedReturns.reduce((sum, r) => sum + Math.log1p(r), 0) / appliedReturns.length) - 1
+    : undefined;
   const retireRow = rows[yearsToRetirement] ?? rows[rows.length - 1];
   const output: ProjectionResult = {
     rows, ageAtStart, yearsToRetirement,
@@ -604,7 +615,7 @@ export function projectTwoBucket(rawInput: RetirementInputs): ProjectionResult {
     emergencyFundAtRetirement: emergencyAtRetirement,
     depleted, depletionAge,
     finalCorpus: rows[rows.length - 1].total,
-    emergencyUsedFirstYear, emergencyUsedFirstAge, emergencyUsedTotal,
+    emergencyUsedFirstYear, emergencyUsedFirstAge, emergencyUsedTotal, currentRunCagr,
   };
   void attachMonteCarlo;
   return output;
@@ -799,6 +810,10 @@ export function project(rawInput: RetirementInputs): ProjectionResult {
       note: notes.join(" · ") || undefined,
     });
   }
+  const appliedReturns = rows.slice(1).map((row) => row.accReturnApplied);
+  const currentRunCagr = appliedReturns.length
+    ? Math.exp(appliedReturns.reduce((sum, r) => sum + Math.log1p(r), 0) / appliedReturns.length) - 1
+    : undefined;
   const retireRow = rows[yearsToRetirement] ?? rows[rows.length - 1];
   const output: ProjectionResult = {
     rows, ageAtStart, yearsToRetirement,
@@ -807,7 +822,7 @@ export function project(rawInput: RetirementInputs): ProjectionResult {
     emergencyFundAtRetirement: emergencyAtRetirement,
     depleted, depletionAge,
     finalCorpus: rows[rows.length - 1].total,
-    emergencyUsedFirstYear, emergencyUsedFirstAge, emergencyUsedTotal,
+    emergencyUsedFirstYear, emergencyUsedFirstAge, emergencyUsedTotal, currentRunCagr,
   };
   return output;
 }

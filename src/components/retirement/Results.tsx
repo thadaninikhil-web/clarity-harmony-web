@@ -18,6 +18,7 @@ import {
 } from "recharts";
 import {
   buildYearBullets,
+  formatDisplayDate,
   formatINR,
   formatINRExact,
   type ProjectionResult,
@@ -104,6 +105,8 @@ export function Results({
 
   const stickyCol = "sticky left-0 z-20 bg-card shadow-[1px_0_0_0_var(--border)]";
   const stickyColHead = "sticky left-0 z-30 bg-card shadow-[1px_0_0_0_var(--border)]";
+  const currentRunCagr = result.currentRunCagr ?? 0;
+  const cagrDelta = currentRunCagr - inputs.sequenceCagr;
 
   const scenarioBanner = (
     <div className="mt-2 flex items-start gap-2 rounded-md border border-accent/40 bg-accent/10 p-3 text-xs text-foreground">
@@ -129,12 +132,6 @@ export function Results({
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {onReshuffleSequence && (
-            <Button variant="outline" size="sm" onClick={onReshuffleSequence} className="gap-2">
-              <Shuffle className="size-4" />
-              Reshuffle
-            </Button>
-          )}
           <Button
             variant="outline"
             size="sm"
@@ -163,6 +160,7 @@ export function Results({
         </CardHeader>
         <CardContent>
           <div className="grid gap-x-6 gap-y-2 text-xs sm:grid-cols-2 lg:grid-cols-4">
+            <SummaryRow label="Date of birth" value={formatDisplayDate(inputs.dob)} />
             <SummaryRow label="Current monthly expenses" value={formatINR(inputs.currentMonthlyExpenses)} />
             <SummaryRow label="Inflation" value={`${(inputs.inflationRate * 100).toFixed(1)}%`} />
             <SummaryRow label="Current corpus" value={formatINR(inputs.currentCorpus)} />
@@ -171,7 +169,8 @@ export function Results({
             <SummaryRow label="Retirement age" value={String(inputs.retirementAge)} />
             <SummaryRow label="Life expectancy" value={String(inputs.lifeExpectancyAge ?? inputs.retirementAge + inputs.lifeExpectancyYears)} />
             <SummaryRow label="Emergency fund" value={`${inputs.emergencyFundMonths ?? 0} mo`} />
-            <SummaryRow label="Equity CAGR" value={`${(inputs.sequenceCagr * 100).toFixed(1)}%`} />
+            <SummaryRow label="Target equity CAGR" value={`${(inputs.sequenceCagr * 100).toFixed(1)}%`} />
+            <SummaryRow label="Current run CAGR" value={`${(currentRunCagr * 100).toFixed(2)}%`} />
             <SummaryRow label="Return range" value={`${(inputs.sequenceMinReturn * 100).toFixed(0)}% to ${(inputs.sequenceMaxReturn * 100).toFixed(0)}%`} />
             {!isTwoBucket && (
               <>
@@ -194,13 +193,17 @@ export function Results({
         </CardHeader>
         <CardContent className="text-xs text-muted-foreground space-y-2">
           <p>
-            Each Monte Carlo path draws a yearly equity return uniformly between{" "}
+            Each Monte Carlo path varies yearly equity returns between{" "}
             <span className="font-mono text-foreground">{(inputs.sequenceMinReturn * 100).toFixed(0)}%</span>{" "}
             and{" "}
             <span className="font-mono text-foreground">{(inputs.sequenceMaxReturn * 100).toFixed(0)}%</span>.
-            We then bias-correct the draws so the realised{" "}
-            <em>geometric mean</em> matches your target CAGR of{" "}
+            The path is generated in log-return space so the realised{" "}
+            <em>geometric mean</em> of this run matches your target CAGR of{" "}
             <span className="font-mono text-foreground">{(inputs.sequenceCagr * 100).toFixed(1)}%</span>.
+          </p>
+          <p>
+            Current run CAGR: <span className="font-mono text-foreground">{(currentRunCagr * 100).toFixed(2)}%</span>
+            {` · difference ${(cagrDelta * 100).toFixed(3)} pp`}.
           </p>
           <p className="font-mono text-foreground">
             CAGR = (∏ (1 + rₜ))<sup>1/N</sup> − 1
@@ -267,7 +270,21 @@ export function Results({
 
           <Card className="shadow-[var(--shadow-card)]">
             <CardHeader>
-              <CardTitle>Corpus over time — single scenario</CardTitle>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <CardTitle>Corpus over time — single scenario</CardTitle>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Current run CAGR <span className="font-mono text-foreground">{(currentRunCagr * 100).toFixed(2)}%</span>
+                    {` · target ${(inputs.sequenceCagr * 100).toFixed(1)}%`}
+                  </p>
+                </div>
+                {onReshuffleSequence && (
+                  <Button variant="outline" size="sm" onClick={onReshuffleSequence} className="gap-2">
+                    <Shuffle className="size-4" />
+                    Reshuffle
+                  </Button>
+                )}
+              </div>
               {scenarioBanner}
             </CardHeader>
             <CardContent>

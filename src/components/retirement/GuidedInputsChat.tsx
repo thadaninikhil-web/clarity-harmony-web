@@ -2,9 +2,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { ArrowRight, Pencil, RotateCcw } from "lucide-react";
+import { ArrowLeft, ArrowRight, Pencil, RotateCcw } from "lucide-react";
 import { IndianNumberInput } from "@/components/retirement/IndianNumberInput";
-import type { RetirementInputs } from "@/lib/retirement";
+import { formatDisplayDate, type RetirementInputs } from "@/lib/retirement";
 
 type FieldType = "text" | "date" | "money" | "age" | "percent" | "number" | "signed-percent";
 
@@ -76,7 +76,7 @@ function buildQuestions(): Question[] {
         if (!Number.isFinite(yr) || yr < 1900 || yr > new Date().getFullYear()) return "Enter a valid year";
         return null;
       },
-      format: (v) => v.dob || "—",
+      format: (v) => formatDisplayDate(v.dob),
     },
     {
       id: "retirementAge",
@@ -373,8 +373,10 @@ export function GuidedInputsChat({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [returnToSummary, setReturnToSummary] = useState(false);
   const [touched, setTouched] = useState(false);
+  const [showCompletedReview, setShowCompletedReview] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const summaryRef = useRef<HTMLButtonElement>(null);
 
   const isSummary = stepIdx >= questions.length;
   const currentQ = !isSummary ? questions[stepIdx] : null;
@@ -387,9 +389,11 @@ export function GuidedInputsChat({
       setError(null);
       setTouched(false);
       setTimeout(() => inputRef.current?.focus(), 50);
+    } else if (isSummary) {
+      setTimeout(() => summaryRef.current?.focus(), 50);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stepIdx]);
+  }, [stepIdx, isSummary]);
 
   // Live validation as user types (without showing error before they touch it)
   const liveError = useMemo(() => {
@@ -442,8 +446,39 @@ export function GuidedInputsChat({
     if (idx < 0) return;
     setEditingId(qid);
     setReturnToSummary(true);
+    setShowCompletedReview(true);
     setStepIdx(idx);
     // Keep all other turns intact — only this one will be updated on submit
+  };
+
+  const goPrevious = () => {
+    if (stepIdx <= 0) return;
+    setEditingId(questions[stepIdx - 1].id);
+    setReturnToSummary(false);
+    setStepIdx((i) => Math.max(0, i - 1));
+  };
+
+  const focusSummaryStep = (index: number) => {
+    const button = scrollRef.current?.querySelector<HTMLButtonElement>(`[data-summary-step="${index}"]`);
+    button?.focus();
+  };
+
+  const onSummaryKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    const current = Number(target.dataset.summaryStep ?? 0);
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      focusSummaryStep(Math.min(questions.length - 1, current + 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      focusSummaryStep(Math.max(0, current - 1));
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      focusSummaryStep(0);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      focusSummaryStep(questions.length - 1);
+    }
   };
 
   const restart = () => {
@@ -453,6 +488,7 @@ export function GuidedInputsChat({
     setError(null);
     setEditingId(null);
     setReturnToSummary(false);
+    setShowCompletedReview(false);
     onRestart();
   };
 
@@ -462,13 +498,21 @@ export function GuidedInputsChat({
       if (e.key === "Enter") {
         e.preventDefault();
         submit();
+      } else if (e.key === "ArrowRight" && !submitDisabled) {
+        e.preventDefault();
+        submit();
+      } else if (e.key === "ArrowLeft" && draft === currentQ.defaultFrom(values)) {
+        e.preventDefault();
+        goPrevious();
       }
     };
     if (currentQ.type === "money") {
       return (
         <IndianNumberInput
+          ref={inputRef}
           value={Number(draft.replace(/,/g, "")) || 0}
           onChange={(n) => setDraft(String(n))}
+          onKeyDown={onKey}
           placeholder="₹"
         />
       );
@@ -533,7 +577,7 @@ export function GuidedInputsChat({
       <Card className="p-4 sm:p-6 shadow-[var(--shadow-card)] max-h-[60vh] overflow-y-auto" ref={scrollRef as any}>
         {/* Past turns */}
         <div className="space-y-4">
-          {turns.map((t, i) => (
+          {(!completed || showCompletedReview) && turns.map((t, i) => (
             <div key={i} className="group flex items-start justify-between gap-3 rounded-md px-2 py-1.5 hover:bg-muted/40">
               <div className="flex-1 min-w-0">
                 <div className="text-sm">{t.question}</div>
@@ -558,8 +602,11 @@ export function GuidedInputsChat({
                   <span className="ml-2 text-xs text-muted-foreground">(editing)</span>
                 )}
               </div>
-              <div className="flex items-end gap-2" onInput={() => setTouched(true)}>
+              <div className="flex flex-wrap items-end gap-2" onInput={() => setTouched(true)}>
                 <div className={inputWidthClass(currentQ.type)}>{renderInput()}</div>
+                <Button onClick={goPrevious} size="icon" variant="outline" className="shrink-0" disabled={stepIdx === 0} aria-label="Previous question">
+                  <ArrowLeft className="size-4" />
+                </Button>
                 <Button onClick={submit} size="icon" className="shrink-0" disabled={submitDisabled}>
                   <ArrowRight className="size-4" />
                 </Button>
@@ -572,20 +619,22 @@ export function GuidedInputsChat({
           )}
 
           {/* Summary view */}
-          {isSummary && (
+          {isSummary && (!completed || showCompletedReview) && (
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground">
                 Here's everything you've told me. Click any value to edit, or hit Calculate to see your results.
               </p>
-              <div className="divide-y rounded-lg border">
-                {questions.map((q) => (
+              <div className="divide-y rounded-lg border" role="listbox" aria-label="Review answers" onKeyDown={onSummaryKeyDown}>
+                {questions.map((q, index) => (
                   <button
                     key={q.id}
+                    ref={index === 0 ? summaryRef : undefined}
+                    data-summary-step={index}
                     onClick={() => editField(q.id)}
-                    className="flex w-full items-center justify-between gap-4 px-4 py-2.5 text-left hover:bg-muted/40 transition-colors"
+                    className="flex w-full flex-col gap-1 px-4 py-2.5 text-left hover:bg-muted/40 focus-visible:bg-muted/40 transition-colors sm:flex-row sm:items-center sm:justify-between"
                   >
                     <span className="text-xs text-muted-foreground">{q.label}</span>
-                    <span className="flex items-center gap-2 text-sm font-medium">
+                    <span className="flex items-center gap-2 text-sm font-medium text-primary sm:text-foreground">
                       {q.format(values)}
                       <Pencil className="size-3 text-muted-foreground" />
                     </span>
@@ -597,11 +646,20 @@ export function GuidedInputsChat({
                   <RotateCcw className="size-4" />
                   Start over
                 </Button>
-                <Button onClick={onComplete} className="gap-2">
+                <Button onClick={() => { setShowCompletedReview(false); onComplete(); }} className="gap-2">
                   {completed ? "Recalculate" : "Calculate"}
                   <ArrowRight className="size-4" />
                 </Button>
               </div>
+            </div>
+          )}
+          {isSummary && completed && !showCompletedReview && (
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-sm text-muted-foreground">Inputs are complete and shared across all simulator tabs.</p>
+              <Button variant="outline" onClick={() => setShowCompletedReview(true)} className="gap-2">
+                <Pencil className="size-4" />
+                Edit inputs
+              </Button>
             </div>
           )}
         </div>
