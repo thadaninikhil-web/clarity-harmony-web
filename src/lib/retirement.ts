@@ -318,6 +318,15 @@ export const formatINRExact = (n: number): string => {
   return `${sign}₹${indianGrouping(Math.abs(n))}`;
 };
 
+export const formatDisplayDate = (value: string): string => {
+  if (!value) return "—";
+  const [yyyy, mm, dd] = value.split("-").map(Number);
+  if (!yyyy || !mm || !dd) return value;
+  const d = new Date(Date.UTC(yyyy, mm - 1, dd));
+  if (Number.isNaN(d.getTime())) return value;
+  return d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric", timeZone: "UTC" }).toUpperCase().replace(/ /g, "-");
+};
+
 export const formatINRPdf = (n: number): string => {
   if (!isFinite(n)) return "—";
   const sign = n < 0 ? "-" : "";
