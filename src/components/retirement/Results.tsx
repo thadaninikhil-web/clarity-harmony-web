@@ -270,7 +270,21 @@ export function Results({
 
           <Card className="shadow-[var(--shadow-card)]">
             <CardHeader>
-              <CardTitle>Corpus over time — single scenario</CardTitle>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <CardTitle>Corpus over time — single scenario</CardTitle>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Current run CAGR <span className="font-mono text-foreground">{(currentRunCagr * 100).toFixed(2)}%</span>
+                    {` · target ${(inputs.sequenceCagr * 100).toFixed(1)}%`}
+                  </p>
+                </div>
+                {onReshuffleSequence && (
+                  <Button variant="outline" size="sm" onClick={onReshuffleSequence} className="gap-2">
+                    <Shuffle className="size-4" />
+                    Reshuffle
+                  </Button>
+                )}
+              </div>
               {scenarioBanner}
             </CardHeader>
             <CardContent>
