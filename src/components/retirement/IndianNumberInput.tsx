@@ -7,6 +7,7 @@ interface Props {
   onChange: (n: number) => void;
   className?: string;
   placeholder?: string;
+  onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
 }
 
 const groupIN = (digits: string): string => {
@@ -24,7 +25,7 @@ const groupIN = (digits: string): string => {
  * numeric value.
  */
 export const IndianNumberInput = React.forwardRef<HTMLInputElement, Props>(function IndianNumberInput(
-  { id, value, onChange, className, placeholder },
+  { id, value, onChange, className, placeholder, onKeyDown },
   ref,
 ) {
   const [text, setText] = React.useState<string>(value ? groupIN(String(Math.round(value))) : "");
@@ -53,6 +54,7 @@ export const IndianNumberInput = React.forwardRef<HTMLInputElement, Props>(funct
       inputMode="numeric"
       value={text}
       onChange={handle}
+      onKeyDown={onKeyDown}
       className={className}
       placeholder={placeholder}
     />
