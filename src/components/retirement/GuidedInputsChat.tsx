@@ -76,7 +76,7 @@ function buildQuestions(): Question[] {
         if (!Number.isFinite(yr) || yr < 1900 || yr > new Date().getFullYear()) return "Enter a valid year";
         return null;
       },
-      format: (v) => v.dob || "—",
+      format: (v) => formatDisplayDate(v.dob),
     },
     {
       id: "retirementAge",
