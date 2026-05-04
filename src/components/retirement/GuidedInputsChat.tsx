@@ -488,6 +488,7 @@ export function GuidedInputsChat({
     setError(null);
     setEditingId(null);
     setReturnToSummary(false);
+    setShowCompletedReview(false);
     onRestart();
   };
 
