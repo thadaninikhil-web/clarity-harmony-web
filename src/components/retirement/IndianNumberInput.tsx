@@ -23,7 +23,10 @@ const groupIN = (digits: string): string => {
  * (1,23,45,678) live as the user types. Calls onChange with the parsed
  * numeric value.
  */
-export function IndianNumberInput({ id, value, onChange, className, placeholder }: Props) {
+export const IndianNumberInput = React.forwardRef<HTMLInputElement, Props>(function IndianNumberInput(
+  { id, value, onChange, className, placeholder },
+  ref,
+) {
   const [text, setText] = React.useState<string>(value ? groupIN(String(Math.round(value))) : "");
 
   // Keep local text in sync when parent value changes externally (e.g. reset)
@@ -45,6 +48,7 @@ export function IndianNumberInput({ id, value, onChange, className, placeholder 
   return (
     <Input
       id={id}
+      ref={ref}
       type="text"
       inputMode="numeric"
       value={text}
@@ -53,4 +57,4 @@ export function IndianNumberInput({ id, value, onChange, className, placeholder 
       placeholder={placeholder}
     />
   );
-}
+});
