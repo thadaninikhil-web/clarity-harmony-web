@@ -506,8 +506,10 @@ export function GuidedInputsChat({
     if (currentQ.type === "money") {
       return (
         <IndianNumberInput
+          ref={inputRef}
           value={Number(draft.replace(/,/g, "")) || 0}
           onChange={(n) => setDraft(String(n))}
+          onKeyDown={onKey}
           placeholder="₹"
         />
       );
@@ -597,8 +599,11 @@ export function GuidedInputsChat({
                   <span className="ml-2 text-xs text-muted-foreground">(editing)</span>
                 )}
               </div>
-              <div className="flex items-end gap-2" onInput={() => setTouched(true)}>
+              <div className="flex flex-wrap items-end gap-2" onInput={() => setTouched(true)}>
                 <div className={inputWidthClass(currentQ.type)}>{renderInput()}</div>
+                <Button onClick={goPrevious} size="icon" variant="outline" className="shrink-0" disabled={stepIdx === 0} aria-label="Previous question">
+                  <ArrowLeft className="size-4" />
+                </Button>
                 <Button onClick={submit} size="icon" className="shrink-0" disabled={submitDisabled}>
                   <ArrowRight className="size-4" />
                 </Button>
@@ -616,15 +621,17 @@ export function GuidedInputsChat({
               <p className="text-sm text-muted-foreground">
                 Here's everything you've told me. Click any value to edit, or hit Calculate to see your results.
               </p>
-              <div className="divide-y rounded-lg border">
-                {questions.map((q) => (
+              <div className="divide-y rounded-lg border" role="listbox" aria-label="Review answers" onKeyDown={onSummaryKeyDown}>
+                {questions.map((q, index) => (
                   <button
                     key={q.id}
+                    ref={index === 0 ? summaryRef : undefined}
+                    data-summary-step={index}
                     onClick={() => editField(q.id)}
-                    className="flex w-full items-center justify-between gap-4 px-4 py-2.5 text-left hover:bg-muted/40 transition-colors"
+                    className="flex w-full flex-col gap-1 px-4 py-2.5 text-left hover:bg-muted/40 focus-visible:bg-muted/40 transition-colors sm:flex-row sm:items-center sm:justify-between"
                   >
                     <span className="text-xs text-muted-foreground">{q.label}</span>
-                    <span className="flex items-center gap-2 text-sm font-medium">
+                    <span className="flex items-center gap-2 text-sm font-medium text-primary sm:text-foreground">
                       {q.format(values)}
                       <Pencil className="size-3 text-muted-foreground" />
                     </span>
