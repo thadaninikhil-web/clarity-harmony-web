@@ -160,6 +160,7 @@ export function Results({
         </CardHeader>
         <CardContent>
           <div className="grid gap-x-6 gap-y-2 text-xs sm:grid-cols-2 lg:grid-cols-4">
+            <SummaryRow label="Date of birth" value={formatDisplayDate(inputs.dob)} />
             <SummaryRow label="Current monthly expenses" value={formatINR(inputs.currentMonthlyExpenses)} />
             <SummaryRow label="Inflation" value={`${(inputs.inflationRate * 100).toFixed(1)}%`} />
             <SummaryRow label="Current corpus" value={formatINR(inputs.currentCorpus)} />
@@ -168,7 +169,8 @@ export function Results({
             <SummaryRow label="Retirement age" value={String(inputs.retirementAge)} />
             <SummaryRow label="Life expectancy" value={String(inputs.lifeExpectancyAge ?? inputs.retirementAge + inputs.lifeExpectancyYears)} />
             <SummaryRow label="Emergency fund" value={`${inputs.emergencyFundMonths ?? 0} mo`} />
-            <SummaryRow label="Equity CAGR" value={`${(inputs.sequenceCagr * 100).toFixed(1)}%`} />
+            <SummaryRow label="Target equity CAGR" value={`${(inputs.sequenceCagr * 100).toFixed(1)}%`} />
+            <SummaryRow label="Current run CAGR" value={`${(currentRunCagr * 100).toFixed(2)}%`} />
             <SummaryRow label="Return range" value={`${(inputs.sequenceMinReturn * 100).toFixed(0)}% to ${(inputs.sequenceMaxReturn * 100).toFixed(0)}%`} />
             {!isTwoBucket && (
               <>
