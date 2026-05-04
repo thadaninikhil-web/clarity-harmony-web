@@ -51,9 +51,6 @@ function inputWidthClass(type: FieldType): string {
   }
 }
 
-const focusInput = () => setTimeout(() => inputRefGlobal.current?.focus(), 40);
-const inputRefGlobal: { current: HTMLInputElement | null } = { current: null };
-
 function buildQuestions(): Question[] {
   return [
     {
