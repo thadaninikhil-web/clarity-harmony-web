@@ -375,6 +375,7 @@ export function GuidedInputsChat({
   const [touched, setTouched] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const summaryRef = useRef<HTMLButtonElement>(null);
 
   const isSummary = stepIdx >= questions.length;
   const currentQ = !isSummary ? questions[stepIdx] : null;
@@ -387,9 +388,11 @@ export function GuidedInputsChat({
       setError(null);
       setTouched(false);
       setTimeout(() => inputRef.current?.focus(), 50);
+    } else if (isSummary) {
+      setTimeout(() => summaryRef.current?.focus(), 50);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stepIdx]);
+  }, [stepIdx, isSummary]);
 
   // Live validation as user types (without showing error before they touch it)
   const liveError = useMemo(() => {
