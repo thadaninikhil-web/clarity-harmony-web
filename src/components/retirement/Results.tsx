@@ -193,13 +193,17 @@ export function Results({
         </CardHeader>
         <CardContent className="text-xs text-muted-foreground space-y-2">
           <p>
-            Each Monte Carlo path draws a yearly equity return uniformly between{" "}
+            Each Monte Carlo path varies yearly equity returns between{" "}
             <span className="font-mono text-foreground">{(inputs.sequenceMinReturn * 100).toFixed(0)}%</span>{" "}
             and{" "}
             <span className="font-mono text-foreground">{(inputs.sequenceMaxReturn * 100).toFixed(0)}%</span>.
-            We then bias-correct the draws so the realised{" "}
-            <em>geometric mean</em> matches your target CAGR of{" "}
+            The path is generated in log-return space so the realised{" "}
+            <em>geometric mean</em> of this run matches your target CAGR of{" "}
             <span className="font-mono text-foreground">{(inputs.sequenceCagr * 100).toFixed(1)}%</span>.
+          </p>
+          <p>
+            Current run CAGR: <span className="font-mono text-foreground">{(currentRunCagr * 100).toFixed(2)}%</span>
+            {` · difference ${(cagrDelta * 100).toFixed(3)} pp`}.
           </p>
           <p className="font-mono text-foreground">
             CAGR = (∏ (1 + rₜ))<sup>1/N</sup> − 1
