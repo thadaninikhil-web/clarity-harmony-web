@@ -373,6 +373,7 @@ export function GuidedInputsChat({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [returnToSummary, setReturnToSummary] = useState(false);
   const [touched, setTouched] = useState(false);
+  const [showCompletedReview, setShowCompletedReview] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const summaryRef = useRef<HTMLButtonElement>(null);
@@ -445,6 +446,7 @@ export function GuidedInputsChat({
     if (idx < 0) return;
     setEditingId(qid);
     setReturnToSummary(true);
+    setShowCompletedReview(true);
     setStepIdx(idx);
     // Keep all other turns intact — only this one will be updated on submit
   };
