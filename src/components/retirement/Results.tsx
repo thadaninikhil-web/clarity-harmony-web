@@ -18,6 +18,7 @@ import {
 } from "recharts";
 import {
   buildYearBullets,
+  formatDisplayDate,
   formatINR,
   formatINRExact,
   type ProjectionResult,
@@ -104,6 +105,8 @@ export function Results({
 
   const stickyCol = "sticky left-0 z-20 bg-card shadow-[1px_0_0_0_var(--border)]";
   const stickyColHead = "sticky left-0 z-30 bg-card shadow-[1px_0_0_0_var(--border)]";
+  const currentRunCagr = result.currentRunCagr ?? 0;
+  const cagrDelta = currentRunCagr - inputs.sequenceCagr;
 
   const scenarioBanner = (
     <div className="mt-2 flex items-start gap-2 rounded-md border border-accent/40 bg-accent/10 p-3 text-xs text-foreground">
@@ -129,12 +132,6 @@ export function Results({
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {onReshuffleSequence && (
-            <Button variant="outline" size="sm" onClick={onReshuffleSequence} className="gap-2">
-              <Shuffle className="size-4" />
-              Reshuffle
-            </Button>
-          )}
           <Button
             variant="outline"
             size="sm"
