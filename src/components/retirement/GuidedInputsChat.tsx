@@ -449,6 +449,36 @@ export function GuidedInputsChat({
     // Keep all other turns intact — only this one will be updated on submit
   };
 
+  const goPrevious = () => {
+    if (stepIdx <= 0) return;
+    setEditingId(questions[stepIdx - 1].id);
+    setReturnToSummary(false);
+    setStepIdx((i) => Math.max(0, i - 1));
+  };
+
+  const focusSummaryStep = (index: number) => {
+    const button = scrollRef.current?.querySelector<HTMLButtonElement>(`[data-summary-step="${index}"]`);
+    button?.focus();
+  };
+
+  const onSummaryKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    const current = Number(target.dataset.summaryStep ?? 0);
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      focusSummaryStep(Math.min(questions.length - 1, current + 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      focusSummaryStep(Math.max(0, current - 1));
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      focusSummaryStep(0);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      focusSummaryStep(questions.length - 1);
+    }
+  };
+
   const restart = () => {
     setTurns([]);
     setStepIdx(0);
@@ -465,6 +495,12 @@ export function GuidedInputsChat({
       if (e.key === "Enter") {
         e.preventDefault();
         submit();
+      } else if (e.key === "ArrowRight" && !submitDisabled) {
+        e.preventDefault();
+        submit();
+      } else if (e.key === "ArrowLeft" && draft === currentQ.defaultFrom(values)) {
+        e.preventDefault();
+        goPrevious();
       }
     };
     if (currentQ.type === "money") {
