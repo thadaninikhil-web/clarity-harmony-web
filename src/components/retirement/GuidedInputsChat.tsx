@@ -577,7 +577,8 @@ export function GuidedInputsChat({
       <Card className="p-4 sm:p-6 shadow-[var(--shadow-card)] max-h-[60vh] overflow-y-auto" ref={scrollRef as any}>
         {/* Past turns */}
         <div className="space-y-4">
-          {(!completed || showCompletedReview) && turns.map((t, i) => (
+          {/* Past turns — only while answering questions, not in summary */}
+          {!isSummary && (!completed || showCompletedReview) && turns.map((t, i) => (
             <div key={i} className="group flex items-start justify-between gap-3 rounded-md px-2 py-1.5 hover:bg-muted/40">
               <div className="flex-1 min-w-0">
                 <div className="text-sm">{t.question}</div>
