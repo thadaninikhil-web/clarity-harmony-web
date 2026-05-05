@@ -157,6 +157,8 @@ const RetirementSimulator = () => {
               strategy="three-bucket"
               onReshuffleSequence={reshuffleSequence}
               onSipSolved={(sip) => setValues((v) => ({ ...v, monthlyInvestment: sip }))}
+              onMonteCarloRunsChange={(runs) => setValues((v) => ({ ...v, monteCarloRuns: runs }))}
+              onSelectRun={(seed) => setValues((v) => ({ ...v, sequenceSeed: seed }))}
             />
             <SaveCompare inputs={values} result={result} onLoad={setValues} />
           </div>
