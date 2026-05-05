@@ -34,6 +34,8 @@ interface Props {
   strategy?: "three-bucket" | "two-bucket";
   onReshuffleSequence?: () => void;
   onSipSolved?: (sip: number) => void;
+  onMonteCarloRunsChange?: (runs: number) => void;
+  onSelectRun?: (seed: number) => void;
 }
 
 const safeNum = (n: unknown): number => {
@@ -48,6 +50,8 @@ export function Results({
   strategy = "three-bucket",
   onReshuffleSequence,
   onSipSolved,
+  onMonteCarloRunsChange,
+  onSelectRun,
 }: Props) {
   const [showDetails, setShowDetails] = useState(false);
   const isTwoBucket = strategy === "two-bucket";
@@ -203,6 +207,8 @@ export function Results({
             strategy={strategy}
             onReshuffle={onReshuffleSequence}
             onSipSolved={onSipSolved}
+            onMonteCarloRunsChange={onMonteCarloRunsChange}
+            onSelectRun={onSelectRun}
           />
         </CardContent>
       </Card>
