@@ -18,7 +18,6 @@ import {
 } from "recharts";
 import {
   buildYearBullets,
-  formatDisplayDate,
   formatINR,
   formatINRExact,
   type ProjectionResult,
@@ -35,6 +34,8 @@ interface Props {
   strategy?: "three-bucket" | "two-bucket";
   onReshuffleSequence?: () => void;
   onSipSolved?: (sip: number) => void;
+  onMonteCarloRunsChange?: (runs: number) => void;
+  onSelectRun?: (seed: number) => void;
 }
 
 const safeNum = (n: unknown): number => {
@@ -49,6 +50,8 @@ export function Results({
   strategy = "three-bucket",
   onReshuffleSequence,
   onSipSolved,
+  onMonteCarloRunsChange,
+  onSelectRun,
 }: Props) {
   const [showDetails, setShowDetails] = useState(false);
   const isTwoBucket = strategy === "two-bucket";
@@ -153,36 +156,6 @@ export function Results({
         </div>
       </div>
 
-      {/* INPUT SUMMARY */}
-      <Card className="shadow-[var(--shadow-card)]">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Input summary</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-x-6 gap-y-2 text-xs sm:grid-cols-2 lg:grid-cols-4">
-            <SummaryRow label="Date of birth" value={formatDisplayDate(inputs.dob)} />
-            <SummaryRow label="Current monthly expenses" value={formatINR(inputs.currentMonthlyExpenses)} />
-            <SummaryRow label="Inflation" value={`${(inputs.inflationRate * 100).toFixed(1)}%`} />
-            <SummaryRow label="Current corpus" value={formatINR(inputs.currentCorpus)} />
-            <SummaryRow label="Monthly SIP" value={formatINR(inputs.monthlyInvestment)} />
-            <SummaryRow label="SIP step-up" value={`${(inputs.sipStepUpRate * 100).toFixed(0)}%`} />
-            <SummaryRow label="Retirement age" value={String(inputs.retirementAge)} />
-            <SummaryRow label="Life expectancy" value={String(inputs.lifeExpectancyAge ?? inputs.retirementAge + inputs.lifeExpectancyYears)} />
-            <SummaryRow label="Emergency fund" value={`${inputs.emergencyFundMonths ?? 0} mo`} />
-            <SummaryRow label="Target equity CAGR" value={`${(inputs.sequenceCagr * 100).toFixed(1)}%`} />
-            <SummaryRow label="Current run CAGR" value={`${(currentRunCagr * 100).toFixed(2)}%`} />
-            <SummaryRow label="Return range" value={`${(inputs.sequenceMinReturn * 100).toFixed(0)}% to ${(inputs.sequenceMaxReturn * 100).toFixed(0)}%`} />
-            {!isTwoBucket && (
-              <>
-                <SummaryRow label="Prep equity" value={`${(inputs.prepEquityPct * 100).toFixed(0)}%`} />
-                <SummaryRow label="Withdrawal years" value={String(inputs.withdrawalYears)} />
-              </>
-            )}
-            <SummaryRow label="Monte Carlo runs" value={inputs.monteCarloRuns.toLocaleString("en-IN")} />
-          </div>
-        </CardContent>
-      </Card>
-
       {/* CAGR explanation */}
       <Card className="shadow-[var(--shadow-card)] border-accent/30">
         <CardHeader className="pb-2">
@@ -234,6 +207,8 @@ export function Results({
             strategy={strategy}
             onReshuffle={onReshuffleSequence}
             onSipSolved={onSipSolved}
+            onMonteCarloRunsChange={onMonteCarloRunsChange}
+            onSelectRun={onSelectRun}
           />
         </CardContent>
       </Card>
@@ -516,15 +491,6 @@ export function Results({
             </CardContent>
           </Card>
       </div>
-    </div>
-  );
-}
-
-function SummaryRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-center justify-between gap-2 border-b border-border/40 py-1">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="font-medium text-foreground tabular-nums">{value}</span>
     </div>
   );
 }

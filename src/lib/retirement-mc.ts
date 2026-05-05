@@ -56,6 +56,8 @@ export function runMonteCarloAsync(
     const finals: number[] = [];
     const depletionAges: number[] = [];
     let successes = 0;
+    const PER_RUN_CAP = 50;
+    const perRun: NonNullable<MonteCarloResult["perRun"]> = [];
     let i = 0;
     const tick = () => {
       if (options.signal?.aborted) {
@@ -64,16 +66,27 @@ export function runMonteCarloAsync(
       }
       const end = Math.min(i + CHUNK, runs);
       for (; i < end; i++) {
+        const seed = (input.sequenceSeed + i * 1013904223) >>> 0;
         const projected = runProjection({
           ...input,
           sequenceMode: "controlled",
-          sequenceSeed: (input.sequenceSeed + i * 1013904223) >>> 0,
+          sequenceSeed: seed,
         });
         finals.push(projected.finalCorpus);
         if (!projected.depleted) {
           successes += 1;
         } else if (projected.depletionAge !== undefined) {
           depletionAges.push(projected.depletionAge);
+        }
+        if (i < PER_RUN_CAP) {
+          perRun.push({
+            index: i + 1,
+            seed,
+            cagr: projected.currentRunCagr ?? 0,
+            finalCorpus: projected.finalCorpus,
+            depleted: projected.depleted,
+            depletionAge: projected.depletionAge,
+          });
         }
       }
       options.onProgress?.(i, runs);
@@ -96,6 +109,7 @@ export function runMonteCarloAsync(
           p50FinalCorpus: percentile(finals, 0.5),
           p75FinalCorpus: percentile(finals, 0.75),
           p90FinalCorpus: percentile(finals, 0.9),
+          perRun,
         };
         if (cacheKey) setCachedMC(cacheKey, result);
         resolve(result);

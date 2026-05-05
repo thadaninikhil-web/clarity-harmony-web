@@ -18,6 +18,15 @@ export interface MonteCarloResult {
   p50FinalCorpus: number;
   p75FinalCorpus: number;
   p90FinalCorpus: number;
+  /** Sample of per-run details (capped) for the per-run table view. */
+  perRun?: Array<{
+    index: number;
+    seed: number;
+    cagr: number;
+    finalCorpus: number;
+    depleted: boolean;
+    depletionAge?: number;
+  }>;
 }
 
 export interface RetirementInputs {

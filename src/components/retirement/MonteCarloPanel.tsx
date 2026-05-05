@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import { RefreshCw, Wand2 } from "lucide-react";
 import {
   formatINR,
@@ -23,9 +24,11 @@ interface Props {
   strategy: "three-bucket" | "two-bucket";
   onReshuffle?: () => void;
   onSipSolved?: (monthlySip: number) => void;
+  onMonteCarloRunsChange?: (runs: number) => void;
+  onSelectRun?: (seed: number) => void;
 }
 
-export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSolved }: Props) {
+export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSolved, onMonteCarloRunsChange, onSelectRun }: Props) {
 
   const [mc, setMc] = useState<MonteCarloResult | undefined>(result.monteCarlo);
   const [progress, setProgress] = useState({ done: 0, total: 0, running: false });
@@ -237,6 +240,112 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
             <RefreshCw className="size-4" />
             Reshuffle
           </Button>
+        </div>
+      )}
+
+      {/* Monte Carlo runs slider — keep it next to the MC output */}
+      {onMonteCarloRunsChange && (
+        <div className="rounded-md border border-border bg-card p-3 space-y-2">
+          <div className="flex items-center justify-between gap-3">
+            <Label className="text-xs">
+              Monte Carlo runs:{" "}
+              <span className="font-semibold text-foreground">
+                {inputs.monteCarloRuns.toLocaleString("en-IN")}
+              </span>
+            </Label>
+            <span className="text-[11px] text-muted-foreground">More runs → smoother estimate, slower.</span>
+          </div>
+          <Slider
+            value={[inputs.monteCarloRuns]}
+            min={1000}
+            max={10000}
+            step={500}
+            onValueChange={(v) => onMonteCarloRunsChange(v[0])}
+          />
+        </div>
+      )}
+
+      {/* Per-run details — first 50 paths, click to load that path into the chart */}
+      {mc?.perRun && mc.perRun.length > 0 && !progress.running && (
+        <div className="rounded-md border border-border bg-card">
+          <div className="flex items-center justify-between gap-2 border-b p-3">
+            <div>
+              <div className="font-medium text-sm">Per-run details</div>
+              <p className="text-[11px] text-muted-foreground">
+                Showing first {mc.perRun.length} of {mc.runs.toLocaleString("en-IN")} runs.
+                Click a row to load that path into the chart and table above.
+              </p>
+            </div>
+            <div className="text-[11px] text-muted-foreground">
+              Target CAGR{" "}
+              <span className="font-mono text-foreground">{(inputs.sequenceCagr * 100).toFixed(2)}%</span>
+            </div>
+          </div>
+          <div className="max-h-72 overflow-auto">
+            <table className="w-full text-xs">
+              <thead className="sticky top-0 bg-card border-b">
+                <tr className="text-left">
+                  <th className="px-3 py-2 font-medium text-muted-foreground">#</th>
+                  <th className="px-3 py-2 font-medium text-muted-foreground text-right">CAGR</th>
+                  <th className="px-3 py-2 font-medium text-muted-foreground text-right">Δ vs target</th>
+                  <th className="px-3 py-2 font-medium text-muted-foreground">Match</th>
+                  <th className="px-3 py-2 font-medium text-muted-foreground text-right">Final corpus</th>
+                  <th className="px-3 py-2 font-medium text-muted-foreground">Outcome</th>
+                  {onSelectRun && <th className="px-3 py-2 font-medium text-muted-foreground"></th>}
+                </tr>
+              </thead>
+              <tbody>
+                {mc.perRun.map((r) => {
+                  const delta = r.cagr - inputs.sequenceCagr;
+                  const matches = Math.abs(delta) < 0.0005; // within 0.05pp
+                  const isActive = inputs.sequenceSeed === r.seed;
+                  return (
+                    <tr
+                      key={r.index}
+                      className={`border-b last:border-0 ${isActive ? "bg-primary/10" : "hover:bg-muted/40"} ${onSelectRun ? "cursor-pointer" : ""}`}
+                      onClick={() => onSelectRun?.(r.seed)}
+                    >
+                      <td className="px-3 py-1.5 tabular-nums">{r.index}</td>
+                      <td className="px-3 py-1.5 text-right tabular-nums font-mono">{(r.cagr * 100).toFixed(2)}%</td>
+                      <td className="px-3 py-1.5 text-right tabular-nums font-mono text-muted-foreground">
+                        {(delta * 100 >= 0 ? "+" : "") + (delta * 100).toFixed(2)} pp
+                      </td>
+                      <td className="px-3 py-1.5">
+                        {matches ? (
+                          <span className="text-green-600 dark:text-green-400">✓</span>
+                        ) : (
+                          <span className="text-amber-600 dark:text-amber-400">≈</span>
+                        )}
+                      </td>
+                      <td className="px-3 py-1.5 text-right tabular-nums">{formatINR(r.finalCorpus)}</td>
+                      <td className="px-3 py-1.5">
+                        {r.depleted ? (
+                          <span className="text-destructive">depleted{r.depletionAge ? ` @ ${r.depletionAge}` : ""}</span>
+                        ) : (
+                          <span className="text-muted-foreground">survived</span>
+                        )}
+                      </td>
+                      {onSelectRun && (
+                        <td className="px-3 py-1.5">
+                          <Button
+                            size="sm"
+                            variant={isActive ? "secondary" : "ghost"}
+                            className="h-7 text-[11px]"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onSelectRun(r.seed);
+                            }}
+                          >
+                            {isActive ? "Loaded" : "Load"}
+                          </Button>
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
