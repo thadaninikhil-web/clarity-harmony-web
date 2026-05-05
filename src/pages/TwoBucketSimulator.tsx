@@ -185,6 +185,8 @@ const TwoBucketSimulator = () => {
               onSipSolved={(sip) =>
                 setValues((v) => ({ ...v, monthlyInvestment: sip }))
               }
+              onMonteCarloRunsChange={(runs) => setValues((v) => ({ ...v, monteCarloRuns: runs }))}
+              onSelectRun={(seed) => setValues((v) => ({ ...v, sequenceSeed: seed }))}
             />
             <SaveCompare inputs={safeValues} result={result} onLoad={setValues} />
           </div>
