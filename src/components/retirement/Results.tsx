@@ -18,7 +18,6 @@ import {
 } from "recharts";
 import {
   buildYearBullets,
-  formatDisplayDate,
   formatINR,
   formatINRExact,
   type ProjectionResult,
