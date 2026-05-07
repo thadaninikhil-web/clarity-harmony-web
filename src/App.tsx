@@ -17,6 +17,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import RetirementSimulator from "./pages/RetirementSimulator";
 import TwoBucketSimulator from "./pages/TwoBucketSimulator";
 import CompareStrategies from "./pages/CompareStrategies";
+import SafeWithdrawalSimulator from "./pages/SafeWithdrawalSimulator";
 import NotFound from "./pages/NotFound";
 import { ScrollToTop } from "./components/ScrollToTop";
 
@@ -43,6 +44,7 @@ const App = () => (
         <Route path="/calculators/retirementsimulator" element={<RetirementSimulator />} />
         <Route path="/calculators/twobucket" element={<TwoBucketSimulator />} />
         <Route path="/calculators/compare" element={<CompareStrategies />} />
+        <Route path="/calculators/safewithdrawalsimulation" element={<SafeWithdrawalSimulator />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </TooltipProvider>
