@@ -227,6 +227,53 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
         </div>
       )}
 
+      {/* Depletion-age percentiles for failed runs */}
+      {mc && !progress.running && mc.failureCount > 0 && (
+        <div className="rounded-md border border-destructive/30 bg-destructive/5 p-4 space-y-3">
+          <div className="flex items-start justify-between gap-3 flex-wrap">
+            <div>
+              <div className="font-medium text-sm text-destructive">Depletion age — failed runs only</div>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Of the {mc.failureCount.toLocaleString("en-IN")} runs where the corpus ran out,
+                here's the age at which it happened. Median ={" "}
+                <span className="font-semibold text-foreground">{mc.medianDepletionAge}</span>.
+              </p>
+            </div>
+          </div>
+          <div className="grid gap-2 grid-cols-5">
+            {[
+              { label: "P10", v: mc.depletionAgeP10, hint: "10% earlier than" },
+              { label: "P25", v: mc.depletionAgeP25, hint: "Lower quartile" },
+              { label: "P50", v: mc.depletionAgeP50, hint: "Median" },
+              { label: "P75", v: mc.depletionAgeP75, hint: "Upper quartile" },
+              { label: "P90", v: mc.depletionAgeP90, hint: "10% later than" },
+            ].map(({ label, v, hint }) => (
+              <div key={label} className="rounded-md bg-card border border-border p-2 text-center">
+                <div className="label-caps">{label}</div>
+                <div className="text-base font-semibold">{v ?? "—"}</div>
+                <div className="text-[10px] text-muted-foreground">{hint}</div>
+              </div>
+            ))}
+          </div>
+          <details className="text-xs text-muted-foreground">
+            <summary className="cursor-pointer">How are these depletion-age percentiles computed?</summary>
+            <div className="mt-2 space-y-1.5 leading-relaxed">
+              <p>
+                We isolate the runs whose corpus hit zero before the planning age. For each such
+                run we record the age at depletion, then sort that list ascending.
+              </p>
+              <p>
+                <span className="font-mono">Pₓ</span> is the value at the{" "}
+                <span className="font-mono">x</span>th-percentile position
+                (linear interpolation between neighbours). So <span className="font-mono">P10</span>{" "}
+                means 10% of failed runs depleted at or before that age — the earliest failures —
+                while <span className="font-mono">P90</span> is the latest. <span className="font-mono">P50</span> is the median failure age.
+              </p>
+            </div>
+          </details>
+        </div>
+      )}
+
       {/* Reshuffle control — re-rolls the random paths within this session.
           Refreshing the page also yields a new random run. */}
       {onReshuffle && (

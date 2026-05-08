@@ -104,6 +104,11 @@ export function runMonteCarloAsync(
             depletionAges.length > 0
               ? depletionAges[Math.floor(depletionAges.length / 2)]
               : undefined,
+          depletionAgeP10: depletionAges.length > 0 ? Math.round(percentile(depletionAges, 0.1)) : undefined,
+          depletionAgeP25: depletionAges.length > 0 ? Math.round(percentile(depletionAges, 0.25)) : undefined,
+          depletionAgeP50: depletionAges.length > 0 ? Math.round(percentile(depletionAges, 0.5)) : undefined,
+          depletionAgeP75: depletionAges.length > 0 ? Math.round(percentile(depletionAges, 0.75)) : undefined,
+          depletionAgeP90: depletionAges.length > 0 ? Math.round(percentile(depletionAges, 0.9)) : undefined,
           p10FinalCorpus: percentile(finals, 0.1),
           p25FinalCorpus: percentile(finals, 0.25),
           p50FinalCorpus: percentile(finals, 0.5),

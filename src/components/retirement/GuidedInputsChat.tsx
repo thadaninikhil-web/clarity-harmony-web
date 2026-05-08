@@ -345,6 +345,8 @@ interface Props {
   completed: boolean;
   onRestart: () => void;
   startInSummary?: boolean;
+  /** Question IDs to omit (e.g. SIP fields for SWR calculator). */
+  skipQuestionIds?: string[];
 }
 
 interface ChatTurn {
@@ -360,8 +362,14 @@ export function GuidedInputsChat({
   completed,
   onRestart,
   startInSummary = false,
+  skipQuestionIds,
 }: Props) {
-  const questions = useMemo(buildQuestions, []);
+  const questions = useMemo(() => {
+    const all = buildQuestions();
+    if (!skipQuestionIds || skipQuestionIds.length === 0) return all;
+    const skip = new Set(skipQuestionIds);
+    return all.filter((q) => !skip.has(q.id));
+  }, [skipQuestionIds]);
   const [stepIdx, setStepIdx] = useState(startInSummary ? questions.length : 0);
   const [turns, setTurns] = useState<ChatTurn[]>(() =>
     startInSummary
