@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Save, RefreshCw } from "lucide-react";
+import { Trash2, Save, RefreshCw, Link2, Check } from "lucide-react";
 import {
   Bar,
   BarChart,
@@ -18,6 +18,7 @@ import {
   loadScenarios,
   saveScenario,
   deleteScenario,
+  encodeInputsToHash,
   type SavedScenario,
 } from "@/lib/scenarios";
 import { formatINR, type ProjectionResult, type RetirementInputs } from "@/lib/retirement";
@@ -26,23 +27,48 @@ interface Props {
   inputs: RetirementInputs;
   result: ProjectionResult;
   onLoad: (inputs: RetirementInputs) => void;
+  /** Namespace ("swr" etc.) so each calculator keeps its own scenario list. */
+  kind?: string;
+  /** Where the share link should land (defaults to current pathname). */
+  shareBasePath?: string;
 }
 
-export function SaveCompare({ inputs, result, onLoad }: Props) {
+export function SaveCompare({ inputs, result, onLoad, kind, shareBasePath }: Props) {
   const [scenarios, setScenarios] = useState<SavedScenario[]>([]);
   const [name, setName] = useState("");
+  const [copied, setCopied] = useState<string | null>(null);
 
   useEffect(() => {
-    setScenarios(loadScenarios());
-  }, []);
+    setScenarios(loadScenarios(kind));
+  }, [kind]);
 
   const onSave = () => {
-    const next = saveScenario(name || inputs.name || "Untitled scenario", inputs, result);
+    const next = saveScenario(name || inputs.name || "Untitled scenario", inputs, result, kind);
     setScenarios(next);
     setName("");
   };
 
-  const onDelete = (id: string) => setScenarios(deleteScenario(id));
+  const onDelete = (id: string) => setScenarios(deleteScenario(id, kind));
+
+  const buildShareUrl = (ins: RetirementInputs): string => {
+    if (typeof window === "undefined") return "";
+    const base = shareBasePath ?? window.location.pathname;
+    const hash = encodeInputsToHash(ins);
+    return `${window.location.origin}${base}#s=${hash}`;
+  };
+
+  const onShare = async (id: string, ins: RetirementInputs) => {
+    const url = buildShareUrl(ins);
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(id);
+      setTimeout(() => setCopied((c) => (c === id ? null : c)), 1800);
+    } catch {
+      window.prompt("Copy this link", url);
+    }
+  };
+
+  const onShareCurrent = () => onShare("__current", inputs);
 
   const compareData = useMemo(
     () =>
@@ -68,6 +94,10 @@ export function SaveCompare({ inputs, result, onLoad }: Props) {
           />
           <Button onClick={onSave} className="gap-2 shrink-0">
             <Save className="size-4" /> Save current
+          </Button>
+          <Button onClick={onShareCurrent} variant="outline" className="gap-2 shrink-0">
+            {copied === "__current" ? <Check className="size-4" /> : <Link2 className="size-4" />}
+            {copied === "__current" ? "Link copied" : "Share link"}
           </Button>
         </div>
 
@@ -125,6 +155,16 @@ export function SaveCompare({ inputs, result, onLoad }: Props) {
                       onClick={() => onLoad(s.inputs)}
                     >
                       <RefreshCw className="size-3" /> Load
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-8 px-2"
+                      onClick={() => onShare(s.id, s.inputs)}
+                      aria-label="Copy share link"
+                      title="Copy share link"
+                    >
+                      {copied === s.id ? <Check className="size-3" /> : <Link2 className="size-3" />}
                     </Button>
                     <Button
                       size="sm"
