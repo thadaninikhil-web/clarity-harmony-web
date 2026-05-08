@@ -13,6 +13,12 @@ export interface MonteCarloResult {
   successCount: number;
   failureCount: number;
   medianDepletionAge?: number;
+  /** Percentiles of depletion age across failed runs (sorted ascending). */
+  depletionAgeP10?: number;
+  depletionAgeP25?: number;
+  depletionAgeP50?: number;
+  depletionAgeP75?: number;
+  depletionAgeP90?: number;
   p10FinalCorpus: number;
   p25FinalCorpus: number;
   p50FinalCorpus: number;
@@ -179,6 +185,11 @@ function attachMonteCarlo(
     failureCount: runs - successes,
     medianDepletionAge:
       depletionAges.length > 0 ? depletionAges[Math.floor(depletionAges.length / 2)] : undefined,
+    depletionAgeP10: depletionAges.length > 0 ? Math.round(percentile(depletionAges, 0.1)) : undefined,
+    depletionAgeP25: depletionAges.length > 0 ? Math.round(percentile(depletionAges, 0.25)) : undefined,
+    depletionAgeP50: depletionAges.length > 0 ? Math.round(percentile(depletionAges, 0.5)) : undefined,
+    depletionAgeP75: depletionAges.length > 0 ? Math.round(percentile(depletionAges, 0.75)) : undefined,
+    depletionAgeP90: depletionAges.length > 0 ? Math.round(percentile(depletionAges, 0.9)) : undefined,
     p10FinalCorpus: percentile(finals, 0.1),
     p25FinalCorpus: percentile(finals, 0.25),
     p50FinalCorpus: percentile(finals, 0.5),
