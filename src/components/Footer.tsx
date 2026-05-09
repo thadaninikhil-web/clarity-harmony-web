@@ -2,6 +2,20 @@ import { Link } from "react-router-dom";
 
 
 export const Footer = () => {
+  const navigateLinks = [
+    { label: "Home", path: "/" },
+    { label: "Our Process", path: "/process" },
+    { label: "Services", path: "/services" },
+    { label: "About Nikhil", path: "/about" },
+  ];
+  const resourceLinks = [
+    { label: "Calculators", path: "/calculators" },
+    { label: "Client Stories", path: "/client-stories" },
+    { label: "Insights", path: "/insights" },
+    { label: "Who We Work With", path: "/who-we-work-with" },
+    { label: "Privacy Policy", path: "/privacy-policy" },
+  ];
+
   return (
     <footer className="bg-primary text-primary-foreground">
       {/* Motto */}
@@ -19,12 +33,7 @@ export const Footer = () => {
           <div>
             <p className="label-caps text-gold mb-4">Navigate</p>
             <div className="flex flex-col gap-2">
-              {[
-                { label: "Home", path: "/" },
-                { label: "Our Process", path: "/process" },
-                { label: "Services", path: "/services" },
-                { label: "About Nikhil", path: "/about" },
-              ].map((l) => (
+              {navigateLinks.map((l) => (
                 <Link key={l.path} to={l.path} className="text-sm text-primary-foreground/60 hover:text-gold transition-colors">
                   {l.label}
                 </Link>
@@ -34,13 +43,7 @@ export const Footer = () => {
           <div>
             <p className="label-caps text-gold mb-4">Resources</p>
             <div className="flex flex-col gap-2">
-              {[
-                { label: "Client Stories", path: "/client-stories" },
-                { label: "Insights", path: "/insights" },
-                { label: "Who We Work With", path: "/who-we-work-with" },
-                { label: "Calculators", path: "/calculators" },
-                { label: "Privacy Policy", path: "/privacy-policy" },
-              ].map((l) => (
+              {resourceLinks.map((l) => (
                 <Link key={l.path} to={l.path} className="text-sm text-primary-foreground/60 hover:text-gold transition-colors">
                   {l.label}
                 </Link>
@@ -100,6 +103,8 @@ export const Footer = () => {
             Disclaimer: Mutual fund investments are subject to market risks. Please read all scheme related documents carefully before investing. Past performance is not indicative of future results. The information provided on this website is for general informational purposes only and should not be construed as investment advice. Please consult your advisor before making any investment decisions.
           </p>
           <p className="text-xs text-primary-foreground/55 text-center mt-3">
+            <Link to="/calculators" className="hover:text-gold transition-colors underline">Calculators</Link>
+            {" · "}
             <Link to="/privacy-policy" className="hover:text-gold transition-colors underline">Privacy Policy</Link>
             {" · "}
             <span>Terms & Conditions apply</span>
