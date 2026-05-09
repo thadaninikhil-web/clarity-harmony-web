@@ -8,6 +8,7 @@ import { SaveCompare } from "@/components/retirement/SaveCompare";
 import { ValidationBanner } from "@/components/retirement/ValidationBanner";
 import { HowToUse } from "@/components/retirement/HowToUse";
 import { Methodology } from "@/components/retirement/Methodology";
+import { CalculatorSectionNav } from "@/components/retirement/CalculatorSectionNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -230,7 +231,10 @@ const SafeWithdrawalSimulator = () => {
       </section>
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 max-w-full overflow-x-hidden">
-        <HowToUse strategy={strategy} />
+        <CalculatorSectionNav />
+        <section id="how-to-use" className="scroll-mt-40">
+          <HowToUse strategy={strategy} />
+        </section>
 
         <InputsErrorBoundary>
           <GuidedInputsChat
@@ -337,7 +341,9 @@ const SafeWithdrawalSimulator = () => {
           </div>
         )}
 
-        <Methodology strategy={strategy} />
+        <section id="how-it-works" className="scroll-mt-40">
+          <Methodology strategy={strategy} />
+        </section>
 
         <p className="mt-12 text-center text-xs text-muted-foreground">
           Educational calculator — not investment advice. Returns shown are nominal

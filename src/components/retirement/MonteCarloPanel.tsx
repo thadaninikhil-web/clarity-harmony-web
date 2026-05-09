@@ -349,8 +349,19 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
                   return (
                     <tr
                       key={r.index}
+                      tabIndex={onSelectRun ? 0 : undefined}
+                      role={onSelectRun ? "button" : undefined}
+                      aria-label={onSelectRun ? `Load Monte Carlo run ${r.index}` : undefined}
+                      aria-pressed={onSelectRun ? isActive : undefined}
                       className={`border-b last:border-0 ${isActive ? "bg-primary/10" : "hover:bg-muted/40"} ${onSelectRun ? "cursor-pointer" : ""}`}
                       onClick={() => onSelectRun?.(r.seed)}
+                      onKeyDown={(e) => {
+                        if (!onSelectRun) return;
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          onSelectRun(r.seed);
+                        }
+                      }}
                     >
                       <td className="px-3 py-1.5 tabular-nums">{r.index}</td>
                       <td className="px-3 py-1.5 text-right tabular-nums font-mono">{(r.cagr * 100).toFixed(2)}%</td>
@@ -359,9 +370,9 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
                       </td>
                       <td className="px-3 py-1.5">
                         {matches ? (
-                          <span className="text-green-600 dark:text-green-400">✓</span>
+                          <span className="text-accent">✓</span>
                         ) : (
-                          <span className="text-amber-600 dark:text-amber-400">≈</span>
+                          <span className="text-muted-foreground">≈</span>
                         )}
                       </td>
                       <td className="px-3 py-1.5 text-right tabular-nums">{formatINR(r.finalCorpus)}</td>
