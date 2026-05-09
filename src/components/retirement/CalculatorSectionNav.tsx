@@ -3,7 +3,7 @@ import { BookOpen, HelpCircle } from "lucide-react";
 export function CalculatorSectionNav() {
   const links = [
     { href: "#how-to-use", label: "How to use", icon: HelpCircle },
-    { href: "#how-it-works", label: "How it works", icon: BookOpen },
+    { href: "#how-it-works", label: "How the calculator works", icon: BookOpen },
   ];
 
   return (
