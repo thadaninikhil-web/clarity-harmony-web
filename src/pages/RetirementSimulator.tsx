@@ -6,6 +6,7 @@ import { InputsErrorBoundary } from "@/components/retirement/InputsErrorBoundary
 import { Results } from "@/components/retirement/Results";
 import { Methodology } from "@/components/retirement/Methodology";
 import { HowToUse } from "@/components/retirement/HowToUse";
+import { CalculatorSectionNav } from "@/components/retirement/CalculatorSectionNav";
 import { SaveCompare } from "@/components/retirement/SaveCompare";
 import { ValidationBanner } from "@/components/retirement/ValidationBanner";
 import { StrategySwitcher } from "@/components/retirement/StrategySwitcher";
@@ -127,7 +128,10 @@ const RetirementSimulator = () => {
       </section>
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 max-w-full overflow-x-hidden">
-        <HowToUse strategy="three-bucket" />
+        <CalculatorSectionNav />
+        <section id="how-to-use" className="scroll-mt-40">
+          <HowToUse strategy="three-bucket" />
+        </section>
 
         <InputsErrorBoundary>
           <GuidedInputsChat
@@ -163,7 +167,9 @@ const RetirementSimulator = () => {
             <SaveCompare inputs={values} result={result} onLoad={setValues} />
           </div>
         )}
-        <Methodology strategy="three-bucket" />
+        <section id="how-it-works" className="scroll-mt-40">
+          <Methodology strategy="three-bucket" />
+        </section>
         <p className="mt-12 text-center text-xs text-muted-foreground">
           Educational calculator — not investment advice. Returns shown are
           nominal and assume constant rates apart from the configured stress
