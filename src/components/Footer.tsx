@@ -38,6 +38,7 @@ export const Footer = () => {
                 { label: "Client Stories", path: "/client-stories" },
                 { label: "Insights", path: "/insights" },
                 { label: "Who We Work With", path: "/who-we-work-with" },
+                { label: "Calculators", path: "/calculators" },
                 { label: "Privacy Policy", path: "/privacy-policy" },
               ].map((l) => (
                 <Link key={l.path} to={l.path} className="text-sm text-primary-foreground/60 hover:text-gold transition-colors">
