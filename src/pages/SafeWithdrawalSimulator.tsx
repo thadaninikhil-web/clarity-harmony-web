@@ -6,6 +6,8 @@ import { InputsErrorBoundary } from "@/components/retirement/InputsErrorBoundary
 import { Results } from "@/components/retirement/Results";
 import { SaveCompare } from "@/components/retirement/SaveCompare";
 import { ValidationBanner } from "@/components/retirement/ValidationBanner";
+import { HowToUse } from "@/components/retirement/HowToUse";
+import { Methodology } from "@/components/retirement/Methodology";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -228,6 +230,8 @@ const SafeWithdrawalSimulator = () => {
       </section>
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 max-w-full overflow-x-hidden">
+        <HowToUse strategy={strategy} />
+
         <InputsErrorBoundary>
           <GuidedInputsChat
             values={safeValues}
@@ -332,6 +336,8 @@ const SafeWithdrawalSimulator = () => {
             />
           </div>
         )}
+
+        <Methodology strategy={strategy} />
 
         <p className="mt-12 text-center text-xs text-muted-foreground">
           Educational calculator — not investment advice. Returns shown are nominal
