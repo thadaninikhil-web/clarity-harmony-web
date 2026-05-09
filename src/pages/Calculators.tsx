@@ -2,23 +2,17 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
 
 const calculators = [
   {
-    title: "Three-Bucket Retirement Simulator",
-    description:
-      "Plan your retirement with the accumulation, preparation and withdrawal bucket framework, including Monte Carlo sequence-of-returns stress testing.",
+    title: "Retirement simulator",
     path: "/calculators/retirementsimulator",
-    cta: "Open simulator",
   },
   {
-    title: "Safe Withdrawal Rate Simulator",
-    description:
-      "Stress-test how long your retirement corpus lasts at a given monthly withdrawal — and goal-seek the safe withdrawal amount for a target confidence level.",
+    title: "Safe withdrawal simulator",
     path: "/calculators/safewithdrawalsimulation",
-    cta: "Open simulator",
   },
 ];
 
@@ -38,26 +32,19 @@ const Calculators = () => {
           </h1>
           <p className="max-w-2xl mx-auto text-base text-primary-foreground/80">
             Educational tools to model retirement, withdrawals and stress scenarios.
-            More calculators are added over time.
           </p>
         </div>
       </section>
       <main className="container mx-auto px-6 lg:px-8 py-12">
         <div className="grid gap-6 md:grid-cols-2 max-w-4xl mx-auto">
           {calculators.map((c) => (
-            <Card key={c.path} className="shadow-[var(--shadow-card)] flex flex-col">
-              <CardHeader>
-                <CardTitle className="font-display text-xl">{c.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="flex-1 flex flex-col justify-between gap-4">
-                <p className="text-sm text-muted-foreground leading-relaxed text-justify">
-                  {c.description}
-                </p>
+            <Card key={c.path} className="shadow-[var(--shadow-card)]">
+              <CardContent className="p-6">
                 <Link
                   to={c.path}
-                  className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-gold transition-colors"
+                  className="flex items-center justify-between gap-4 text-lg font-semibold text-primary transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 >
-                  {c.cta} <ArrowRight className="size-4" />
+                  {c.title} <ArrowRight className="size-5 shrink-0" aria-hidden="true" />
                 </Link>
               </CardContent>
             </Card>
