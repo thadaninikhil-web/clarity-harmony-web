@@ -309,6 +309,7 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
             max={10000}
             step={500}
             onValueChange={(v) => onMonteCarloRunsChange(v[0])}
+            aria-label="Number of Monte Carlo runs"
           />
         </div>
       )}
@@ -330,7 +331,12 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
             </div>
           </div>
           <div className="max-h-72 overflow-auto">
-            <table className="w-full text-xs">
+            <table className="w-full text-xs" aria-label="Monte Carlo per-run details">
+              <caption className="sr-only">
+                First {mc.perRun.length} of {mc.runs.toLocaleString("en-IN")} Monte
+                Carlo runs. Click a row to load that path into the chart and
+                year-by-year table.
+              </caption>
               <thead className="sticky top-0 bg-card border-b">
                 <tr className="text-left">
                   <th className="px-3 py-2 font-medium text-muted-foreground">#</th>
