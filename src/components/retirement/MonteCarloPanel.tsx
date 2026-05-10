@@ -12,6 +12,7 @@ import {
   formatINR,
   project,
   projectTwoBucket,
+  projectOneBucket,
   type MonteCarloResult,
   type ProjectionResult,
   type RetirementInputs,
@@ -21,7 +22,7 @@ import { runMonteCarloAsync } from "@/lib/retirement-mc";
 interface Props {
   inputs: RetirementInputs;
   result: ProjectionResult;
-  strategy: "three-bucket" | "two-bucket";
+  strategy: "three-bucket" | "two-bucket" | "one-bucket";
   onReshuffle?: () => void;
   onSipSolved?: (monthlySip: number) => void;
   onMonteCarloRunsChange?: (runs: number) => void;
@@ -51,7 +52,7 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
     setSolverResult(null);
     setSolverProgress(null);
     solverAbortRef.current?.abort();
-    const runner = strategy === "two-bucket" ? projectTwoBucket : project;
+    const runner = strategy === "one-bucket" ? projectOneBucket : strategy === "two-bucket" ? projectTwoBucket : project;
     // Force MC-mode inputs for the runner regardless of saved state.
     const mcInputs = {
       ...inputs,
@@ -114,7 +115,7 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
     solverAbortRef.current?.abort();
     solverAbortRef.current = ctrl;
     const target = Math.max(0.01, Math.min(0.99, targetPct / 100));
-    const runner = strategy === "two-bucket" ? projectTwoBucket : project;
+    const runner = strategy === "one-bucket" ? projectOneBucket : strategy === "two-bucket" ? projectTwoBucket : project;
     const probeRuns = Math.min(1500, inputs.monteCarloRuns);
 
     const probe = async (sip: number): Promise<number> => {
@@ -308,6 +309,7 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
             max={10000}
             step={500}
             onValueChange={(v) => onMonteCarloRunsChange(v[0])}
+            aria-label="Number of Monte Carlo runs"
           />
         </div>
       )}
@@ -329,7 +331,12 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
             </div>
           </div>
           <div className="max-h-72 overflow-auto">
-            <table className="w-full text-xs">
+            <table className="w-full text-xs" aria-label="Monte Carlo per-run details">
+              <caption className="sr-only">
+                First {mc.perRun.length} of {mc.runs.toLocaleString("en-IN")} Monte
+                Carlo runs. Click a row to load that path into the chart and
+                year-by-year table.
+              </caption>
               <thead className="sticky top-0 bg-card border-b">
                 <tr className="text-left">
                   <th className="px-3 py-2 font-medium text-muted-foreground">#</th>

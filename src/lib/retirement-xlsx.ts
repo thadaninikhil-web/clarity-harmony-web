@@ -5,7 +5,7 @@ import type { ProjectionResult, RetirementInputs } from "@/lib/retirement";
 import { buildYearBullets } from "@/lib/retirement";
 
 interface Options {
-  strategy?: "three-bucket" | "two-bucket";
+  strategy?: "three-bucket" | "two-bucket" | "one-bucket";
 }
 
 // Full-precision rupee format — no lakh/crore truncation. Two decimals so

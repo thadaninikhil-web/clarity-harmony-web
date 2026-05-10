@@ -27,7 +27,7 @@ function sanitizeForPdf(s: string): string {
 
 interface ExportOptions {
   showCalculation?: boolean;
-  strategy?: "three-bucket" | "two-bucket";
+  strategy?: "three-bucket" | "two-bucket" | "one-bucket";
 }
 
 export function exportRetirementPDF(input: RetirementInputs, result: ProjectionResult, options: ExportOptions = {}) {

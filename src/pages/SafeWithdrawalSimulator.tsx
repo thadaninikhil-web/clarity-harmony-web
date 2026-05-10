@@ -18,6 +18,7 @@ import {
   formatINR,
   project,
   projectTwoBucket,
+  projectOneBucket,
   validateInputs,
   attachBullets,
   type RetirementInputs,
@@ -25,7 +26,7 @@ import {
 import { runMonteCarloAsync } from "@/lib/retirement-mc";
 import { decodeInputsFromHash } from "@/lib/scenarios";
 
-type Strategy = "three-bucket" | "two-bucket";
+type Strategy = "three-bucket" | "two-bucket" | "one-bucket";
 
 const defaultMonthlyExpenses = 100000;
 const defaultRetireAge = 60;
@@ -66,7 +67,7 @@ const defaults: RetirementInputs = {
 
 // SWR doesn't take SIP/step-up — user is already retired (or evaluating
 // solely the corpus). Skip those questions in the guided chat.
-const SKIP_QUESTIONS = ["monthlyInvestment", "sipStepUpRate"];
+const SKIP_QUESTIONS = ["monthlyInvestment", "sipStepUpRate", "prepYearsBeforeRetirement"];
 
 const SafeWithdrawalSimulator = () => {
   const [strategy, setStrategy] = useState<Strategy>("three-bucket");
@@ -94,8 +95,8 @@ const SafeWithdrawalSimulator = () => {
     () =>
       attachBullets(
         validation.ok
-          ? (strategy === "two-bucket" ? projectTwoBucket : project)(safeValues)
-          : (strategy === "two-bucket" ? projectTwoBucket : project)(defaults),
+          ? (strategy === "one-bucket" ? projectOneBucket : strategy === "two-bucket" ? projectTwoBucket : project)(safeValues)
+          : (strategy === "one-bucket" ? projectOneBucket : strategy === "two-bucket" ? projectTwoBucket : project)(defaults),
         strategy,
       ),
     [safeValues, strategy, validation.ok],
@@ -134,7 +135,7 @@ const SafeWithdrawalSimulator = () => {
     solverAbortRef.current?.abort();
     solverAbortRef.current = ctrl;
     const target = Math.max(0.01, Math.min(0.99, targetPct / 100));
-    const runner = strategy === "two-bucket" ? projectTwoBucket : project;
+    const runner = strategy === "one-bucket" ? projectOneBucket : strategy === "two-bucket" ? projectTwoBucket : project;
     const probeRuns = Math.min(1500, safeValues.monteCarloRuns);
 
     // Probe takes a year-1 monthly expense and returns success probability.
@@ -214,6 +215,12 @@ const SafeWithdrawalSimulator = () => {
             confidence level.
           </p>
           <div className="mt-6 inline-flex rounded-full border border-primary-foreground/30 bg-primary-foreground/10 p-1">
+            <button
+              className={`rounded-full px-4 py-1.5 text-sm font-medium ${strategy === "one-bucket" ? "bg-gold text-primary" : "text-primary-foreground/80 hover:bg-primary-foreground/10"}`}
+              onClick={() => setStrategy("one-bucket")}
+            >
+              One-Bucket
+            </button>
             <button
               className={`rounded-full px-4 py-1.5 text-sm font-medium ${strategy === "three-bucket" ? "bg-gold text-primary" : "text-primary-foreground/80 hover:bg-primary-foreground/10"}`}
               onClick={() => setStrategy("three-bucket")}

@@ -15,7 +15,7 @@ const MC_KEYS: Array<keyof RetirementInputs> = [
   "sequenceMode", "monteCarloRuns", "sequenceSeed",
 ];
 
-export function mcCacheKey(input: RetirementInputs, strategy: "three-bucket" | "two-bucket"): string {
+export function mcCacheKey(input: RetirementInputs, strategy: "three-bucket" | "two-bucket" | "one-bucket"): string {
   const slice: Record<string, unknown> = { strategy };
   for (const k of MC_KEYS) slice[k as string] = input[k];
   return JSON.stringify(slice);

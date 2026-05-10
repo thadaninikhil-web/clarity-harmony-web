@@ -31,7 +31,7 @@ interface Props {
   result: ProjectionResult;
   name: string;
   inputs: RetirementInputs;
-  strategy?: "three-bucket" | "two-bucket";
+  strategy?: "three-bucket" | "two-bucket" | "one-bucket";
   onReshuffleSequence?: () => void;
   onSipSolved?: (sip: number) => void;
   onMonteCarloRunsChange?: (runs: number) => void;

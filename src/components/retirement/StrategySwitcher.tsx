@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-type Active = "three" | "two" | "compare";
+type Active = "one" | "two" | "three" | "compare";
 
 const base =
   "rounded-full px-4 py-1.5 text-sm font-medium transition-colors";
@@ -11,6 +11,13 @@ const active = "bg-gold text-primary";
 export function StrategySwitcher({ activeTab }: { activeTab: Active }) {
   return (
     <div className="mt-6 inline-flex rounded-full border border-primary-foreground/30 bg-primary-foreground/10 p-1">
+      {activeTab === "one" ? (
+        <span className={`${base} ${active}`}>One-Bucket</span>
+      ) : (
+        <Link to="/calculators/onebucket" className={`${base} ${inactive}`}>
+          One-Bucket
+        </Link>
+      )}
       {activeTab === "three" ? (
         <span className={`${base} ${active}`}>Three-Bucket</span>
       ) : (
