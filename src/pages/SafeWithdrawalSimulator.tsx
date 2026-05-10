@@ -67,7 +67,7 @@ const defaults: RetirementInputs = {
 
 // SWR doesn't take SIP/step-up — user is already retired (or evaluating
 // solely the corpus). Skip those questions in the guided chat.
-const SKIP_QUESTIONS = ["monthlyInvestment", "sipStepUpRate"];
+const SKIP_QUESTIONS = ["monthlyInvestment", "sipStepUpRate", "prepYearsBeforeRetirement"];
 
 const SafeWithdrawalSimulator = () => {
   const [strategy, setStrategy] = useState<Strategy>("three-bucket");

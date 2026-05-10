@@ -136,6 +136,7 @@ const RetirementSimulator = () => {
         <InputsErrorBoundary>
           <GuidedInputsChat
             values={values}
+            skipQuestionIds={["monthlyInvestment", "sipStepUpRate", "prepYearsBeforeRetirement"]}
             onChange={setValues}
             completed={completed}
             startInSummary={hasPrefilled}
