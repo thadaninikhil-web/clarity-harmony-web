@@ -12,6 +12,7 @@ import {
   formatINR,
   project,
   projectTwoBucket,
+  projectOneBucket,
   type MonteCarloResult,
   type ProjectionResult,
   type RetirementInputs,
