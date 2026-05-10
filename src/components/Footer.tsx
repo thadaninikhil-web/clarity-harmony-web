@@ -103,8 +103,6 @@ export const Footer = () => {
             Disclaimer: Mutual fund investments are subject to market risks. Please read all scheme related documents carefully before investing. Past performance is not indicative of future results. The information provided on this website is for general informational purposes only and should not be construed as investment advice. Please consult your advisor before making any investment decisions.
           </p>
           <p className="text-xs text-primary-foreground/55 text-center mt-3">
-            <Link to="/calculators" className="hover:text-gold transition-colors underline">Calculators</Link>
-            {" · "}
             <Link to="/privacy-policy" className="hover:text-gold transition-colors underline">Privacy Policy</Link>
             {" · "}
             <span>Terms & Conditions apply</span>

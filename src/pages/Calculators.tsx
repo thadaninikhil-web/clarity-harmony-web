@@ -3,16 +3,32 @@ import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Wallet, PiggyBank, LineChart, Layers3, Scale } from "lucide-react";
 
 const calculators = [
   {
-    title: "Retirement simulator",
+    title: "One-bucket retirement simulator",
+    description: "A single retirement corpus stress-tested against sequence-of-returns risk.",
+    path: "/calculators/onebucket",
+    Icon: Wallet,
+  },
+  {
+    title: "Two-bucket retirement simulator",
+    description: "Equity / debt sleeves with annual rebalancing.",
+    path: "/calculators/twobucket",
+    Icon: Scale,
+  },
+  {
+    title: "Three-bucket retirement simulator",
+    description: "Accumulation, preparation and withdrawal buckets.",
     path: "/calculators/retirementsimulator",
+    Icon: Layers3,
   },
   {
     title: "Safe withdrawal simulator",
+    description: "Goal-seek the safe year-1 withdrawal for any target confidence.",
     path: "/calculators/safewithdrawalsimulation",
+    Icon: LineChart,
   },
 ];
 
@@ -36,15 +52,23 @@ const Calculators = () => {
         </div>
       </section>
       <main className="container mx-auto px-6 lg:px-8 py-12">
-        <div className="grid gap-6 md:grid-cols-2 max-w-4xl mx-auto">
-          {calculators.map((c) => (
-            <Card key={c.path} className="shadow-[var(--shadow-card)]">
+        <div className="grid gap-6 md:grid-cols-2 max-w-5xl mx-auto">
+          {calculators.map(({ title, description, path, Icon }) => (
+            <Card key={path} className="shadow-[var(--shadow-card)]">
               <CardContent className="p-6">
                 <Link
-                  to={c.path}
-                  className="flex items-center justify-between gap-4 text-lg font-semibold text-primary transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  to={path}
+                  className="flex items-start gap-4 text-primary transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md"
+                  aria-label={`${title} — ${description}`}
                 >
-                  {c.title} <ArrowRight className="size-5 shrink-0" aria-hidden="true" />
+                  <span className="flex size-12 shrink-0 items-center justify-center rounded-md bg-gold/15 text-gold">
+                    <Icon className="size-6" aria-hidden="true" />
+                  </span>
+                  <span className="flex-1 min-w-0">
+                    <span className="block text-lg font-semibold">{title}</span>
+                    <span className="mt-1 block text-sm text-muted-foreground">{description}</span>
+                  </span>
+                  <ArrowRight className="size-5 shrink-0 mt-1.5" aria-hidden="true" />
                 </Link>
               </CardContent>
             </Card>
