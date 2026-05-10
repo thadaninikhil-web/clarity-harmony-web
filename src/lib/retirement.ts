@@ -859,3 +859,109 @@ export function project(rawInput: RetirementInputs): ProjectionResult {
   };
   return output;
 }
+
+// One-Bucket: a single sleeve. The entered corpus is the value on retirement
+// day. Each year: grow at the sampled return, deduct that year's expenses,
+// only break the emergency reserve (months × today's expenses) when the
+// remaining corpus can't cover the spend.
+export function projectOneBucket(rawInput: RetirementInputs): ProjectionResult {
+  const input: RetirementInputs = {
+    ...normaliseStartAtRetirement(rawInput),
+    stressEnabled: true,
+    stressMode: "sequence",
+    sequenceMode: "montecarlo",
+  };
+  const ageAtStart = Math.max(ageFromDob(input.dob), input.retirementAge);
+  const yearsToRetirement = 0;
+  const totalYears = Math.min(150, planYears(input));
+  const startYear = new Date().getFullYear();
+  let corpus = input.currentCorpus;
+  let emergencyReserve = emergencyAmountToday(input);
+  let emergencyUsedTotal = 0;
+  let emergencyUsedFirstYear: number | undefined;
+  let emergencyUsedFirstAge: number | undefined;
+  const sequenceReturns = buildSequenceReturns(
+    totalYears,
+    input.sequenceCagr,
+    input.sequenceMinReturn,
+    input.sequenceMaxReturn,
+    input.sequenceSeed || 1,
+  );
+  const rows: YearRow[] = [];
+  let depleted = false;
+  let depletionAge: number | undefined;
+  rows.push({
+    year: startYear, age: ageAtStart, phase: "retirement",
+    accumulation: corpus, preparation: 0, withdrawal: 0,
+    total: corpus, contribution: 0, expense: 0, withdrawn: 0,
+    ...emptyTransfers(),
+    accReturnApplied: 0, accOpening: corpus, accGrowth: 0,
+    prepOpening: 0, prepGrowth: 0,
+    withdOpening: 0, withdGrowth: 0,
+    emergencyReserve, emergencyUsed: 0,
+    note: `Starting position at retirement (incl. ${formatINR(emergencyReserve)} emergency reserve)`,
+  });
+  for (let y = 1; y <= totalYears; y++) {
+    const age = ageAtStart + y;
+    const opening = corpus;
+    const ret = sequenceReturns[y - 1] ?? input.sequenceCagr;
+    corpus = corpus * (1 + ret);
+    emergencyReserve = emergencyReserve * (1 + input.inflationRate);
+    const annualExpense = input.currentMonthlyExpenses * 12 * Math.pow(1 + input.inflationRate, y - 1);
+    const notes: string[] = [`Sequence year: return ${(ret * 100).toFixed(1)}%`];
+    let withdrawn = 0;
+    let emergencyUsed = 0;
+    const spendable = Math.max(0, corpus - emergencyReserve);
+    const fromCorpus = Math.min(spendable, annualExpense);
+    corpus -= fromCorpus;
+    withdrawn = fromCorpus;
+    let short = annualExpense - fromCorpus;
+    if (short > 0 && corpus > 0) {
+      const fromReserve = Math.min(corpus, short);
+      corpus -= fromReserve;
+      emergencyReserve = Math.max(0, emergencyReserve - fromReserve);
+      withdrawn += fromReserve;
+      short -= fromReserve;
+      emergencyUsed = fromReserve;
+      emergencyUsedTotal += fromReserve;
+      if (emergencyUsedFirstYear === undefined) {
+        emergencyUsedFirstYear = startYear + y;
+        emergencyUsedFirstAge = age;
+      }
+      notes.push(`⚠ Used emergency reserve: ${formatINR(fromReserve)}`);
+    }
+    notes.push(`Spent ${formatINR(annualExpense)}${withdrawn < annualExpense - 1 ? ` (shortfall ${formatINR(annualExpense - withdrawn)})` : ""}`);
+    if (corpus <= 0 && !depleted) {
+      depleted = true;
+      depletionAge = age;
+      notes.push("⚠ Corpus depleted");
+    }
+    corpus = Math.max(0, corpus);
+    rows.push({
+      year: startYear + y, age,
+      phase: "retirement",
+      accumulation: corpus, preparation: 0, withdrawal: 0,
+      total: corpus, contribution: 0, expense: annualExpense, withdrawn,
+      ...emptyTransfers(),
+      accReturnApplied: ret,
+      accOpening: opening, accGrowth: opening * ret,
+      prepOpening: 0, prepGrowth: 0,
+      withdOpening: 0, withdGrowth: 0,
+      emergencyReserve, emergencyUsed,
+      note: notes.join(" · "),
+    });
+  }
+  const appliedReturns = rows.slice(1).map((r) => r.accReturnApplied);
+  const currentRunCagr = appliedReturns.length
+    ? Math.exp(appliedReturns.reduce((s, r) => s + Math.log1p(r), 0) / appliedReturns.length) - 1
+    : undefined;
+  return {
+    rows, ageAtStart, yearsToRetirement,
+    corpusAtRetirement: input.currentCorpus,
+    monthlyExpenseAtRetirement: input.currentMonthlyExpenses,
+    emergencyFundAtRetirement: emergencyAmountToday(input),
+    depleted, depletionAge,
+    finalCorpus: rows[rows.length - 1].total,
+    emergencyUsedFirstYear, emergencyUsedFirstAge, emergencyUsedTotal, currentRunCagr,
+  };
+}
