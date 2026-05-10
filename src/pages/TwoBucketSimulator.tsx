@@ -6,6 +6,7 @@ import { InputsErrorBoundary } from "@/components/retirement/InputsErrorBoundary
 import { Results } from "@/components/retirement/Results";
 import { Methodology } from "@/components/retirement/Methodology";
 import { HowToUse } from "@/components/retirement/HowToUse";
+import { CalculatorSectionNav } from "@/components/retirement/CalculatorSectionNav";
 import { SaveCompare } from "@/components/retirement/SaveCompare";
 import { ValidationBanner } from "@/components/retirement/ValidationBanner";
 import { StrategySwitcher } from "@/components/retirement/StrategySwitcher";
@@ -154,7 +155,10 @@ const TwoBucketSimulator = () => {
       </section>
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 max-w-full overflow-x-hidden">
-        <HowToUse strategy="two-bucket" />
+        <CalculatorSectionNav />
+        <section id="how-to-use" className="scroll-mt-40">
+          <HowToUse strategy="two-bucket" />
+        </section>
         <InputsErrorBoundary>
           <GuidedInputsChat
             values={values}
@@ -192,7 +196,9 @@ const TwoBucketSimulator = () => {
             <SaveCompare inputs={safeValues} result={result} onLoad={setValues} />
           </div>
         )}
-        <Methodology strategy="two-bucket" />
+        <section id="how-it-works" className="scroll-mt-40">
+          <Methodology strategy="two-bucket" />
+        </section>
         <p className="mt-12 text-center text-xs text-muted-foreground">
           Educational calculator — not investment advice. Returns shown are
           nominal and assume constant rates apart from the configured stress
