@@ -25,7 +25,7 @@ import {
 import { runMonteCarloAsync } from "@/lib/retirement-mc";
 import { decodeInputsFromHash } from "@/lib/scenarios";
 
-type Strategy = "three-bucket" | "two-bucket";
+type Strategy = "three-bucket" | "two-bucket" | "one-bucket";
 
 const defaultMonthlyExpenses = 100000;
 const defaultRetireAge = 60;

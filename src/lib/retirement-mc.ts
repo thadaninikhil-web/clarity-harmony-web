@@ -20,7 +20,7 @@ const clampRuns = (runs: number) =>
 export interface RunMonteCarloOptions {
   onProgress?: (done: number, total: number) => void;
   signal?: AbortSignal;
-  strategy?: "three-bucket" | "two-bucket";
+  strategy?: "three-bucket" | "two-bucket" | "one-bucket";
 }
 
 type Schedule = (cb: () => void) => void;

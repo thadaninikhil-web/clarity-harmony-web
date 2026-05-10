@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Props {
-  strategy?: "three-bucket" | "two-bucket";
+  strategy?: "three-bucket" | "two-bucket" | "one-bucket";
 }
 
 export function HowToUse({ strategy = "three-bucket" }: Props) {

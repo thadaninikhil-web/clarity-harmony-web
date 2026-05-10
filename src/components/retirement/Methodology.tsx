@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/accordion";
 
 interface Props {
-  strategy?: "three-bucket" | "two-bucket";
+  strategy?: "three-bucket" | "two-bucket" | "one-bucket";
 }
 
 export function Methodology({ strategy = "three-bucket" }: Props) {

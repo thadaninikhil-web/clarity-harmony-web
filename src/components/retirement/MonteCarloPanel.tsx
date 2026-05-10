@@ -21,7 +21,7 @@ import { runMonteCarloAsync } from "@/lib/retirement-mc";
 interface Props {
   inputs: RetirementInputs;
   result: ProjectionResult;
-  strategy: "three-bucket" | "two-bucket";
+  strategy: "three-bucket" | "two-bucket" | "one-bucket";
   onReshuffle?: () => void;
   onSipSolved?: (monthlySip: number) => void;
   onMonteCarloRunsChange?: (runs: number) => void;
