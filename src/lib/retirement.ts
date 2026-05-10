@@ -382,10 +382,18 @@ const emptyTransfers = () => ({ accToPrep: 0, prepToWithd: 0, accToWithd: 0 });
 // "Note" column stays consistent across surfaces.
 export function buildYearBullets(
   r: YearRow,
-  strategy: "three-bucket" | "two-bucket" = "three-bucket",
+  strategy: "three-bucket" | "two-bucket" | "one-bucket" = "three-bucket",
 ): string[] {
   const lines: string[] = [];
   const fmt = (n: number) => formatINR(n);
+  if (strategy === "one-bucket") {
+    if (r.phase === "retirement") {
+      lines.push(`Expense: ${fmt(r.expense)}${r.withdrawn < r.expense - 1 ? ` · withdrawn ${fmt(r.withdrawn)} (shortfall)` : ""}`);
+      if (r.accGrowth) lines.push(`Corpus growth (${(r.accReturnApplied * 100).toFixed(1)}%): ${fmt(r.accGrowth)}`);
+      if (r.emergencyUsed > 0) lines.push(`⚠ Emergency reserve used: ${fmt(r.emergencyUsed)}`);
+    }
+    return lines;
+  }
   if (r.phase === "accumulation") {
     if (r.contribution > 0) lines.push(`SIP contribution: ${fmt(r.contribution)}`);
     if (r.accGrowth) lines.push(`Accumulation growth (${(r.accReturnApplied * 100).toFixed(1)}%): ${fmt(r.accGrowth)}`);
@@ -418,7 +426,7 @@ export function buildYearBullets(
 // multiple times.
 export function attachBullets(
   result: ProjectionResult,
-  strategy: "three-bucket" | "two-bucket" = "three-bucket",
+  strategy: "three-bucket" | "two-bucket" | "one-bucket" = "three-bucket",
 ): ProjectionResult {
   for (const r of result.rows) {
     if (!r.notes || r.notes.length === 0) {
