@@ -216,6 +216,12 @@ const SafeWithdrawalSimulator = () => {
           </p>
           <div className="mt-6 inline-flex rounded-full border border-primary-foreground/30 bg-primary-foreground/10 p-1">
             <button
+              className={`rounded-full px-4 py-1.5 text-sm font-medium ${strategy === "one-bucket" ? "bg-gold text-primary" : "text-primary-foreground/80 hover:bg-primary-foreground/10"}`}
+              onClick={() => setStrategy("one-bucket")}
+            >
+              One-Bucket
+            </button>
+            <button
               className={`rounded-full px-4 py-1.5 text-sm font-medium ${strategy === "three-bucket" ? "bg-gold text-primary" : "text-primary-foreground/80 hover:bg-primary-foreground/10"}`}
               onClick={() => setStrategy("three-bucket")}
             >
