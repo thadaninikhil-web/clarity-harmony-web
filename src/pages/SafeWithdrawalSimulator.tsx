@@ -94,8 +94,8 @@ const SafeWithdrawalSimulator = () => {
     () =>
       attachBullets(
         validation.ok
-          ? (strategy === "two-bucket" ? projectTwoBucket : project)(safeValues)
-          : (strategy === "two-bucket" ? projectTwoBucket : project)(defaults),
+          ? (strategy === "one-bucket" ? projectOneBucket : strategy === "two-bucket" ? projectTwoBucket : project)(safeValues)
+          : (strategy === "one-bucket" ? projectOneBucket : strategy === "two-bucket" ? projectTwoBucket : project)(defaults),
         strategy,
       ),
     [safeValues, strategy, validation.ok],
@@ -134,7 +134,7 @@ const SafeWithdrawalSimulator = () => {
     solverAbortRef.current?.abort();
     solverAbortRef.current = ctrl;
     const target = Math.max(0.01, Math.min(0.99, targetPct / 100));
-    const runner = strategy === "two-bucket" ? projectTwoBucket : project;
+    const runner = strategy === "one-bucket" ? projectOneBucket : strategy === "two-bucket" ? projectTwoBucket : project;
     const probeRuns = Math.min(1500, safeValues.monteCarloRuns);
 
     // Probe takes a year-1 monthly expense and returns success probability.

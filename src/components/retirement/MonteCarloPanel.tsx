@@ -52,7 +52,7 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
     setSolverResult(null);
     setSolverProgress(null);
     solverAbortRef.current?.abort();
-    const runner = strategy === "two-bucket" ? projectTwoBucket : project;
+    const runner = strategy === "one-bucket" ? projectOneBucket : strategy === "two-bucket" ? projectTwoBucket : project;
     // Force MC-mode inputs for the runner regardless of saved state.
     const mcInputs = {
       ...inputs,
@@ -115,7 +115,7 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
     solverAbortRef.current?.abort();
     solverAbortRef.current = ctrl;
     const target = Math.max(0.01, Math.min(0.99, targetPct / 100));
-    const runner = strategy === "two-bucket" ? projectTwoBucket : project;
+    const runner = strategy === "one-bucket" ? projectOneBucket : strategy === "two-bucket" ? projectTwoBucket : project;
     const probeRuns = Math.min(1500, inputs.monteCarloRuns);
 
     const probe = async (sip: number): Promise<number> => {
