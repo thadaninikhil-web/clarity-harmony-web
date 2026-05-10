@@ -480,13 +480,13 @@ function buildSequenceReturns(
 
 export function projectTwoBucket(rawInput: RetirementInputs): ProjectionResult {
   const input: RetirementInputs = {
-    ...rawInput,
+    ...normaliseStartAtRetirement(rawInput),
     stressEnabled: true,
     stressMode: "sequence",
     sequenceMode: "montecarlo",
   };
-  const ageAtStart = ageFromDob(input.dob);
-  const yearsToRetirement = Math.max(0, input.retirementAge - ageAtStart);
+  const ageAtStart = Math.max(ageFromDob(input.dob), input.retirementAge);
+  const yearsToRetirement = 0;
   const totalYears = Math.min(150, yearsToRetirement + planYears(input));
   const startYear = new Date().getFullYear();
   const equityWeight = Math.max(0, Math.min(1, input.accEquityPct));
@@ -656,13 +656,13 @@ export function projectTwoBucket(rawInput: RetirementInputs): ProjectionResult {
 
 export function project(rawInput: RetirementInputs): ProjectionResult {
   const input: RetirementInputs = {
-    ...rawInput,
+    ...normaliseStartAtRetirement(rawInput),
     stressEnabled: true,
     stressMode: "sequence",
     sequenceMode: "montecarlo",
   };
-  const ageAtStart = ageFromDob(input.dob);
-  const yearsToRetirement = Math.max(0, input.retirementAge - ageAtStart);
+  const ageAtStart = Math.max(ageFromDob(input.dob), input.retirementAge);
+  const yearsToRetirement = 0;
   const totalYears = Math.min(150, yearsToRetirement + planYears(input));
   const startYear = new Date().getFullYear();
   let acc = input.currentCorpus;
