@@ -19,6 +19,7 @@ import TwoBucketSimulator from "./pages/TwoBucketSimulator";
 import CompareStrategies from "./pages/CompareStrategies";
 import SafeWithdrawalSimulator from "./pages/SafeWithdrawalSimulator";
 import OneBucketSimulator from "./pages/OneBucketSimulator";
+import SwrCompareStrategies from "./pages/SwrCompareStrategies";
 import Calculators from "./pages/Calculators";
 import NotFound from "./pages/NotFound";
 import { ScrollToTop } from "./components/ScrollToTop";
@@ -49,6 +50,9 @@ const App = () => (
         <Route path="/calculators/onebucket" element={<OneBucketSimulator />} />
         <Route path="/calculators/compare" element={<CompareStrategies />} />
         <Route path="/calculators/safewithdrawalsimulation" element={<SafeWithdrawalSimulator />} />
+        <Route path="/calculators/safewithdrawalsimulation/onebucket" element={<SafeWithdrawalSimulator strategy="one-bucket" />} />
+        <Route path="/calculators/safewithdrawalsimulation/twobucket" element={<SafeWithdrawalSimulator strategy="two-bucket" />} />
+        <Route path="/calculators/safewithdrawalsimulation/compare" element={<SwrCompareStrategies />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </TooltipProvider>
