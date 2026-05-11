@@ -286,8 +286,10 @@ const CompareStrategies = () => {
 
   const [threeMC, setThreeMC] = useState<MonteCarloResult | undefined>();
   const [twoMC, setTwoMC] = useState<MonteCarloResult | undefined>();
+  const [oneMC, setOneMC] = useState<MonteCarloResult | undefined>();
   const [threeProgress, setThreeProgress] = useState({ done: 0, total: 0 });
   const [twoProgress, setTwoProgress] = useState({ done: 0, total: 0 });
+  const [oneProgress, setOneProgress] = useState({ done: 0, total: 0 });
   const [mcRunning, setMcRunning] = useState(false);
   const [mcError, setMcError] = useState<string | null>(null);
   const [runId, setRunId] = useState(0);
@@ -300,8 +302,10 @@ const CompareStrategies = () => {
     setMcError(null);
     setThreeMC(undefined);
     setTwoMC(undefined);
+    setOneMC(undefined);
     setThreeProgress({ done: 0, total: threeInputs.monteCarloRuns });
     setTwoProgress({ done: 0, total: twoInputs.monteCarloRuns });
+    setOneProgress({ done: 0, total: oneInputs.monteCarloRuns });
 
     const ctrl = new AbortController();
     const timeout = setTimeout(() => {
@@ -314,6 +318,11 @@ const CompareStrategies = () => {
     }, MC_TIMEOUT_MS);
 
     Promise.all([
+      runMonteCarloAsync(oneInputs, projectOneBucket, {
+        signal: ctrl.signal,
+        strategy: "one-bucket",
+        onProgress: (done, total) => setOneProgress({ done, total }),
+      }),
       runMonteCarloAsync(threeInputs, project, {
         signal: ctrl.signal,
         strategy: "three-bucket",
@@ -334,8 +343,9 @@ const CompareStrategies = () => {
         },
       ),
     ])
-      .then(([a, b]) => {
+      .then(([o, a, b]) => {
         if (ctrl.signal.aborted) return;
+        setOneMC(o);
         setThreeMC(a);
         setTwoMC(b);
         setMcRunning(false);
@@ -356,7 +366,7 @@ const CompareStrategies = () => {
       runningRef.current = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [threeInputs, twoInputs, runId]);
+  }, [threeInputs, twoInputs, oneInputs, runId]);
 
   const retryMC = () => setRunId((n) => n + 1);
 
