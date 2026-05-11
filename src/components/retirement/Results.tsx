@@ -55,6 +55,10 @@ export function Results({
 }: Props) {
   const [showDetails, setShowDetails] = useState(false);
   const isTwoBucket = strategy === "two-bucket";
+  const isOneBucket = strategy === "one-bucket";
+  const hasPrep = strategy === "three-bucket";
+  const hasWithd = strategy !== "one-bucket";
+  const accLabel = isOneBucket ? "Retirement corpus" : "Accumulation";
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -64,12 +68,12 @@ export function Results({
     () =>
       result.rows.map((r, i) => ({
         age: safeNum(r.age),
-        Accumulation: Math.round(safeNum(r.accumulation)),
-        ...(isTwoBucket ? {} : { Preparation: Math.round(safeNum(r.preparation)) }),
-        Withdrawal: Math.round(safeNum(r.withdrawal)),
+        [accLabel]: Math.round(safeNum(r.accumulation)),
+        ...(hasPrep ? { Preparation: Math.round(safeNum(r.preparation)) } : {}),
+        ...(hasWithd ? { Withdrawal: Math.round(safeNum(r.withdrawal)) } : {}),
         AccReturnPct: i === 0 ? null : Number((safeNum(r.accReturnApplied) * 100).toFixed(2)),
       })),
-    [result.rows, isTwoBucket],
+    [result.rows, hasPrep, hasWithd, accLabel],
   );
 
   // Symmetric domain centred on 0 so the right-axis 0% line sits in the middle
@@ -128,7 +132,7 @@ export function Results({
         <div>
           <h2 className="font-display text-xl font-semibold">
             {displayName ? `${displayName}'s ` : ""}
-            {isTwoBucket ? "Two-bucket" : "Three-bucket"} projection
+            {isOneBucket ? "One-bucket" : isTwoBucket ? "Two-bucket" : "Three-bucket"} projection
           </h2>
           <p className="text-xs text-muted-foreground">
             Sequence-of-returns Monte Carlo · {inputs.monteCarloRuns.toLocaleString("en-IN")} runs
@@ -309,11 +313,13 @@ export function Results({
                       labelFormatter={(l) => `Age ${l}`}
                     />
                     <Legend />
-                    <Area yAxisId="left" type="monotone" dataKey="Accumulation" stackId="1" stroke="var(--color-bucket-accumulation)" fill="url(#g1)" />
-                    {!isTwoBucket && (
+                    <Area yAxisId="left" type="monotone" dataKey={accLabel} stackId="1" stroke="var(--color-bucket-accumulation)" fill="url(#g1)" />
+                    {hasPrep && (
                       <Area yAxisId="left" type="monotone" dataKey="Preparation" stackId="1" stroke="var(--color-bucket-preparation)" fill="url(#g2)" />
                     )}
-                    <Area yAxisId="left" type="monotone" dataKey="Withdrawal" stackId="1" stroke="var(--color-bucket-withdrawal)" fill="url(#g3)" />
+                    {hasWithd && (
+                      <Area yAxisId="left" type="monotone" dataKey="Withdrawal" stackId="1" stroke="var(--color-bucket-withdrawal)" fill="url(#g3)" />
+                    )}
                     <Line
                       yAxisId="right"
                       type="monotone"
@@ -361,9 +367,9 @@ export function Results({
               <div className="relative h-[480px] w-full overflow-auto rounded-md border">
                 <table className="caption-bottom text-sm border-collapse">
                   {showDetails ? (
-                    <DetailedHead isTwoBucket={isTwoBucket} stickyColHead={stickyColHead} />
+                    <DetailedHead isTwoBucket={isTwoBucket} hasPrep={hasPrep} hasWithd={hasWithd} accLabel={accLabel} stickyColHead={stickyColHead} />
                   ) : (
-                    <SimpleHead stickyColHead={stickyColHead} isTwoBucket={isTwoBucket} />
+                    <SimpleHead stickyColHead={stickyColHead} isTwoBucket={isTwoBucket} hasPrep={hasPrep} hasWithd={hasWithd} accLabel={accLabel} />
                   )}
                   <tbody>
                     {result.rows.map((r) => {
@@ -404,10 +410,12 @@ export function Results({
                           {!showDetails && (
                             <>
                               <td className="p-2 align-middle text-right tabular-nums bg-bucket-accumulation/5">{formatINR(r.accumulation)}</td>
-                              {!isTwoBucket && (
+                              {hasPrep && (
                                 <td className="p-2 align-middle text-right tabular-nums bg-bucket-preparation/5">{formatINR(r.preparation)}</td>
                               )}
-                              <td className="p-2 align-middle text-right tabular-nums bg-bucket-withdrawal/5">{formatINR(r.withdrawal)}</td>
+                              {hasWithd && (
+                                <td className="p-2 align-middle text-right tabular-nums bg-bucket-withdrawal/5">{formatINR(r.withdrawal)}</td>
+                              )}
                             </>
                           )}
 
@@ -427,7 +435,7 @@ export function Results({
                               <td className="p-2 align-middle text-right tabular-nums font-medium bg-bucket-accumulation/5">{formatINR(r.accumulation)}</td>
 
                               {/* Preparation block (3-bucket only) */}
-                              {!isTwoBucket && (
+                              {hasPrep && (
                                 <>
                                   <td className="p-2 align-middle text-right tabular-nums bg-bucket-preparation/5">{formatINR(r.prepOpening)}</td>
                                   <td className="p-2 align-middle text-right tabular-nums bg-bucket-preparation/5">
@@ -444,6 +452,7 @@ export function Results({
                               )}
 
                               {/* Withdrawal / Debt block */}
+                              {hasWithd && (<>
                               <td className="p-2 align-middle text-right tabular-nums bg-bucket-withdrawal/5">{formatINR(r.withdOpening)}</td>
                               <td className="p-2 align-middle text-right tabular-nums bg-bucket-withdrawal/5">
                                 {(isTwoBucket ? r.accToWithd : r.prepToWithd + r.accToWithd) > 0
@@ -456,7 +465,7 @@ export function Results({
                               <td className="p-2 align-middle text-right tabular-nums bg-bucket-withdrawal/5">
                                 {r.withdGrowth ? formatINR(r.withdGrowth) : "—"}
                               </td>
-                              {!isTwoBucket && (
+                              {hasPrep && (
                                 <td className="p-2 align-middle text-right tabular-nums bg-bucket-withdrawal/5">
                                   {r.emergencyReserve ? formatINR(r.emergencyReserve) : "—"}
                                   {r.emergencyUsed > 0 && (
@@ -465,6 +474,7 @@ export function Results({
                                 </td>
                               )}
                               <td className="p-2 align-middle text-right tabular-nums font-medium bg-bucket-withdrawal/5">{formatINR(r.withdrawal)}</td>
+                              </>)}
                             </>
                           ) : null}
 
