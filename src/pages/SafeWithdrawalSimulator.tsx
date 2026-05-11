@@ -92,11 +92,18 @@ const SafeWithdrawalSimulator = ({ strategy: propStrategy }: SwrProps = {}) => {
   const [completed, setCompleted] = useState(hasPrefilled);
   const resultsRef = useRef<HTMLDivElement>(null);
 
-  // Force SIP fields to zero so accidental imports never re-introduce them.
-  const safeValues = useMemo(
-    () => ({ ...values, monthlyInvestment: 0, sipStepUpRate: 0 }),
-    [values],
-  );
+  // Force SIP off + zero out non-applicable bucket fields per strategy so any
+  // imported state can't reintroduce a third bucket / prep sleeve.
+  const safeValues = useMemo(() => {
+    const base = { ...values, monthlyInvestment: 0, sipStepUpRate: 0 };
+    if (strategy === "one-bucket") {
+      return { ...base, prepEquityPct: 0, prepYearsBeforeRetirement: 0, withdrawalYears: 0, accEquityPct: 1 };
+    }
+    if (strategy === "two-bucket") {
+      return { ...base, prepEquityPct: 0, prepYearsBeforeRetirement: 0, withdrawalYears: 0 };
+    }
+    return base;
+  }, [values, strategy]);
   const validation = useMemo(() => validateInputs(safeValues), [safeValues]);
   const result = useMemo(
     () =>
