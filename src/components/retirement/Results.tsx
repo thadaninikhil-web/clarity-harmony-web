@@ -505,7 +505,19 @@ export function Results({
   );
 }
 
-function SimpleHead({ stickyColHead, isTwoBucket }: { stickyColHead: string; isTwoBucket: boolean }) {
+function SimpleHead({
+  stickyColHead,
+  isTwoBucket,
+  hasPrep,
+  hasWithd,
+  accLabel,
+}: {
+  stickyColHead: string;
+  isTwoBucket: boolean;
+  hasPrep: boolean;
+  hasWithd: boolean;
+  accLabel: string;
+}) {
   return (
     <thead className="sticky top-0 z-30 bg-card shadow-[0_1px_0_0_var(--border)] [&_th]:bg-card">
       <tr className="border-b">
@@ -515,18 +527,32 @@ function SimpleHead({ stickyColHead, isTwoBucket }: { stickyColHead: string; isT
         <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground">Total corpus</th>
         <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground">Expense</th>
         <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground">Withdrawn</th>
-        <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground bg-bucket-accumulation/5">Accumulation</th>
-        {!isTwoBucket && (
+        <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground bg-bucket-accumulation/5">{accLabel}</th>
+        {hasPrep && (
           <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground bg-bucket-preparation/5">Preparation</th>
         )}
-        <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground bg-bucket-withdrawal/5">{isTwoBucket ? "Debt sleeve" : "Withdrawal"}</th>
+        {hasWithd && (
+          <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground bg-bucket-withdrawal/5">{isTwoBucket ? "Debt sleeve" : "Withdrawal"}</th>
+        )}
         <th className="h-10 px-2 text-left align-middle font-medium text-muted-foreground min-w-[260px]">What happened</th>
       </tr>
     </thead>
   );
 }
 
-function DetailedHead({ isTwoBucket, stickyColHead }: { isTwoBucket: boolean; stickyColHead: string }) {
+function DetailedHead({
+  isTwoBucket,
+  hasPrep,
+  hasWithd,
+  accLabel,
+  stickyColHead,
+}: {
+  isTwoBucket: boolean;
+  hasPrep: boolean;
+  hasWithd: boolean;
+  accLabel: string;
+  stickyColHead: string;
+}) {
   const accCols = 5; // start, add, ret, growth, closing
   const prepCols = 5;
   const withdCols = isTwoBucket ? 5 : 6; // include emergency for 3-bucket
@@ -537,16 +563,18 @@ function DetailedHead({ isTwoBucket, stickyColHead }: { isTwoBucket: boolean; st
           Summary
         </th>
         <th colSpan={accCols} className="h-9 px-2 text-left align-middle text-xs font-semibold bg-bucket-accumulation/15 text-foreground">
-          Accumulation
+          {accLabel}
         </th>
-        {!isTwoBucket && (
+        {hasPrep && (
           <th colSpan={prepCols} className="h-9 px-2 text-left align-middle text-xs font-semibold bg-bucket-preparation/15 text-foreground">
             Preparation
           </th>
         )}
-        <th colSpan={withdCols} className="h-9 px-2 text-left align-middle text-xs font-semibold bg-bucket-withdrawal/15 text-foreground">
-          {isTwoBucket ? "Debt sleeve" : "Withdrawal"}
-        </th>
+        {hasWithd && (
+          <th colSpan={withdCols} className="h-9 px-2 text-left align-middle text-xs font-semibold bg-bucket-withdrawal/15 text-foreground">
+            {isTwoBucket ? "Debt sleeve" : "Withdrawal"}
+          </th>
+        )}
         <th rowSpan={2} className="h-9 px-2 text-left align-middle font-medium text-muted-foreground min-w-[260px]">
           What happened
         </th>
@@ -565,7 +593,7 @@ function DetailedHead({ isTwoBucket, stickyColHead }: { isTwoBucket: boolean; st
         <th className="h-9 px-2 text-right align-middle text-[11px] font-medium text-muted-foreground bg-bucket-accumulation/5">Growth</th>
         <th className="h-9 px-2 text-right align-middle text-[11px] font-medium text-muted-foreground bg-bucket-accumulation/5">Closing</th>
         {/* Prep */}
-        {!isTwoBucket && (
+        {hasPrep && (
           <>
             <th className="h-9 px-2 text-right align-middle text-[11px] font-medium text-muted-foreground bg-bucket-preparation/5">Start</th>
             <th className="h-9 px-2 text-right align-middle text-[11px] font-medium text-muted-foreground bg-bucket-preparation/5">Acc → Prep</th>
@@ -575,14 +603,18 @@ function DetailedHead({ isTwoBucket, stickyColHead }: { isTwoBucket: boolean; st
           </>
         )}
         {/* Withd / Debt */}
-        <th className="h-9 px-2 text-right align-middle text-[11px] font-medium text-muted-foreground bg-bucket-withdrawal/5">Start</th>
-        <th className="h-9 px-2 text-right align-middle text-[11px] font-medium text-muted-foreground bg-bucket-withdrawal/5">{isTwoBucket ? "Eq → Debt" : "Inflow"}</th>
-        <th className="h-9 px-2 text-right align-middle text-[11px] font-medium text-muted-foreground bg-bucket-withdrawal/5">Ret %</th>
-        <th className="h-9 px-2 text-right align-middle text-[11px] font-medium text-muted-foreground bg-bucket-withdrawal/5">Growth</th>
-        {!isTwoBucket && (
-          <th className="h-9 px-2 text-right align-middle text-[11px] font-medium text-muted-foreground bg-bucket-withdrawal/5">Emergency</th>
+        {hasWithd && (
+          <>
+            <th className="h-9 px-2 text-right align-middle text-[11px] font-medium text-muted-foreground bg-bucket-withdrawal/5">Start</th>
+            <th className="h-9 px-2 text-right align-middle text-[11px] font-medium text-muted-foreground bg-bucket-withdrawal/5">{isTwoBucket ? "Eq → Debt" : "Inflow"}</th>
+            <th className="h-9 px-2 text-right align-middle text-[11px] font-medium text-muted-foreground bg-bucket-withdrawal/5">Ret %</th>
+            <th className="h-9 px-2 text-right align-middle text-[11px] font-medium text-muted-foreground bg-bucket-withdrawal/5">Growth</th>
+            {hasPrep && (
+              <th className="h-9 px-2 text-right align-middle text-[11px] font-medium text-muted-foreground bg-bucket-withdrawal/5">Emergency</th>
+            )}
+            <th className="h-9 px-2 text-right align-middle text-[11px] font-medium text-muted-foreground bg-bucket-withdrawal/5">Closing</th>
+          </>
         )}
-        <th className="h-9 px-2 text-right align-middle text-[11px] font-medium text-muted-foreground bg-bucket-withdrawal/5">Closing</th>
       </tr>
     </thead>
   );
