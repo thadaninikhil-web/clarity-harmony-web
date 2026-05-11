@@ -878,7 +878,7 @@ function AssumptionTable({
   rows,
 }: {
   title: string;
-  rows: Array<[string, string, string]>;
+  rows: Array<[string, string, string, string]>;
 }) {
   return (
     <div>
@@ -887,17 +887,19 @@ function AssumptionTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-1/3">Assumption</TableHead>
-              <TableHead>Three-bucket</TableHead>
+              <TableHead className="w-1/4">Assumption</TableHead>
+              <TableHead>One-bucket</TableHead>
               <TableHead>Two-bucket</TableHead>
+              <TableHead>Three-bucket</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {rows.map(([label, a, b]) => (
+            {rows.map(([label, a, b, c]) => (
               <TableRow key={label}>
                 <TableCell className="font-medium">{label}</TableCell>
                 <TableCell className="tabular-nums">{a}</TableCell>
                 <TableCell className="tabular-nums">{b}</TableCell>
+                <TableCell className="tabular-nums">{c}</TableCell>
               </TableRow>
             ))}
           </TableBody>
