@@ -22,6 +22,7 @@ import {
   formatINR,
   project,
   projectTwoBucket,
+  projectOneBucket,
   type MonteCarloResult,
   type RetirementInputs,
 } from "@/lib/retirement";
@@ -94,8 +95,12 @@ function writeInputs(key: string, values: RetirementInputs) {
 
 const pct = (n: number) => `${(n * 100).toFixed(1)}%`;
 
-function encodeStateToHash(three: RetirementInputs, two: RetirementInputs): string {
-  const payload = { v: 1, three, two };
+function encodeStateToHash(
+  one: RetirementInputs,
+  two: RetirementInputs,
+  three: RetirementInputs,
+): string {
+  const payload = { v: 2, one, two, three };
   const json = JSON.stringify(payload);
   if (typeof window === "undefined") return "";
   return btoa(unescape(encodeURIComponent(json)))
@@ -133,22 +138,39 @@ function isValidLeg(x: unknown): x is RetirementInputs {
 
 function decodeStateFromHash(
   hash: string,
-): { three: RetirementInputs; two: RetirementInputs } | null {
+): { one: RetirementInputs; two: RetirementInputs; three: RetirementInputs } | null {
   try {
     const b64 = hash.replace(/-/g, "+").replace(/_/g, "/");
     const padded = b64 + "=".repeat((4 - (b64.length % 4)) % 4);
     const json = decodeURIComponent(escape(atob(padded)));
     const parsed = JSON.parse(json);
     if (!parsed || typeof parsed !== "object") return null;
-    if (parsed.v !== 1) return null;
-    if (!isValidLeg(parsed.three) || !isValidLeg(parsed.two)) return null;
-    return {
-      three: { ...baseInputs, ...parsed.three },
-      two: { ...baseInputs, ...parsed.two },
-    };
+    if (parsed.v === 1 && isValidLeg(parsed.three) && isValidLeg(parsed.two)) {
+      const three = { ...baseInputs, ...parsed.three };
+      const two = { ...baseInputs, ...parsed.two };
+      return { one: oneBucketDefaults(three), two, three };
+    }
+    if (parsed.v === 2 && isValidLeg(parsed.one) && isValidLeg(parsed.two) && isValidLeg(parsed.three)) {
+      return {
+        one: { ...baseInputs, ...parsed.one },
+        two: { ...baseInputs, ...parsed.two },
+        three: { ...baseInputs, ...parsed.three },
+      };
+    }
+    return null;
   } catch {
     return null;
   }
+}
+
+function oneBucketDefaults(src: RetirementInputs): RetirementInputs {
+  return {
+    ...src,
+    accEquityPct: 1,
+    prepEquityPct: 0,
+    prepYearsBeforeRetirement: 0,
+    withdrawalYears: 0,
+  };
 }
 
 const MC_TIMEOUT_MS = 60_000;
@@ -163,6 +185,7 @@ const CompareStrategies = () => {
     withdrawalYears: 0,
     withdrawalReturn: 0.07,
   });
+  const [oneInputs, setOneInputs] = useState<RetirementInputs>(oneBucketDefaults(baseInputs));
   const [copied, setCopied] = useState(false);
   const [linkError, setLinkError] = useState<string | null>(null);
 
@@ -173,8 +196,9 @@ const CompareStrategies = () => {
     if (rawHash.startsWith("s=")) {
       const decoded = decodeStateFromHash(rawHash.slice(2));
       if (decoded) {
-        setThreeInputs(decoded.three);
+        setOneInputs(decoded.one);
         setTwoInputs(decoded.two);
+        setThreeInputs(decoded.three);
         writeShared(decoded.three);
         writeInputs(THREE_KEY, decoded.three);
         writeInputs(TWO_KEY, decoded.two);
@@ -192,6 +216,7 @@ const CompareStrategies = () => {
     const sharedNow = readShared() ?? {};
     setThreeInputs((prev) => ({ ...readInputs(THREE_KEY, prev), ...sharedNow }));
     setTwoInputs((prev) => ({ ...readInputs(TWO_KEY, prev), ...sharedNow }));
+    setOneInputs((prev) => oneBucketDefaults({ ...readInputs(THREE_KEY, prev), ...sharedNow }));
   }, []);
 
   useEffect(() => {
@@ -200,6 +225,7 @@ const CompareStrategies = () => {
       if (!shared) return;
       setThreeInputs((prev) => ({ ...prev, ...shared }));
       setTwoInputs((prev) => ({ ...prev, ...shared }));
+      setOneInputs((prev) => oneBucketDefaults({ ...prev, ...shared }));
     });
   }, []);
 
@@ -207,6 +233,7 @@ const CompareStrategies = () => {
     const s = Math.floor(Math.random() * 2 ** 31) || 1;
     setThreeInputs((v) => ({ ...v, sequenceSeed: s }));
     setTwoInputs((v) => ({ ...v, sequenceSeed: s }));
+    setOneInputs((v) => ({ ...v, sequenceSeed: s }));
   }, []);
 
   const updateShared = useCallback(
@@ -222,6 +249,7 @@ const CompareStrategies = () => {
         writeInputs(TWO_KEY, next);
         return next;
       });
+      setOneInputs((prev) => oneBucketDefaults({ ...prev, [key]: value }));
     },
     [],
   );
@@ -236,6 +264,7 @@ const CompareStrategies = () => {
       withdrawalYears: 0,
       withdrawalReturn: 0.07,
     });
+    setOneInputs(oneBucketDefaults(baseInputs));
     writeShared(baseInputs);
     writeInputs(THREE_KEY, baseInputs);
     writeInputs(TWO_KEY, baseInputs);
@@ -243,7 +272,7 @@ const CompareStrategies = () => {
 
   const copyShareLink = async () => {
     if (typeof window === "undefined") return;
-    const hash = encodeStateToHash(threeInputs, twoInputs);
+    const hash = encodeStateToHash(oneInputs, twoInputs, threeInputs);
     const url = `${window.location.origin}${window.location.pathname}#s=${hash}`;
     try {
       await navigator.clipboard.writeText(url);
@@ -257,8 +286,10 @@ const CompareStrategies = () => {
 
   const [threeMC, setThreeMC] = useState<MonteCarloResult | undefined>();
   const [twoMC, setTwoMC] = useState<MonteCarloResult | undefined>();
+  const [oneMC, setOneMC] = useState<MonteCarloResult | undefined>();
   const [threeProgress, setThreeProgress] = useState({ done: 0, total: 0 });
   const [twoProgress, setTwoProgress] = useState({ done: 0, total: 0 });
+  const [oneProgress, setOneProgress] = useState({ done: 0, total: 0 });
   const [mcRunning, setMcRunning] = useState(false);
   const [mcError, setMcError] = useState<string | null>(null);
   const [runId, setRunId] = useState(0);
@@ -271,8 +302,10 @@ const CompareStrategies = () => {
     setMcError(null);
     setThreeMC(undefined);
     setTwoMC(undefined);
+    setOneMC(undefined);
     setThreeProgress({ done: 0, total: threeInputs.monteCarloRuns });
     setTwoProgress({ done: 0, total: twoInputs.monteCarloRuns });
+    setOneProgress({ done: 0, total: oneInputs.monteCarloRuns });
 
     const ctrl = new AbortController();
     const timeout = setTimeout(() => {
@@ -285,6 +318,11 @@ const CompareStrategies = () => {
     }, MC_TIMEOUT_MS);
 
     Promise.all([
+      runMonteCarloAsync(oneInputs, projectOneBucket, {
+        signal: ctrl.signal,
+        strategy: "one-bucket",
+        onProgress: (done, total) => setOneProgress({ done, total }),
+      }),
       runMonteCarloAsync(threeInputs, project, {
         signal: ctrl.signal,
         strategy: "three-bucket",
@@ -305,8 +343,9 @@ const CompareStrategies = () => {
         },
       ),
     ])
-      .then(([a, b]) => {
+      .then(([o, a, b]) => {
         if (ctrl.signal.aborted) return;
+        setOneMC(o);
         setThreeMC(a);
         setTwoMC(b);
         setMcRunning(false);
@@ -327,7 +366,7 @@ const CompareStrategies = () => {
       runningRef.current = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [threeInputs, twoInputs, runId]);
+  }, [threeInputs, twoInputs, oneInputs, runId]);
 
   const retryMC = () => setRunId((n) => n + 1);
 
@@ -336,82 +375,90 @@ const CompareStrategies = () => {
   const medianOrDash = (mc?: MonteCarloResult) =>
     mc?.medianDepletionAge !== undefined ? `${mc.medianDepletionAge}` : "Never";
 
-  const sharedRows: Array<[string, string, string]> = [
-    ["Date of birth", threeInputs.dob || "—", twoInputs.dob || "—"],
+  const sharedRows: Array<[string, string, string, string]> = [
+    ["Date of birth", oneInputs.dob || "—", twoInputs.dob || "—", threeInputs.dob || "—"],
     [
       "Current monthly expenses",
-      formatINR(threeInputs.currentMonthlyExpenses),
+      formatINR(oneInputs.currentMonthlyExpenses),
       formatINR(twoInputs.currentMonthlyExpenses),
+      formatINR(threeInputs.currentMonthlyExpenses),
     ],
-    ["Inflation rate", pct(threeInputs.inflationRate), pct(twoInputs.inflationRate)],
-    ["Current corpus", formatINR(threeInputs.currentCorpus), formatINR(twoInputs.currentCorpus)],
+    ["Inflation rate", pct(oneInputs.inflationRate), pct(twoInputs.inflationRate), pct(threeInputs.inflationRate)],
+    ["Retirement corpus", formatINR(oneInputs.currentCorpus), formatINR(twoInputs.currentCorpus), formatINR(threeInputs.currentCorpus)],
     [
       "Monthly investment (SIP)",
-      formatINR(threeInputs.monthlyInvestment),
+      formatINR(oneInputs.monthlyInvestment),
       formatINR(twoInputs.monthlyInvestment),
+      formatINR(threeInputs.monthlyInvestment),
     ],
     [
       "SIP annual step-up",
-      pct(threeInputs.sipStepUpRate),
+      pct(oneInputs.sipStepUpRate),
       pct(twoInputs.sipStepUpRate),
+      pct(threeInputs.sipStepUpRate),
     ],
-    ["Retirement age", String(threeInputs.retirementAge), String(twoInputs.retirementAge)],
+    ["Retirement age", String(oneInputs.retirementAge), String(twoInputs.retirementAge), String(threeInputs.retirementAge)],
     [
       "Life expectancy age",
+      String(oneInputs.lifeExpectancyAge ?? oneInputs.retirementAge + oneInputs.lifeExpectancyYears),
+      String(twoInputs.lifeExpectancyAge ?? twoInputs.retirementAge + twoInputs.lifeExpectancyYears),
       String(
         threeInputs.lifeExpectancyAge ??
           threeInputs.retirementAge + threeInputs.lifeExpectancyYears,
       ),
-      String(
-        twoInputs.lifeExpectancyAge ??
-          twoInputs.retirementAge + twoInputs.lifeExpectancyYears,
-      ),
     ],
     [
       "Years planned post-retirement",
-      String(threeInputs.lifeExpectancyYears),
+      String(oneInputs.lifeExpectancyYears),
       String(twoInputs.lifeExpectancyYears),
+      String(threeInputs.lifeExpectancyYears),
     ],
     [
       "Emergency fund (months)",
-      String(threeInputs.emergencyFundMonths ?? 0),
+      String(oneInputs.emergencyFundMonths ?? 0),
       String(twoInputs.emergencyFundMonths ?? 0),
+      String(threeInputs.emergencyFundMonths ?? 0),
     ],
-    ["Equity expected return", pct(threeInputs.accReturn), pct(twoInputs.accReturn)],
+    ["Equity expected return", pct(oneInputs.accReturn), pct(twoInputs.accReturn), pct(threeInputs.accReturn)],
     [
       "Debt / withdrawal return",
-      pct(threeInputs.withdrawalReturn),
+      "—",
       pct(twoInputs.withdrawalReturn),
+      pct(threeInputs.withdrawalReturn),
     ],
   ];
 
-  const strategyRows: Array<[string, string, string]> = [
+  const strategyRows: Array<[string, string, string, string]> = [
     [
       "Accumulation equity %",
-      pct(threeInputs.accEquityPct),
+      "100% (single sleeve)",
       `${pct(twoInputs.accEquityPct)} (whole portfolio)`,
+      pct(threeInputs.accEquityPct),
     ],
-    ["Preparation equity %", pct(threeInputs.prepEquityPct), "— (no prep bucket)"],
-    ["Preparation expected return", pct(threeInputs.prepReturn), "—"],
+    ["Preparation equity %", "—", "—", pct(threeInputs.prepEquityPct)],
+    ["Preparation expected return", "—", "—", pct(threeInputs.prepReturn)],
     [
       "Years prep starts before retirement",
-      String(threeInputs.prepYearsBeforeRetirement),
       "—",
+      "—",
+      String(threeInputs.prepYearsBeforeRetirement),
     ],
-    ["Withdrawal bucket years parked", String(threeInputs.withdrawalYears), "—"],
+    ["Withdrawal bucket years parked", "—", "—", String(threeInputs.withdrawalYears)],
   ];
 
-  const sequenceRows: Array<[string, string, string]> = [
-    ["Sequence CAGR", pct(threeInputs.sequenceCagr), pct(twoInputs.sequenceCagr)],
+  const sequenceRows: Array<[string, string, string, string]> = [
+    ["Sequence CAGR", pct(oneInputs.sequenceCagr), pct(twoInputs.sequenceCagr), pct(threeInputs.sequenceCagr)],
     [
       "Sequence min / max",
-      `${pct(threeInputs.sequenceMinReturn)} / ${pct(threeInputs.sequenceMaxReturn)}`,
+      `${pct(oneInputs.sequenceMinReturn)} / ${pct(oneInputs.sequenceMaxReturn)}`,
       `${pct(twoInputs.sequenceMinReturn)} / ${pct(twoInputs.sequenceMaxReturn)}`,
+      `${pct(threeInputs.sequenceMinReturn)} / ${pct(threeInputs.sequenceMaxReturn)}`,
     ],
     [
       "Monte Carlo runs",
-      threeInputs.monteCarloRuns.toLocaleString("en-IN"),
+      oneInputs.monteCarloRuns.toLocaleString("en-IN"),
       twoInputs.monteCarloRuns.toLocaleString("en-IN"),
+      threeInputs.monteCarloRuns.toLocaleString("en-IN"),
     ],
   ];
 
@@ -660,19 +707,19 @@ const CompareStrategies = () => {
             )}
 
             {mcRunning && (
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-3">
                 <div>
-                  <div className="text-xs label-caps mb-1">Three-bucket</div>
+                  <div className="text-xs label-caps mb-1">One-bucket</div>
                   <Progress
                     value={
-                      threeProgress.total
-                        ? Math.round((threeProgress.done / threeProgress.total) * 100)
+                      oneProgress.total
+                        ? Math.round((oneProgress.done / oneProgress.total) * 100)
                         : 0
                     }
                   />
                   <div className="text-xs text-muted-foreground mt-1">
-                    {threeProgress.done.toLocaleString("en-IN")} /{" "}
-                    {threeProgress.total.toLocaleString("en-IN")} runs
+                    {oneProgress.done.toLocaleString("en-IN")} /{" "}
+                    {oneProgress.total.toLocaleString("en-IN")} runs
                   </div>
                 </div>
                 <div>
@@ -689,20 +736,34 @@ const CompareStrategies = () => {
                     {twoProgress.total.toLocaleString("en-IN")} runs
                   </div>
                 </div>
+                <div>
+                  <div className="text-xs label-caps mb-1">Three-bucket</div>
+                  <Progress
+                    value={
+                      threeProgress.total
+                        ? Math.round((threeProgress.done / threeProgress.total) * 100)
+                        : 0
+                    }
+                  />
+                  <div className="text-xs text-muted-foreground mt-1">
+                    {threeProgress.done.toLocaleString("en-IN")} /{" "}
+                    {threeProgress.total.toLocaleString("en-IN")} runs
+                  </div>
+                </div>
               </div>
             )}
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-lg border border-border bg-primary/5 p-4">
-                <div className="label-caps text-xs">Three-bucket</div>
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="rounded-lg border border-border bg-secondary/5 p-4">
+                <div className="label-caps text-xs">One-bucket</div>
                 <div className="mt-1 grid grid-cols-2 gap-3">
                   <div>
                     <div className="text-xs text-muted-foreground">Success probability</div>
-                    <div className="text-3xl font-serif tabular-nums">{pctOrDash(threeMC)}</div>
+                    <div className="text-3xl font-serif tabular-nums">{pctOrDash(oneMC)}</div>
                   </div>
                   <div>
                     <div className="text-xs text-muted-foreground">Median depletion age</div>
-                    <div className="text-3xl font-serif tabular-nums">{medianOrDash(threeMC)}</div>
+                    <div className="text-3xl font-serif tabular-nums">{medianOrDash(oneMC)}</div>
                   </div>
                 </div>
               </div>
@@ -719,66 +780,89 @@ const CompareStrategies = () => {
                   </div>
                 </div>
               </div>
+              <div className="rounded-lg border border-border bg-primary/5 p-4">
+                <div className="label-caps text-xs">Three-bucket</div>
+                <div className="mt-1 grid grid-cols-2 gap-3">
+                  <div>
+                    <div className="text-xs text-muted-foreground">Success probability</div>
+                    <div className="text-3xl font-serif tabular-nums">{pctOrDash(threeMC)}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Median depletion age</div>
+                    <div className="text-3xl font-serif tabular-nums">{medianOrDash(threeMC)}</div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="rounded-md border overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-1/3">Metric</TableHead>
-                    <TableHead>Three-bucket</TableHead>
+                    <TableHead className="w-1/4">Metric</TableHead>
+                    <TableHead>One-bucket</TableHead>
                     <TableHead>Two-bucket</TableHead>
+                    <TableHead>Three-bucket</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {[
-                    ["Success probability", pctOrDash(threeMC), pctOrDash(twoMC)],
+                    ["Success probability", pctOrDash(oneMC), pctOrDash(twoMC), pctOrDash(threeMC)],
                     [
                       "Run count",
-                      threeMC ? threeMC.runs.toLocaleString("en-IN") : "—",
+                      oneMC ? oneMC.runs.toLocaleString("en-IN") : "—",
                       twoMC ? twoMC.runs.toLocaleString("en-IN") : "—",
+                      threeMC ? threeMC.runs.toLocaleString("en-IN") : "—",
                     ],
                     [
                       "Successes (corpus survived)",
-                      threeMC ? threeMC.successCount.toLocaleString("en-IN") : "—",
+                      oneMC ? oneMC.successCount.toLocaleString("en-IN") : "—",
                       twoMC ? twoMC.successCount.toLocaleString("en-IN") : "—",
+                      threeMC ? threeMC.successCount.toLocaleString("en-IN") : "—",
                     ],
                     [
                       "Failures (corpus depleted)",
-                      threeMC ? threeMC.failureCount.toLocaleString("en-IN") : "—",
+                      oneMC ? oneMC.failureCount.toLocaleString("en-IN") : "—",
                       twoMC ? twoMC.failureCount.toLocaleString("en-IN") : "—",
+                      threeMC ? threeMC.failureCount.toLocaleString("en-IN") : "—",
                     ],
-                    ["Median depletion age (failed runs)", medianOrDash(threeMC), medianOrDash(twoMC)],
+                    ["Median depletion age (failed runs)", medianOrDash(oneMC), medianOrDash(twoMC), medianOrDash(threeMC)],
                     [
                       "P10 final corpus",
-                      threeMC ? formatINR(threeMC.p10FinalCorpus) : "—",
+                      oneMC ? formatINR(oneMC.p10FinalCorpus) : "—",
                       twoMC ? formatINR(twoMC.p10FinalCorpus) : "—",
+                      threeMC ? formatINR(threeMC.p10FinalCorpus) : "—",
                     ],
                     [
                       "P25 final corpus",
-                      threeMC ? formatINR(threeMC.p25FinalCorpus) : "—",
+                      oneMC ? formatINR(oneMC.p25FinalCorpus) : "—",
                       twoMC ? formatINR(twoMC.p25FinalCorpus) : "—",
+                      threeMC ? formatINR(threeMC.p25FinalCorpus) : "—",
                     ],
                     [
                       "P50 final corpus (median)",
-                      threeMC ? formatINR(threeMC.p50FinalCorpus) : "—",
+                      oneMC ? formatINR(oneMC.p50FinalCorpus) : "—",
                       twoMC ? formatINR(twoMC.p50FinalCorpus) : "—",
+                      threeMC ? formatINR(threeMC.p50FinalCorpus) : "—",
                     ],
                     [
                       "P75 final corpus",
-                      threeMC ? formatINR(threeMC.p75FinalCorpus) : "—",
+                      oneMC ? formatINR(oneMC.p75FinalCorpus) : "—",
                       twoMC ? formatINR(twoMC.p75FinalCorpus) : "—",
+                      threeMC ? formatINR(threeMC.p75FinalCorpus) : "—",
                     ],
                     [
                       "P90 final corpus",
-                      threeMC ? formatINR(threeMC.p90FinalCorpus) : "—",
+                      oneMC ? formatINR(oneMC.p90FinalCorpus) : "—",
                       twoMC ? formatINR(twoMC.p90FinalCorpus) : "—",
+                      threeMC ? formatINR(threeMC.p90FinalCorpus) : "—",
                     ],
-                  ].map(([label, a, b]) => (
+                  ].map(([label, a, b, c]) => (
                     <TableRow key={label}>
                       <TableCell className="font-medium">{label}</TableCell>
                       <TableCell className="tabular-nums">{a}</TableCell>
                       <TableCell className="tabular-nums">{b}</TableCell>
+                      <TableCell className="tabular-nums">{c}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -831,7 +915,7 @@ function AssumptionTable({
   rows,
 }: {
   title: string;
-  rows: Array<[string, string, string]>;
+  rows: Array<[string, string, string, string]>;
 }) {
   return (
     <div>
@@ -840,17 +924,19 @@ function AssumptionTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-1/3">Assumption</TableHead>
-              <TableHead>Three-bucket</TableHead>
+              <TableHead className="w-1/4">Assumption</TableHead>
+              <TableHead>One-bucket</TableHead>
               <TableHead>Two-bucket</TableHead>
+              <TableHead>Three-bucket</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {rows.map(([label, a, b]) => (
+            {rows.map(([label, a, b, c]) => (
               <TableRow key={label}>
                 <TableCell className="font-medium">{label}</TableCell>
                 <TableCell className="tabular-nums">{a}</TableCell>
                 <TableCell className="tabular-nums">{b}</TableCell>
+                <TableCell className="tabular-nums">{c}</TableCell>
               </TableRow>
             ))}
           </TableBody>

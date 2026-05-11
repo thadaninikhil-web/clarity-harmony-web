@@ -9,6 +9,7 @@ import { ValidationBanner } from "@/components/retirement/ValidationBanner";
 import { HowToUse } from "@/components/retirement/HowToUse";
 import { Methodology } from "@/components/retirement/Methodology";
 import { CalculatorSectionNav } from "@/components/retirement/CalculatorSectionNav";
+import { StrategySwitcher } from "@/components/retirement/StrategySwitcher";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,6 +28,10 @@ import { runMonteCarloAsync } from "@/lib/retirement-mc";
 import { decodeInputsFromHash } from "@/lib/scenarios";
 
 type Strategy = "three-bucket" | "two-bucket" | "one-bucket";
+
+interface SwrProps {
+  strategy?: Strategy;
+}
 
 const defaultMonthlyExpenses = 100000;
 const defaultRetireAge = 60;
@@ -69,8 +74,10 @@ const defaults: RetirementInputs = {
 // solely the corpus). Skip those questions in the guided chat.
 const SKIP_QUESTIONS = ["monthlyInvestment", "sipStepUpRate", "prepYearsBeforeRetirement"];
 
-const SafeWithdrawalSimulator = () => {
-  const [strategy, setStrategy] = useState<Strategy>("three-bucket");
+const SafeWithdrawalSimulator = ({ strategy: propStrategy }: SwrProps = {}) => {
+  const strategy: Strategy = propStrategy ?? "three-bucket";
+  const activeTab: "one" | "two" | "three" =
+    strategy === "one-bucket" ? "one" : strategy === "two-bucket" ? "two" : "three";
 
   // If a share-link hash is present, hydrate from it and start in summary view.
   const initialFromHash = useMemo(() => {
@@ -85,11 +92,18 @@ const SafeWithdrawalSimulator = () => {
   const [completed, setCompleted] = useState(hasPrefilled);
   const resultsRef = useRef<HTMLDivElement>(null);
 
-  // Force SIP fields to zero so accidental imports never re-introduce them.
-  const safeValues = useMemo(
-    () => ({ ...values, monthlyInvestment: 0, sipStepUpRate: 0 }),
-    [values],
-  );
+  // Force SIP off + zero out non-applicable bucket fields per strategy so any
+  // imported state can't reintroduce a third bucket / prep sleeve.
+  const safeValues = useMemo(() => {
+    const base = { ...values, monthlyInvestment: 0, sipStepUpRate: 0 };
+    if (strategy === "one-bucket") {
+      return { ...base, prepEquityPct: 0, prepYearsBeforeRetirement: 0, withdrawalYears: 0, accEquityPct: 1 };
+    }
+    if (strategy === "two-bucket") {
+      return { ...base, prepEquityPct: 0, prepYearsBeforeRetirement: 0, withdrawalYears: 0 };
+    }
+    return base;
+  }, [values, strategy]);
   const validation = useMemo(() => validateInputs(safeValues), [safeValues]);
   const result = useMemo(
     () =>
@@ -214,26 +228,7 @@ const SafeWithdrawalSimulator = () => {
             withdrawal — and goal-seek the safe withdrawal amount for a target
             confidence level.
           </p>
-          <div className="mt-6 inline-flex rounded-full border border-primary-foreground/30 bg-primary-foreground/10 p-1">
-            <button
-              className={`rounded-full px-4 py-1.5 text-sm font-medium ${strategy === "one-bucket" ? "bg-gold text-primary" : "text-primary-foreground/80 hover:bg-primary-foreground/10"}`}
-              onClick={() => setStrategy("one-bucket")}
-            >
-              One-Bucket
-            </button>
-            <button
-              className={`rounded-full px-4 py-1.5 text-sm font-medium ${strategy === "three-bucket" ? "bg-gold text-primary" : "text-primary-foreground/80 hover:bg-primary-foreground/10"}`}
-              onClick={() => setStrategy("three-bucket")}
-            >
-              Three-Bucket
-            </button>
-            <button
-              className={`rounded-full px-4 py-1.5 text-sm font-medium ${strategy === "two-bucket" ? "bg-gold text-primary" : "text-primary-foreground/80 hover:bg-primary-foreground/10"}`}
-              onClick={() => setStrategy("two-bucket")}
-            >
-              Two-Bucket
-            </button>
-          </div>
+          <StrategySwitcher mode="swr" activeTab={activeTab} />
         </div>
       </section>
 
