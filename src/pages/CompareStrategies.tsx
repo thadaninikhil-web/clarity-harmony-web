@@ -22,6 +22,7 @@ import {
   formatINR,
   project,
   projectTwoBucket,
+  projectOneBucket,
   type MonteCarloResult,
   type RetirementInputs,
 } from "@/lib/retirement";
@@ -94,8 +95,12 @@ function writeInputs(key: string, values: RetirementInputs) {
 
 const pct = (n: number) => `${(n * 100).toFixed(1)}%`;
 
-function encodeStateToHash(three: RetirementInputs, two: RetirementInputs): string {
-  const payload = { v: 1, three, two };
+function encodeStateToHash(
+  one: RetirementInputs,
+  two: RetirementInputs,
+  three: RetirementInputs,
+): string {
+  const payload = { v: 2, one, two, three };
   const json = JSON.stringify(payload);
   if (typeof window === "undefined") return "";
   return btoa(unescape(encodeURIComponent(json)))
@@ -133,22 +138,39 @@ function isValidLeg(x: unknown): x is RetirementInputs {
 
 function decodeStateFromHash(
   hash: string,
-): { three: RetirementInputs; two: RetirementInputs } | null {
+): { one: RetirementInputs; two: RetirementInputs; three: RetirementInputs } | null {
   try {
     const b64 = hash.replace(/-/g, "+").replace(/_/g, "/");
     const padded = b64 + "=".repeat((4 - (b64.length % 4)) % 4);
     const json = decodeURIComponent(escape(atob(padded)));
     const parsed = JSON.parse(json);
     if (!parsed || typeof parsed !== "object") return null;
-    if (parsed.v !== 1) return null;
-    if (!isValidLeg(parsed.three) || !isValidLeg(parsed.two)) return null;
-    return {
-      three: { ...baseInputs, ...parsed.three },
-      two: { ...baseInputs, ...parsed.two },
-    };
+    if (parsed.v === 1 && isValidLeg(parsed.three) && isValidLeg(parsed.two)) {
+      const three = { ...baseInputs, ...parsed.three };
+      const two = { ...baseInputs, ...parsed.two };
+      return { one: oneBucketDefaults(three), two, three };
+    }
+    if (parsed.v === 2 && isValidLeg(parsed.one) && isValidLeg(parsed.two) && isValidLeg(parsed.three)) {
+      return {
+        one: { ...baseInputs, ...parsed.one },
+        two: { ...baseInputs, ...parsed.two },
+        three: { ...baseInputs, ...parsed.three },
+      };
+    }
+    return null;
   } catch {
     return null;
   }
+}
+
+function oneBucketDefaults(src: RetirementInputs): RetirementInputs {
+  return {
+    ...src,
+    accEquityPct: 1,
+    prepEquityPct: 0,
+    prepYearsBeforeRetirement: 0,
+    withdrawalYears: 0,
+  };
 }
 
 const MC_TIMEOUT_MS = 60_000;
@@ -163,6 +185,7 @@ const CompareStrategies = () => {
     withdrawalYears: 0,
     withdrawalReturn: 0.07,
   });
+  const [oneInputs, setOneInputs] = useState<RetirementInputs>(oneBucketDefaults(baseInputs));
   const [copied, setCopied] = useState(false);
   const [linkError, setLinkError] = useState<string | null>(null);
 
@@ -173,8 +196,9 @@ const CompareStrategies = () => {
     if (rawHash.startsWith("s=")) {
       const decoded = decodeStateFromHash(rawHash.slice(2));
       if (decoded) {
-        setThreeInputs(decoded.three);
+        setOneInputs(decoded.one);
         setTwoInputs(decoded.two);
+        setThreeInputs(decoded.three);
         writeShared(decoded.three);
         writeInputs(THREE_KEY, decoded.three);
         writeInputs(TWO_KEY, decoded.two);
@@ -192,6 +216,7 @@ const CompareStrategies = () => {
     const sharedNow = readShared() ?? {};
     setThreeInputs((prev) => ({ ...readInputs(THREE_KEY, prev), ...sharedNow }));
     setTwoInputs((prev) => ({ ...readInputs(TWO_KEY, prev), ...sharedNow }));
+    setOneInputs((prev) => oneBucketDefaults({ ...readInputs(THREE_KEY, prev), ...sharedNow }));
   }, []);
 
   useEffect(() => {
@@ -200,6 +225,7 @@ const CompareStrategies = () => {
       if (!shared) return;
       setThreeInputs((prev) => ({ ...prev, ...shared }));
       setTwoInputs((prev) => ({ ...prev, ...shared }));
+      setOneInputs((prev) => oneBucketDefaults({ ...prev, ...shared }));
     });
   }, []);
 
@@ -207,6 +233,7 @@ const CompareStrategies = () => {
     const s = Math.floor(Math.random() * 2 ** 31) || 1;
     setThreeInputs((v) => ({ ...v, sequenceSeed: s }));
     setTwoInputs((v) => ({ ...v, sequenceSeed: s }));
+    setOneInputs((v) => ({ ...v, sequenceSeed: s }));
   }, []);
 
   const updateShared = useCallback(
@@ -222,6 +249,7 @@ const CompareStrategies = () => {
         writeInputs(TWO_KEY, next);
         return next;
       });
+      setOneInputs((prev) => oneBucketDefaults({ ...prev, [key]: value }));
     },
     [],
   );
@@ -236,6 +264,7 @@ const CompareStrategies = () => {
       withdrawalYears: 0,
       withdrawalReturn: 0.07,
     });
+    setOneInputs(oneBucketDefaults(baseInputs));
     writeShared(baseInputs);
     writeInputs(THREE_KEY, baseInputs);
     writeInputs(TWO_KEY, baseInputs);
@@ -243,7 +272,7 @@ const CompareStrategies = () => {
 
   const copyShareLink = async () => {
     if (typeof window === "undefined") return;
-    const hash = encodeStateToHash(threeInputs, twoInputs);
+    const hash = encodeStateToHash(oneInputs, twoInputs, threeInputs);
     const url = `${window.location.origin}${window.location.pathname}#s=${hash}`;
     try {
       await navigator.clipboard.writeText(url);
