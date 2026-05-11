@@ -1,62 +1,83 @@
-# Plan
+# Calculators restructure
 
-## 1. One Bucket scenario (new strategy)
+## 1. Calculators landing page (`/calculators`)
 
-**Inputs (only):** Name, DOB, Retirement Age, Plan-Until Age, Year-1 Monthly Expenses, Inflation, Retirement Corpus, Emergency Fund (months), and the sequence block (CAGR, Min, Max, Monte Carlo runs).
+Reduce from four tiles to **two**, in this exact order:
 
-**Math:** Single sleeve. Each year: grow corpus at sampled return, deduct that year's inflated expenses, only break the emergency reserve (months × today's expenses, inflated) when corpus is otherwise empty. Survive = corpus > 0 at plan-until age.
+1. **Retirement Calculator** → `/calculators/retirementsimulator` (lands on Three-Bucket scenario, with switcher)
+2. **Safe Withdrawal Calculator** → `/calculators/safewithdrawalsimulation` (lands on Three-Bucket SWR with switcher)
 
-**Where it shows up:**
-- New tab in `StrategySwitcher` (order: One / Two / Three Bucket).
-- New page `src/pages/OneBucketSimulator.tsx` at `/calculators/onebucketsimulator`.
-- Same wiring as the Two/Three pages: Guided chat, `Results`, `MonteCarloPanel`, `SaveCompare`, sticky nav, How-to-use, Methodology.
-- Same setup added to **Safe Withdrawal** (strategy switcher + One Bucket math path).
-- Compare page becomes 3 columns in order: One / Two / Three Bucket.
+Icons: `PiggyBank` for Retirement, `LineChart` for SWR. Drop the One/Two/Three tiles from the landing page.
 
-## 2. Start every strategy from the date of retirement
+## 2. Retirement Calculator scenarios
 
-Per your answer "Apply same rule to Two and Three Bucket too":
-- Remove SIP-related inputs from the chat (monthly investment, SIP step-up).
-- Remove "years before retirement" prep transfers from Three Bucket inputs.
-- The entered **Retirement Corpus** is treated as the value on retirement day.
-- For Three Bucket: split that corpus across Accumulation / Preparation / Withdrawal at retirement using existing target-equity rules (no transfers needed).
-- Year 0 of the projection = retirement year. Charts/tables start there.
-- Goal Seek will solve for required **starting corpus** (instead of SIP) on retirement-only flows, except SWR which still solves for safe withdrawal % as today.
+Top of every retirement page shows the same **scenario switcher** in this order:
+`One-Bucket · Two-Bucket · Three-Bucket · Compare`
 
-## 3. Sticky section nav UX
+- `/calculators/onebucket` → One-Bucket
+- `/calculators/twobucket` → Two-Bucket
+- `/calculators/retirementsimulator` → Three-Bucket
+- `/calculators/compare` → Compare
 
-- Smooth scroll on click (`scroll-behavior: smooth` or `scrollIntoView({behavior:"smooth"})`).
-- Active link highlight using `IntersectionObserver` on `#how-to-use` and `#how-it-works`. Active = bold + gold underline.
+Update `StrategySwitcher.tsx` so the rendered order is **One, Two, Three, Compare** (currently One, Three, Two, Compare).
 
-## 4. Accessibility audit pass
+## 3. Safe Withdrawal Calculator scenarios
 
-- Verify every interactive element on Retirement and SWR pages has visible focus ring, aria-label where icon-only, sane tab order, and that the per-run table rows expose `aria-pressed` and a meaningful row label.
-- Add skip-link target on main, `aria-current="page"` to active sticky link, role/labels on the MC slider, and `<caption>` on per-run tables.
+Same switcher pattern, four tabs: One / Two / Three / Compare. Implement as routes so the switcher can be reused:
 
-## 5. Footer cleanup
+- `/calculators/safewithdrawalsimulation` → Three-Bucket SWR (default)
+- `/calculators/safewithdrawalsimulation/onebucket` → One-Bucket SWR
+- `/calculators/safewithdrawalsimulation/twobucket` → Two-Bucket SWR
+- `/calculators/safewithdrawalsimulation/compare` → SWR Compare
 
-Remove the "Calculators · Privacy Policy · Terms" line at the bottom — keep Calculators only in the Resources column.
+Refactor: the existing `SafeWithdrawalSimulator.tsx` already has internal `strategy` state; convert it to read scenario from a route param (or use a small wrapper component per route that passes `strategy`). Replace the inline pill switcher with a new `SwrStrategySwitcher` matching the retirement one, in order One/Two/Three/Compare.
 
-## 6. Calculators landing page
+## 4. Per-scenario input rules (already mostly enforced — verify)
 
-Add a professional icon next to each calculator (no people). Use `lucide-react`:
-- Retirement simulator → `PiggyBank`
-- Safe withdrawal simulator → `LineChart`
-- One bucket simulator → `Wallet`
-Icons in a gold rounded square to match brand.
+- **One-Bucket**: only Retirement Corpus + Emergency Fund + sequence inputs. Hide all preparation, withdrawal-bucket, SIP, prep-years questions in the guided chat. Single `accumulation` corpus column. Confirmed: `OneBucketSimulator.tsx` already does this; verify SWR One-Bucket path also forces `prepEquityPct=0`, `prepYears=0`, `withdrawalYears=0` like the retirement page does.
+- **Two-Bucket**: no preparation column. Already enforced in `TwoBucketSimulator.tsx`; verify Results table hides the preparation column for `strategy === "two-bucket"` (and same for the SWR two-bucket view).
+- **Three-Bucket**: unchanged.
+
+## 5. Compare page — add One-Bucket column
+
+Rewrite `CompareStrategies.tsx` so the comparison runs **three legs** in the order **One, Two, Three** (and emits a third Monte Carlo run via `projectOneBucket`). Each comparison table row gains a third column. The shareable hash schema bumps to `v: 2` with `{ one, two, three }`; v1 hashes still decode (one-bucket gets cloned from `two`). Per-run table and percentile cards reuse the existing components for the new column with no formatting changes.
+
+A separate `SwrCompare` page mirrors the same three-column layout but solves SWR per leg (binary search on each strategy in parallel) and shows the resulting safe year-1 monthly withdrawal + SWR % per column.
+
+## 6. Verify One-Bucket UI parity
+
+Audit `Results.tsx` and `MonteCarloPanel.tsx`:
+- Chart: same `<AreaChart>` series; for one-bucket only the accumulation series is plotted (already the case via the single corpus column).
+- Percentile cards: identical card grid (P10/P25/P50/P75/P90 + success probability).
+- Per-run table: identical column set; for one-bucket the prep / withdrawal columns collapse to "—" or are hidden by the `strategy` prop.
+
+Add small fixes wherever a column or label still references "preparation" / "withdrawal bucket" for the one-bucket view.
+
+## 7. E2E tests
+
+Add Playwright specs under `tests/e2e/`:
+
+- `calculators.spec.ts` — landing page renders exactly two tiles in the right order, both links navigate.
+- `onebucket.spec.ts` — `/calculators/onebucket` loads, guided chat skips SIP / prep / withdrawal questions, Results section appears after completion, Monte Carlo percentile cards render, per-run table present.
+- `swr-onebucket.spec.ts` — `/calculators/safewithdrawalsimulation/onebucket` loads, goal-seek button appears, switcher highlights correct tab.
+- `compare.spec.ts` — `/calculators/compare` shows three columns with headers One / Two / Three, share-link copy works.
+- `a11y.spec.ts` — keyboard `Tab` reaches scenario switcher, sticky section nav, guided chat input, and Results action buttons on both `/calculators/retirementsimulator` and `/calculators/safewithdrawalsimulation`. Uses `axe-core/playwright` for a basic violations check on each page.
+
+## 8. Footer / nav
+
+No change beyond the existing Calculators link — confirm it points to `/calculators` only.
+
+## Out of scope
+
+- Goal-seek behavior changes.
+- PDF/XLSX export schema changes (one-bucket already exports today via the existing path).
+- Sanity / CMS / insights.
 
 ## Technical notes
 
-- `src/lib/retirement.ts`: add `OneBucketInputs` shape + `projectOneBucket()` deterministic projection; refactor existing project() to accept corpus-at-retirement and skip pre-retirement loop when SIP fields absent.
-- `src/lib/retirement-mc.ts`: add `runOneBucketMC()` reusing the same return-sampling util; per-run record keeps same shape so `MonteCarloPanel` works unchanged.
-- `src/components/retirement/StrategySwitcher.tsx`: add `one` tab.
-- `src/components/retirement/GuidedInputsChat.tsx`: gate SIP / step-up / prep-years questions behind a `strategy` prop and skip them entirely; remove from `defaults`.
-- New `OneBucketInputsForm` not required — guided chat covers it.
-- `src/pages/CompareStrategies.tsx`: third column.
-- `App.tsx`: route for `/calculators/onebucketsimulator`.
-- `Calculators.tsx`: third tile + icons.
-
-## Out of scope (will not touch)
-
-- Existing exports, CMS, Sanity wiring, anything outside the calculators flow.
-- Goal Seek behavior change beyond what's needed for "no SIP".
+- `StrategySwitcher` order change.
+- New `SwrStrategySwitcher` component (or a `mode: "retirement" | "swr"` prop on the existing one).
+- `SafeWithdrawalSimulator` refactored to accept a `strategy` prop and registered four times in `App.tsx`.
+- `CompareStrategies` adds `oneInputs` state, third MC promise via `projectOneBucket`, third column rendered in every `<Table>` row map (`sharedRows`, `strategyRows`, `sequenceRows`, `Per-leg Results`).
+- New `SwrCompareStrategies` page reusing the binary-search solver from `SafeWithdrawalSimulator`.
+- New `playwright.config.ts` already exists; add specs and ensure dev server is started by the existing fixture.
