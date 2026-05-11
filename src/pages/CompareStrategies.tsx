@@ -375,82 +375,90 @@ const CompareStrategies = () => {
   const medianOrDash = (mc?: MonteCarloResult) =>
     mc?.medianDepletionAge !== undefined ? `${mc.medianDepletionAge}` : "Never";
 
-  const sharedRows: Array<[string, string, string]> = [
-    ["Date of birth", threeInputs.dob || "—", twoInputs.dob || "—"],
+  const sharedRows: Array<[string, string, string, string]> = [
+    ["Date of birth", oneInputs.dob || "—", twoInputs.dob || "—", threeInputs.dob || "—"],
     [
       "Current monthly expenses",
-      formatINR(threeInputs.currentMonthlyExpenses),
+      formatINR(oneInputs.currentMonthlyExpenses),
       formatINR(twoInputs.currentMonthlyExpenses),
+      formatINR(threeInputs.currentMonthlyExpenses),
     ],
-    ["Inflation rate", pct(threeInputs.inflationRate), pct(twoInputs.inflationRate)],
-    ["Current corpus", formatINR(threeInputs.currentCorpus), formatINR(twoInputs.currentCorpus)],
+    ["Inflation rate", pct(oneInputs.inflationRate), pct(twoInputs.inflationRate), pct(threeInputs.inflationRate)],
+    ["Retirement corpus", formatINR(oneInputs.currentCorpus), formatINR(twoInputs.currentCorpus), formatINR(threeInputs.currentCorpus)],
     [
       "Monthly investment (SIP)",
-      formatINR(threeInputs.monthlyInvestment),
+      formatINR(oneInputs.monthlyInvestment),
       formatINR(twoInputs.monthlyInvestment),
+      formatINR(threeInputs.monthlyInvestment),
     ],
     [
       "SIP annual step-up",
-      pct(threeInputs.sipStepUpRate),
+      pct(oneInputs.sipStepUpRate),
       pct(twoInputs.sipStepUpRate),
+      pct(threeInputs.sipStepUpRate),
     ],
-    ["Retirement age", String(threeInputs.retirementAge), String(twoInputs.retirementAge)],
+    ["Retirement age", String(oneInputs.retirementAge), String(twoInputs.retirementAge), String(threeInputs.retirementAge)],
     [
       "Life expectancy age",
+      String(oneInputs.lifeExpectancyAge ?? oneInputs.retirementAge + oneInputs.lifeExpectancyYears),
+      String(twoInputs.lifeExpectancyAge ?? twoInputs.retirementAge + twoInputs.lifeExpectancyYears),
       String(
         threeInputs.lifeExpectancyAge ??
           threeInputs.retirementAge + threeInputs.lifeExpectancyYears,
       ),
-      String(
-        twoInputs.lifeExpectancyAge ??
-          twoInputs.retirementAge + twoInputs.lifeExpectancyYears,
-      ),
     ],
     [
       "Years planned post-retirement",
-      String(threeInputs.lifeExpectancyYears),
+      String(oneInputs.lifeExpectancyYears),
       String(twoInputs.lifeExpectancyYears),
+      String(threeInputs.lifeExpectancyYears),
     ],
     [
       "Emergency fund (months)",
-      String(threeInputs.emergencyFundMonths ?? 0),
+      String(oneInputs.emergencyFundMonths ?? 0),
       String(twoInputs.emergencyFundMonths ?? 0),
+      String(threeInputs.emergencyFundMonths ?? 0),
     ],
-    ["Equity expected return", pct(threeInputs.accReturn), pct(twoInputs.accReturn)],
+    ["Equity expected return", pct(oneInputs.accReturn), pct(twoInputs.accReturn), pct(threeInputs.accReturn)],
     [
       "Debt / withdrawal return",
-      pct(threeInputs.withdrawalReturn),
+      "—",
       pct(twoInputs.withdrawalReturn),
+      pct(threeInputs.withdrawalReturn),
     ],
   ];
 
-  const strategyRows: Array<[string, string, string]> = [
+  const strategyRows: Array<[string, string, string, string]> = [
     [
       "Accumulation equity %",
-      pct(threeInputs.accEquityPct),
+      "100% (single sleeve)",
       `${pct(twoInputs.accEquityPct)} (whole portfolio)`,
+      pct(threeInputs.accEquityPct),
     ],
-    ["Preparation equity %", pct(threeInputs.prepEquityPct), "— (no prep bucket)"],
-    ["Preparation expected return", pct(threeInputs.prepReturn), "—"],
+    ["Preparation equity %", "—", "—", pct(threeInputs.prepEquityPct)],
+    ["Preparation expected return", "—", "—", pct(threeInputs.prepReturn)],
     [
       "Years prep starts before retirement",
-      String(threeInputs.prepYearsBeforeRetirement),
       "—",
+      "—",
+      String(threeInputs.prepYearsBeforeRetirement),
     ],
-    ["Withdrawal bucket years parked", String(threeInputs.withdrawalYears), "—"],
+    ["Withdrawal bucket years parked", "—", "—", String(threeInputs.withdrawalYears)],
   ];
 
-  const sequenceRows: Array<[string, string, string]> = [
-    ["Sequence CAGR", pct(threeInputs.sequenceCagr), pct(twoInputs.sequenceCagr)],
+  const sequenceRows: Array<[string, string, string, string]> = [
+    ["Sequence CAGR", pct(oneInputs.sequenceCagr), pct(twoInputs.sequenceCagr), pct(threeInputs.sequenceCagr)],
     [
       "Sequence min / max",
-      `${pct(threeInputs.sequenceMinReturn)} / ${pct(threeInputs.sequenceMaxReturn)}`,
+      `${pct(oneInputs.sequenceMinReturn)} / ${pct(oneInputs.sequenceMaxReturn)}`,
       `${pct(twoInputs.sequenceMinReturn)} / ${pct(twoInputs.sequenceMaxReturn)}`,
+      `${pct(threeInputs.sequenceMinReturn)} / ${pct(threeInputs.sequenceMaxReturn)}`,
     ],
     [
       "Monte Carlo runs",
-      threeInputs.monteCarloRuns.toLocaleString("en-IN"),
+      oneInputs.monteCarloRuns.toLocaleString("en-IN"),
       twoInputs.monteCarloRuns.toLocaleString("en-IN"),
+      threeInputs.monteCarloRuns.toLocaleString("en-IN"),
     ],
   ];
 
