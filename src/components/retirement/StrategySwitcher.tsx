@@ -1,43 +1,71 @@
 import { Link } from "react-router-dom";
 
 type Active = "one" | "two" | "three" | "compare";
+type Mode = "retirement" | "swr";
 
 const base =
-  "rounded-full px-4 py-1.5 text-sm font-medium transition-colors";
+  "rounded-full px-4 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-primary";
 const inactive =
   "text-primary-foreground/80 hover:bg-primary-foreground/10";
 const active = "bg-gold text-primary";
 
-export function StrategySwitcher({ activeTab }: { activeTab: Active }) {
+const ROUTES: Record<Mode, Record<Active, string>> = {
+  retirement: {
+    one: "/calculators/onebucket",
+    two: "/calculators/twobucket",
+    three: "/calculators/retirementsimulator",
+    compare: "/calculators/compare",
+  },
+  swr: {
+    one: "/calculators/safewithdrawalsimulation/onebucket",
+    two: "/calculators/safewithdrawalsimulation/twobucket",
+    three: "/calculators/safewithdrawalsimulation",
+    compare: "/calculators/safewithdrawalsimulation/compare",
+  },
+};
+
+const TABS: Array<{ id: Active; label: string }> = [
+  { id: "one", label: "One-Bucket" },
+  { id: "two", label: "Two-Bucket" },
+  { id: "three", label: "Three-Bucket" },
+  { id: "compare", label: "Compare" },
+];
+
+export function StrategySwitcher({
+  activeTab,
+  mode = "retirement",
+}: {
+  activeTab: Active;
+  mode?: Mode;
+}) {
+  const routes = ROUTES[mode];
   return (
-    <div className="mt-6 inline-flex rounded-full border border-primary-foreground/30 bg-primary-foreground/10 p-1">
-      {activeTab === "one" ? (
-        <span className={`${base} ${active}`}>One-Bucket</span>
-      ) : (
-        <Link to="/calculators/onebucket" className={`${base} ${inactive}`}>
-          One-Bucket
-        </Link>
-      )}
-      {activeTab === "three" ? (
-        <span className={`${base} ${active}`}>Three-Bucket</span>
-      ) : (
-        <Link to="/calculators/retirementsimulator" className={`${base} ${inactive}`}>
-          Three-Bucket
-        </Link>
-      )}
-      {activeTab === "two" ? (
-        <span className={`${base} ${active}`}>Two-Bucket</span>
-      ) : (
-        <Link to="/calculators/twobucket" className={`${base} ${inactive}`}>
-          Two-Bucket
-        </Link>
-      )}
-      {activeTab === "compare" ? (
-        <span className={`${base} ${active}`}>Compare</span>
-      ) : (
-        <Link to="/calculators/compare" className={`${base} ${inactive}`}>
-          Compare
-        </Link>
+    <div
+      role="tablist"
+      aria-label="Calculator scenario"
+      className="mt-6 inline-flex rounded-full border border-primary-foreground/30 bg-primary-foreground/10 p-1"
+    >
+      {TABS.map(({ id, label }) =>
+        activeTab === id ? (
+          <span
+            key={id}
+            role="tab"
+            aria-selected="true"
+            className={`${base} ${active}`}
+          >
+            {label}
+          </span>
+        ) : (
+          <Link
+            key={id}
+            role="tab"
+            aria-selected="false"
+            to={routes[id]}
+            className={`${base} ${inactive}`}
+          >
+            {label}
+          </Link>
+        ),
       )}
     </div>
   );

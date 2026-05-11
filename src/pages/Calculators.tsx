@@ -3,30 +3,20 @@ import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, Wallet, PiggyBank, LineChart, Layers3, Scale } from "lucide-react";
+import { ArrowRight, PiggyBank, LineChart } from "lucide-react";
 
 const calculators = [
   {
-    title: "One-bucket retirement simulator",
-    description: "A single retirement corpus stress-tested against sequence-of-returns risk.",
-    path: "/calculators/onebucket",
-    Icon: Wallet,
-  },
-  {
-    title: "Two-bucket retirement simulator",
-    description: "Equity / debt sleeves with annual rebalancing.",
-    path: "/calculators/twobucket",
-    Icon: Scale,
-  },
-  {
-    title: "Three-bucket retirement simulator",
-    description: "Accumulation, preparation and withdrawal buckets.",
+    title: "Retirement Calculator",
+    description:
+      "Project your retirement corpus across one-, two- and three-bucket strategies, with sequence-of-returns stress testing.",
     path: "/calculators/retirementsimulator",
-    Icon: Layers3,
+    Icon: PiggyBank,
   },
   {
-    title: "Safe withdrawal simulator",
-    description: "Goal-seek the safe year-1 withdrawal for any target confidence.",
+    title: "Safe Withdrawal Calculator",
+    description:
+      "Goal-seek the safe year-1 monthly withdrawal that keeps the corpus solvent for any target confidence level.",
     path: "/calculators/safewithdrawalsimulation",
     Icon: LineChart,
   },
