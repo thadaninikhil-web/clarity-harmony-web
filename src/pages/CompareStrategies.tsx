@@ -707,19 +707,19 @@ const CompareStrategies = () => {
             )}
 
             {mcRunning && (
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-3">
                 <div>
-                  <div className="text-xs label-caps mb-1">Three-bucket</div>
+                  <div className="text-xs label-caps mb-1">One-bucket</div>
                   <Progress
                     value={
-                      threeProgress.total
-                        ? Math.round((threeProgress.done / threeProgress.total) * 100)
+                      oneProgress.total
+                        ? Math.round((oneProgress.done / oneProgress.total) * 100)
                         : 0
                     }
                   />
                   <div className="text-xs text-muted-foreground mt-1">
-                    {threeProgress.done.toLocaleString("en-IN")} /{" "}
-                    {threeProgress.total.toLocaleString("en-IN")} runs
+                    {oneProgress.done.toLocaleString("en-IN")} /{" "}
+                    {oneProgress.total.toLocaleString("en-IN")} runs
                   </div>
                 </div>
                 <div>
@@ -736,20 +736,34 @@ const CompareStrategies = () => {
                     {twoProgress.total.toLocaleString("en-IN")} runs
                   </div>
                 </div>
+                <div>
+                  <div className="text-xs label-caps mb-1">Three-bucket</div>
+                  <Progress
+                    value={
+                      threeProgress.total
+                        ? Math.round((threeProgress.done / threeProgress.total) * 100)
+                        : 0
+                    }
+                  />
+                  <div className="text-xs text-muted-foreground mt-1">
+                    {threeProgress.done.toLocaleString("en-IN")} /{" "}
+                    {threeProgress.total.toLocaleString("en-IN")} runs
+                  </div>
+                </div>
               </div>
             )}
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-lg border border-border bg-primary/5 p-4">
-                <div className="label-caps text-xs">Three-bucket</div>
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="rounded-lg border border-border bg-secondary/5 p-4">
+                <div className="label-caps text-xs">One-bucket</div>
                 <div className="mt-1 grid grid-cols-2 gap-3">
                   <div>
                     <div className="text-xs text-muted-foreground">Success probability</div>
-                    <div className="text-3xl font-serif tabular-nums">{pctOrDash(threeMC)}</div>
+                    <div className="text-3xl font-serif tabular-nums">{pctOrDash(oneMC)}</div>
                   </div>
                   <div>
                     <div className="text-xs text-muted-foreground">Median depletion age</div>
-                    <div className="text-3xl font-serif tabular-nums">{medianOrDash(threeMC)}</div>
+                    <div className="text-3xl font-serif tabular-nums">{medianOrDash(oneMC)}</div>
                   </div>
                 </div>
               </div>
@@ -766,66 +780,89 @@ const CompareStrategies = () => {
                   </div>
                 </div>
               </div>
+              <div className="rounded-lg border border-border bg-primary/5 p-4">
+                <div className="label-caps text-xs">Three-bucket</div>
+                <div className="mt-1 grid grid-cols-2 gap-3">
+                  <div>
+                    <div className="text-xs text-muted-foreground">Success probability</div>
+                    <div className="text-3xl font-serif tabular-nums">{pctOrDash(threeMC)}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-muted-foreground">Median depletion age</div>
+                    <div className="text-3xl font-serif tabular-nums">{medianOrDash(threeMC)}</div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="rounded-md border overflow-hidden">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-1/3">Metric</TableHead>
-                    <TableHead>Three-bucket</TableHead>
+                    <TableHead className="w-1/4">Metric</TableHead>
+                    <TableHead>One-bucket</TableHead>
                     <TableHead>Two-bucket</TableHead>
+                    <TableHead>Three-bucket</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {[
-                    ["Success probability", pctOrDash(threeMC), pctOrDash(twoMC)],
+                    ["Success probability", pctOrDash(oneMC), pctOrDash(twoMC), pctOrDash(threeMC)],
                     [
                       "Run count",
-                      threeMC ? threeMC.runs.toLocaleString("en-IN") : "—",
+                      oneMC ? oneMC.runs.toLocaleString("en-IN") : "—",
                       twoMC ? twoMC.runs.toLocaleString("en-IN") : "—",
+                      threeMC ? threeMC.runs.toLocaleString("en-IN") : "—",
                     ],
                     [
                       "Successes (corpus survived)",
-                      threeMC ? threeMC.successCount.toLocaleString("en-IN") : "—",
+                      oneMC ? oneMC.successCount.toLocaleString("en-IN") : "—",
                       twoMC ? twoMC.successCount.toLocaleString("en-IN") : "—",
+                      threeMC ? threeMC.successCount.toLocaleString("en-IN") : "—",
                     ],
                     [
                       "Failures (corpus depleted)",
-                      threeMC ? threeMC.failureCount.toLocaleString("en-IN") : "—",
+                      oneMC ? oneMC.failureCount.toLocaleString("en-IN") : "—",
                       twoMC ? twoMC.failureCount.toLocaleString("en-IN") : "—",
+                      threeMC ? threeMC.failureCount.toLocaleString("en-IN") : "—",
                     ],
-                    ["Median depletion age (failed runs)", medianOrDash(threeMC), medianOrDash(twoMC)],
+                    ["Median depletion age (failed runs)", medianOrDash(oneMC), medianOrDash(twoMC), medianOrDash(threeMC)],
                     [
                       "P10 final corpus",
-                      threeMC ? formatINR(threeMC.p10FinalCorpus) : "—",
+                      oneMC ? formatINR(oneMC.p10FinalCorpus) : "—",
                       twoMC ? formatINR(twoMC.p10FinalCorpus) : "—",
+                      threeMC ? formatINR(threeMC.p10FinalCorpus) : "—",
                     ],
                     [
                       "P25 final corpus",
-                      threeMC ? formatINR(threeMC.p25FinalCorpus) : "—",
+                      oneMC ? formatINR(oneMC.p25FinalCorpus) : "—",
                       twoMC ? formatINR(twoMC.p25FinalCorpus) : "—",
+                      threeMC ? formatINR(threeMC.p25FinalCorpus) : "—",
                     ],
                     [
                       "P50 final corpus (median)",
-                      threeMC ? formatINR(threeMC.p50FinalCorpus) : "—",
+                      oneMC ? formatINR(oneMC.p50FinalCorpus) : "—",
                       twoMC ? formatINR(twoMC.p50FinalCorpus) : "—",
+                      threeMC ? formatINR(threeMC.p50FinalCorpus) : "—",
                     ],
                     [
                       "P75 final corpus",
-                      threeMC ? formatINR(threeMC.p75FinalCorpus) : "—",
+                      oneMC ? formatINR(oneMC.p75FinalCorpus) : "—",
                       twoMC ? formatINR(twoMC.p75FinalCorpus) : "—",
+                      threeMC ? formatINR(threeMC.p75FinalCorpus) : "—",
                     ],
                     [
                       "P90 final corpus",
-                      threeMC ? formatINR(threeMC.p90FinalCorpus) : "—",
+                      oneMC ? formatINR(oneMC.p90FinalCorpus) : "—",
                       twoMC ? formatINR(twoMC.p90FinalCorpus) : "—",
+                      threeMC ? formatINR(threeMC.p90FinalCorpus) : "—",
                     ],
-                  ].map(([label, a, b]) => (
+                  ].map(([label, a, b, c]) => (
                     <TableRow key={label}>
                       <TableCell className="font-medium">{label}</TableCell>
                       <TableCell className="tabular-nums">{a}</TableCell>
                       <TableCell className="tabular-nums">{b}</TableCell>
+                      <TableCell className="tabular-nums">{c}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
