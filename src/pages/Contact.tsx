@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { z } from "zod";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ScrollReveal } from "@/components/ScrollReveal";
@@ -9,12 +10,26 @@ import { Mail, Phone, Linkedin, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { SITE_CONFIG } from "@/config/site";
 
+const contactSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(100, "Name must be under 100 characters"),
+  email: z.string().trim().email("Please enter a valid email").max(254, "Email is too long"),
+  phone: z.string().trim().max(20, "Phone must be under 20 characters").optional().or(z.literal("")),
+  city: z.string().trim().max(100, "City must be under 100 characters").optional().or(z.literal("")),
+  message: z.string().trim().max(1000, "Message must be under 1000 characters").optional().or(z.literal("")),
+});
+
 const Contact = () => {
   const [form, setForm] = useState({ name: "", email: "", phone: "", city: "", message: "" });
   const [sending, setSending] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const parsed = contactSchema.safeParse(form);
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0]?.message ?? "Please check your inputs.");
+      return;
+    }
+    const safe = parsed.data;
     setSending(true);
 
     if (SITE_CONFIG.web3formsKey) {
@@ -24,12 +39,12 @@ const Contact = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             access_key: SITE_CONFIG.web3formsKey,
-            subject: `Contact from ${form.name}`,
-            from_name: form.name,
-            email: form.email,
-            phone: form.phone,
-            city: form.city,
-            message: form.message,
+            subject: `Contact from ${safe.name}`,
+            from_name: safe.name,
+            email: safe.email,
+            phone: safe.phone ?? "",
+            city: safe.city ?? "",
+            message: safe.message ?? "",
           }),
         });
         const data = await res.json();
@@ -39,13 +54,14 @@ const Contact = () => {
         } else {
           throw new Error("Submission failed");
         }
-      } catch {
+      } catch (err) {
+        console.error("Contact form submission failed", err);
         toast.error("Something went wrong. Please try again or email us directly.");
       }
     } else {
-      const subject = encodeURIComponent(`Contact from ${form.name}`);
+      const subject = encodeURIComponent(`Contact from ${safe.name}`);
       const body = encodeURIComponent(
-        `Name: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone}\nCity/Country: ${form.city}\n\nMessage:\n${form.message}`
+        `Name: ${safe.name}\nEmail: ${safe.email}\nPhone: ${safe.phone ?? ""}\nCity/Country: ${safe.city ?? ""}\n\nMessage:\n${safe.message ?? ""}`
       );
       window.location.href = `mailto:${SITE_CONFIG.contactEmail}?subject=${subject}&body=${body}`;
       toast.success("Opening your email client. We'll respond within 24 hours.");

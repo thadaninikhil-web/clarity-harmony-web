@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { z } from "zod";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { ScrollReveal } from "@/components/ScrollReveal";
@@ -8,12 +9,26 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { SITE_CONFIG } from "@/config/site";
 
+const bookSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(100, "Name must be under 100 characters"),
+  email: z.string().trim().email("Please enter a valid email").max(254, "Email is too long"),
+  phone: z.string().trim().max(20, "Phone must be under 20 characters").optional().or(z.literal("")),
+  city: z.string().trim().max(100, "City must be under 100 characters").optional().or(z.literal("")),
+  message: z.string().trim().max(1000, "Message must be under 1000 characters").optional().or(z.literal("")),
+});
+
 const Book = () => {
   const [form, setForm] = useState({ name: "", email: "", phone: "", city: "", message: "" });
   const [sending, setSending] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const parsed = bookSchema.safeParse(form);
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0]?.message ?? "Please check your inputs.");
+      return;
+    }
+    const safe = parsed.data;
     setSending(true);
 
     // If Web3Forms key is configured, send directly
@@ -24,12 +39,12 @@ const Book = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             access_key: SITE_CONFIG.web3formsKey,
-            subject: `Discovery Call Request from ${form.name}`,
-            from_name: form.name,
-            email: form.email,
-            phone: form.phone,
-            city: form.city,
-            message: form.message,
+            subject: `Discovery Call Request from ${safe.name}`,
+            from_name: safe.name,
+            email: safe.email,
+            phone: safe.phone ?? "",
+            city: safe.city ?? "",
+            message: safe.message ?? "",
           }),
         });
         const data = await res.json();
@@ -39,14 +54,15 @@ const Book = () => {
         } else {
           throw new Error("Submission failed");
         }
-      } catch {
+      } catch (err) {
+        console.error("Book form submission failed", err);
         toast.error("Something went wrong. Please try again or email us directly.");
       }
     } else {
       // Fallback to mailto
-      const subject = encodeURIComponent(`Discovery Call Request from ${form.name}`);
+      const subject = encodeURIComponent(`Discovery Call Request from ${safe.name}`);
       const body = encodeURIComponent(
-        `Name: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone}\nCity/Country: ${form.city}\n\nWhat they need help with:\n${form.message}`
+        `Name: ${safe.name}\nEmail: ${safe.email}\nPhone: ${safe.phone ?? ""}\nCity/Country: ${safe.city ?? ""}\n\nWhat they need help with:\n${safe.message ?? ""}`
       );
       window.location.href = `mailto:${SITE_CONFIG.contactEmail}?subject=${subject}&body=${body}`;
       toast.success("Opening your email client. We'll be in touch within 24 hours.");
