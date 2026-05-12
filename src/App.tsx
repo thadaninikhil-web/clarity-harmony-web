@@ -44,10 +44,14 @@ const App = () => (
         <Route path="/book" element={<Book />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/calculators/retirementsimulator" element={<RetirementSimulator />} />
         <Route path="/calculators" element={<Calculators />} />
-        <Route path="/calculators/twobucket" element={<TwoBucketSimulator />} />
+        <Route path="/calculators/retirementsimulator" element={<RetirementSimulator />} />
+        <Route path="/calculators/retirementsimulator/onebucket" element={<OneBucketSimulator />} />
+        <Route path="/calculators/retirementsimulator/twobucket" element={<TwoBucketSimulator />} />
+        <Route path="/calculators/retirementsimulator/compare" element={<CompareStrategies />} />
+        {/* Legacy redirects */}
         <Route path="/calculators/onebucket" element={<OneBucketSimulator />} />
+        <Route path="/calculators/twobucket" element={<TwoBucketSimulator />} />
         <Route path="/calculators/compare" element={<CompareStrategies />} />
         <Route path="/calculators/safewithdrawalsimulation" element={<SafeWithdrawalSimulator />} />
         <Route path="/calculators/safewithdrawalsimulation/onebucket" element={<SafeWithdrawalSimulator strategy="one-bucket" />} />

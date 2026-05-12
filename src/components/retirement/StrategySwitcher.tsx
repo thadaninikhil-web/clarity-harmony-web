@@ -11,10 +11,10 @@ const active = "bg-gold text-primary";
 
 const ROUTES: Record<Mode, Record<Active, string>> = {
   retirement: {
-    one: "/calculators/onebucket",
-    two: "/calculators/twobucket",
+    one: "/calculators/retirementsimulator/onebucket",
+    two: "/calculators/retirementsimulator/twobucket",
     three: "/calculators/retirementsimulator",
-    compare: "/calculators/compare",
+    compare: "/calculators/retirementsimulator/compare",
   },
   swr: {
     one: "/calculators/safewithdrawalsimulation/onebucket",
