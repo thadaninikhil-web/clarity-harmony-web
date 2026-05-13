@@ -4,7 +4,6 @@ import { Footer } from "@/components/Footer";
 import { GuidedInputsChat } from "@/components/retirement/GuidedInputsChat";
 import { InputsErrorBoundary } from "@/components/retirement/InputsErrorBoundary";
 import { Results } from "@/components/retirement/Results";
-import { SaveCompare } from "@/components/retirement/SaveCompare";
 import { ValidationBanner } from "@/components/retirement/ValidationBanner";
 import { HowToUse } from "@/components/retirement/HowToUse";
 import { Methodology } from "@/components/retirement/Methodology";
