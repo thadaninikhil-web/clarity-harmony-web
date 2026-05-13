@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Progress } from "@/components/ui/progress";
 import { IndianNumberInput } from "@/components/retirement/IndianNumberInput";
-import { Check, Link2, RotateCcw, AlertTriangle } from "lucide-react";
+import { RotateCcw, AlertTriangle } from "lucide-react";
 import {
   formatINR,
   project,
@@ -486,10 +486,6 @@ const CompareStrategies = () => {
           </p>
           <StrategySwitcher activeTab="compare" />
           <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-            <Button onClick={copyShareLink} variant="secondary" size="sm" className="gap-2">
-              {copied ? <Check className="size-4" /> : <Link2 className="size-4" />}
-              {copied ? "Link copied" : "Copy shareable link"}
-            </Button>
             <Button
               onClick={resetToDefaults}
               variant="outline"

@@ -7,7 +7,6 @@ import { Results } from "@/components/retirement/Results";
 import { Methodology } from "@/components/retirement/Methodology";
 import { HowToUse } from "@/components/retirement/HowToUse";
 import { CalculatorSectionNav } from "@/components/retirement/CalculatorSectionNav";
-import { SaveCompare } from "@/components/retirement/SaveCompare";
 import { ValidationBanner } from "@/components/retirement/ValidationBanner";
 import { StrategySwitcher } from "@/components/retirement/StrategySwitcher";
 import {
@@ -16,6 +15,7 @@ import {
   attachBullets,
   type RetirementInputs,
 } from "@/lib/retirement";
+import { readShared, subscribeShared, writeShared } from "@/lib/sharedInputs";
 
 const defaultMonthlyExpenses = 100000;
 const defaultRetireAge = 60;
@@ -67,7 +67,12 @@ const SKIP = [
 ];
 
 const OneBucketSimulator = () => {
-  const [values, setValues] = useState<RetirementInputs>(defaults);
+  const initialShared = useMemo(() => readShared(), []);
+  const [values, setValues] = useState<RetirementInputs>(() =>
+    initialShared ? { ...defaults, ...initialShared, monthlyInvestment: 0, sipStepUpRate: 0, accEquityPct: 1 } : defaults,
+  );
+  const hasPrefilled = !!initialShared;
+  const skipNextWriteRef = useRef(false);
   const safeValues = useMemo(
     () => ({ ...values, monthlyInvestment: 0, sipStepUpRate: 0, accEquityPct: 1 }),
     [values],
@@ -81,7 +86,7 @@ const OneBucketSimulator = () => {
       ),
     [safeValues, validation.ok],
   );
-  const [completed, setCompleted] = useState(false);
+  const [completed, setCompleted] = useState(hasPrefilled);
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const reshuffleSequence = useCallback(() => {
@@ -92,6 +97,29 @@ const OneBucketSimulator = () => {
   useEffect(() => {
     document.title = "One-Bucket Retirement Simulator | Balancing Act";
     setValues((v) => ({ ...v, sequenceSeed: Math.floor(Math.random() * 2 ** 31) || 1 }));
+  }, []);
+
+  useEffect(() => {
+    if (skipNextWriteRef.current) {
+      skipNextWriteRef.current = false;
+      return;
+    }
+    writeShared(values);
+  }, [values]);
+
+  useEffect(() => {
+    return subscribeShared(() => {
+      const shared = readShared();
+      if (!shared) return;
+      setValues((prev) => {
+        const prevAny = prev as unknown as Record<string, unknown>;
+        const sharedAny = shared as Record<string, unknown>;
+        const same = Object.keys(sharedAny).every((k) => prevAny[k] === sharedAny[k]);
+        if (same) return prev;
+        skipNextWriteRef.current = true;
+        return { ...prev, ...shared };
+      });
+    });
   }, []);
 
   return (
@@ -123,6 +151,7 @@ const OneBucketSimulator = () => {
             values={values}
             onChange={setValues}
             completed={completed}
+            startInSummary={hasPrefilled}
             skipQuestionIds={SKIP}
             onComplete={() => {
               setCompleted(true);
@@ -148,7 +177,6 @@ const OneBucketSimulator = () => {
               onMonteCarloRunsChange={(runs) => setValues((v) => ({ ...v, monteCarloRuns: runs }))}
               onSelectRun={(seed) => setValues((v) => ({ ...v, sequenceSeed: seed }))}
             />
-            <SaveCompare inputs={safeValues} result={result} onLoad={setValues} />
           </div>
         )}
         <section id="how-it-works" className="scroll-mt-40">

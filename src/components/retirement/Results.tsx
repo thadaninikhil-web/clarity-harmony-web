@@ -160,40 +160,6 @@ export function Results({
         </div>
       </div>
 
-      {/* CAGR explanation */}
-      <Card className="shadow-[var(--shadow-card)] border-accent/30">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
-            <Info className="size-4 text-accent" />
-            How CAGR is computed
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="text-xs text-muted-foreground space-y-2">
-          <p>
-            Each Monte Carlo path varies yearly equity returns between{" "}
-            <span className="font-mono text-foreground">{(inputs.sequenceMinReturn * 100).toFixed(0)}%</span>{" "}
-            and{" "}
-            <span className="font-mono text-foreground">{(inputs.sequenceMaxReturn * 100).toFixed(0)}%</span>.
-            The path is generated in log-return space so the realised{" "}
-            <em>geometric mean</em> of this run matches your target CAGR of{" "}
-            <span className="font-mono text-foreground">{(inputs.sequenceCagr * 100).toFixed(1)}%</span>.
-          </p>
-          <p>
-            Current run CAGR: <span className="font-mono text-foreground">{(currentRunCagr * 100).toFixed(2)}%</span>
-            {` · difference ${(cagrDelta * 100).toFixed(3)} pp`}.
-          </p>
-          <p className="font-mono text-foreground">
-            CAGR = (∏ (1 + rₜ))<sup>1/N</sup> − 1
-          </p>
-          <p>
-            Where <span className="font-mono">rₜ</span> is the year-t return and{" "}
-            <span className="font-mono">N</span> is the number of years. This avoids
-            the “volatility drag” that would otherwise pull the realised return below
-            the simple average of the bad-year and good-year inputs.
-          </p>
-        </CardContent>
-      </Card>
-
       {/* MONTE CARLO */}
       <Card className="shadow-[var(--shadow-card)]">
         <CardHeader>

@@ -4,7 +4,6 @@ import { Footer } from "@/components/Footer";
 import { GuidedInputsChat } from "@/components/retirement/GuidedInputsChat";
 import { InputsErrorBoundary } from "@/components/retirement/InputsErrorBoundary";
 import { Results } from "@/components/retirement/Results";
-import { SaveCompare } from "@/components/retirement/SaveCompare";
 import { ValidationBanner } from "@/components/retirement/ValidationBanner";
 import { HowToUse } from "@/components/retirement/HowToUse";
 import { Methodology } from "@/components/retirement/Methodology";
@@ -26,6 +25,7 @@ import {
 } from "@/lib/retirement";
 import { runMonteCarloAsync } from "@/lib/retirement-mc";
 import { decodeInputsFromHash } from "@/lib/scenarios";
+import { readShared, subscribeShared, writeShared } from "@/lib/sharedInputs";
 
 type Strategy = "three-bucket" | "two-bucket" | "one-bucket";
 
@@ -85,10 +85,16 @@ const SafeWithdrawalSimulator = ({ strategy: propStrategy }: SwrProps = {}) => {
     if (!window.location.hash.startsWith("#s=")) return null;
     return decodeInputsFromHash(window.location.hash);
   }, []);
+  const initialShared = useMemo(() => (initialFromHash ? null : readShared()), [initialFromHash]);
   const [values, setValues] = useState<RetirementInputs>(() =>
-    initialFromHash ? { ...defaults, ...initialFromHash, monthlyInvestment: 0, sipStepUpRate: 0 } : defaults,
+    initialFromHash
+      ? { ...defaults, ...initialFromHash, monthlyInvestment: 0, sipStepUpRate: 0 }
+      : initialShared
+        ? { ...defaults, ...initialShared, monthlyInvestment: 0, sipStepUpRate: 0 }
+        : defaults,
   );
-  const hasPrefilled = !!initialFromHash;
+  const hasPrefilled = !!initialFromHash || !!initialShared;
+  const skipNextWriteRef = useRef(false);
   const [completed, setCompleted] = useState(hasPrefilled);
   const resultsRef = useRef<HTMLDivElement>(null);
 
@@ -127,6 +133,29 @@ const SafeWithdrawalSimulator = ({ strategy: propStrategy }: SwrProps = {}) => {
   useEffect(() => {
     document.title = "Safe Withdrawal Simulator | Balancing Act";
     setValues((v) => ({ ...v, sequenceSeed: Math.floor(Math.random() * 2 ** 31) || 1 }));
+  }, []);
+
+  useEffect(() => {
+    if (skipNextWriteRef.current) {
+      skipNextWriteRef.current = false;
+      return;
+    }
+    writeShared(values);
+  }, [values]);
+
+  useEffect(() => {
+    return subscribeShared(() => {
+      const shared = readShared();
+      if (!shared) return;
+      setValues((prev) => {
+        const prevAny = prev as unknown as Record<string, unknown>;
+        const sharedAny = shared as Record<string, unknown>;
+        const same = Object.keys(sharedAny).every((k) => prevAny[k] === sharedAny[k]);
+        if (same) return prev;
+        skipNextWriteRef.current = true;
+        return { ...prev, ...shared };
+      });
+    });
   }, []);
 
   // Goal seek — find the year-1 monthly expense that yields target confidence.
@@ -333,13 +362,6 @@ const SafeWithdrawalSimulator = ({ strategy: propStrategy }: SwrProps = {}) => {
               </CardContent>
             </Card>
 
-            <SaveCompare
-              inputs={safeValues}
-              result={result}
-              onLoad={setValues}
-              kind="swr"
-              shareBasePath="/calculators/safewithdrawalsimulation"
-            />
           </div>
         )}
 
