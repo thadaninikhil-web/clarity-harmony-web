@@ -7,7 +7,6 @@ import { Results } from "@/components/retirement/Results";
 import { Methodology } from "@/components/retirement/Methodology";
 import { HowToUse } from "@/components/retirement/HowToUse";
 import { CalculatorSectionNav } from "@/components/retirement/CalculatorSectionNav";
-import { SaveCompare } from "@/components/retirement/SaveCompare";
 import { ValidationBanner } from "@/components/retirement/ValidationBanner";
 import { StrategySwitcher } from "@/components/retirement/StrategySwitcher";
 import { project, validateInputs, attachBullets, type RetirementInputs } from "@/lib/retirement";
@@ -136,7 +135,7 @@ const RetirementSimulator = () => {
         <InputsErrorBoundary>
           <GuidedInputsChat
             values={values}
-            skipQuestionIds={["monthlyInvestment", "sipStepUpRate", "prepYearsBeforeRetirement"]}
+            skipQuestionIds={["monthlyInvestment", "sipStepUpRate"]}
             onChange={setValues}
             completed={completed}
             startInSummary={hasPrefilled}
@@ -165,7 +164,6 @@ const RetirementSimulator = () => {
               onMonteCarloRunsChange={(runs) => setValues((v) => ({ ...v, monteCarloRuns: runs }))}
               onSelectRun={(seed) => setValues((v) => ({ ...v, sequenceSeed: seed }))}
             />
-            <SaveCompare inputs={values} result={result} onLoad={setValues} />
           </div>
         )}
         <section id="how-it-works" className="scroll-mt-40">
