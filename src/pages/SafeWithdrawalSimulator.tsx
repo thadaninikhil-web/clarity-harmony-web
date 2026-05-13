@@ -333,13 +333,6 @@ const SafeWithdrawalSimulator = ({ strategy: propStrategy }: SwrProps = {}) => {
               </CardContent>
             </Card>
 
-            <SaveCompare
-              inputs={safeValues}
-              result={result}
-              onLoad={setValues}
-              kind="swr"
-              shareBasePath="/calculators/safewithdrawalsimulation"
-            />
           </div>
         )}
 
