@@ -147,7 +147,6 @@ const OneBucketSimulator = () => {
               onMonteCarloRunsChange={(runs) => setValues((v) => ({ ...v, monteCarloRuns: runs }))}
               onSelectRun={(seed) => setValues((v) => ({ ...v, sequenceSeed: seed }))}
             />
-            <SaveCompare inputs={safeValues} result={result} onLoad={setValues} />
           </div>
         )}
         <section id="how-it-works" className="scroll-mt-40">
