@@ -7,7 +7,6 @@ import { Results } from "@/components/retirement/Results";
 import { Methodology } from "@/components/retirement/Methodology";
 import { HowToUse } from "@/components/retirement/HowToUse";
 import { CalculatorSectionNav } from "@/components/retirement/CalculatorSectionNav";
-import { SaveCompare } from "@/components/retirement/SaveCompare";
 import { ValidationBanner } from "@/components/retirement/ValidationBanner";
 import { StrategySwitcher } from "@/components/retirement/StrategySwitcher";
 import {
