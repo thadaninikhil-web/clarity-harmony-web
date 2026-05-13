@@ -453,7 +453,7 @@ export function GuidedInputsChat({
     const idx = questions.findIndex((q) => q.id === qid);
     if (idx < 0) return;
     setEditingId(qid);
-    setReturnToSummary(true);
+    setReturnToSummary(false);
     setShowCompletedReview(true);
     setStepIdx(idx);
     // Keep all other turns intact — only this one will be updated on submit
