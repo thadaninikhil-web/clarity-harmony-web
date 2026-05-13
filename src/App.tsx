@@ -45,17 +45,20 @@ const App = () => (
         <Route path="/contact" element={<Contact />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/calculators" element={<Calculators />} />
-        <Route path="/calculators/retirementsimulator" element={<RetirementSimulator />} />
+        <Route path="/calculators/retirementsimulator" element={<OneBucketSimulator />} />
         <Route path="/calculators/retirementsimulator/onebucket" element={<OneBucketSimulator />} />
         <Route path="/calculators/retirementsimulator/twobucket" element={<TwoBucketSimulator />} />
+        <Route path="/calculators/retirementsimulator/threebucket" element={<RetirementSimulator />} />
         <Route path="/calculators/retirementsimulator/compare" element={<CompareStrategies />} />
         {/* Legacy redirects */}
         <Route path="/calculators/onebucket" element={<OneBucketSimulator />} />
         <Route path="/calculators/twobucket" element={<TwoBucketSimulator />} />
+        <Route path="/calculators/threebucket" element={<RetirementSimulator />} />
         <Route path="/calculators/compare" element={<CompareStrategies />} />
-        <Route path="/calculators/safewithdrawalsimulation" element={<SafeWithdrawalSimulator />} />
+        <Route path="/calculators/safewithdrawalsimulation" element={<SafeWithdrawalSimulator strategy="one-bucket" />} />
         <Route path="/calculators/safewithdrawalsimulation/onebucket" element={<SafeWithdrawalSimulator strategy="one-bucket" />} />
         <Route path="/calculators/safewithdrawalsimulation/twobucket" element={<SafeWithdrawalSimulator strategy="two-bucket" />} />
+        <Route path="/calculators/safewithdrawalsimulation/threebucket" element={<SafeWithdrawalSimulator strategy="three-bucket" />} />
         <Route path="/calculators/safewithdrawalsimulation/compare" element={<SwrCompareStrategies />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
