@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StrategySwitcher } from "@/components/retirement/StrategySwitcher";
+import { BetaBanner } from "@/components/retirement/BetaBanner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -222,6 +223,7 @@ const SwrCompareStrategies = () => {
       </section>
 
       <main className="container mx-auto px-6 lg:px-8 py-10 space-y-6">
+        <div className="-mx-6 lg:-mx-8 mb-2"><BetaBanner /></div>
         <Card>
           <CardHeader>
             <CardTitle className="font-serif text-2xl">Base assumptions</CardTitle>

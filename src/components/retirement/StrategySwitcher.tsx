@@ -13,13 +13,13 @@ const ROUTES: Record<Mode, Record<Active, string>> = {
   retirement: {
     one: "/calculators/retirementsimulator/onebucket",
     two: "/calculators/retirementsimulator/twobucket",
-    three: "/calculators/retirementsimulator",
+    three: "/calculators/retirementsimulator/threebucket",
     compare: "/calculators/retirementsimulator/compare",
   },
   swr: {
     one: "/calculators/safewithdrawalsimulation/onebucket",
     two: "/calculators/safewithdrawalsimulation/twobucket",
-    three: "/calculators/safewithdrawalsimulation",
+    three: "/calculators/safewithdrawalsimulation/threebucket",
     compare: "/calculators/safewithdrawalsimulation/compare",
   },
 };

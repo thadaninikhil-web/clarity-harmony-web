@@ -9,6 +9,7 @@ import { HowToUse } from "@/components/retirement/HowToUse";
 import { CalculatorSectionNav } from "@/components/retirement/CalculatorSectionNav";
 import { ValidationBanner } from "@/components/retirement/ValidationBanner";
 import { StrategySwitcher } from "@/components/retirement/StrategySwitcher";
+import { BetaBanner } from "@/components/retirement/BetaBanner";
 import {
   projectOneBucket,
   validateInputs,
@@ -141,6 +142,7 @@ const OneBucketSimulator = () => {
       </section>
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 max-w-full overflow-x-hidden">
+        <div className="-mx-4 sm:-mx-6 lg:-mx-8"><BetaBanner /></div>
         <CalculatorSectionNav />
         <section id="how-to-use" className="scroll-mt-40">
           <HowToUse strategy="one-bucket" />

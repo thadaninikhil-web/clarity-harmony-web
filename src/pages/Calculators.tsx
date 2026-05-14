@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { BetaBanner } from "@/components/retirement/BetaBanner";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, PiggyBank, LineChart } from "lucide-react";
 
@@ -42,6 +43,7 @@ const Calculators = () => {
         </div>
       </section>
       <main className="container mx-auto px-6 lg:px-8 py-12">
+        <div className="-mx-6 lg:-mx-8 mb-6"><BetaBanner /></div>
         <div className="grid gap-6 md:grid-cols-2 max-w-5xl mx-auto">
           {calculators.map(({ title, description, path, Icon }) => (
             <Card key={path} className="shadow-[var(--shadow-card)]">
