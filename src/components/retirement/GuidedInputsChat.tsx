@@ -396,9 +396,19 @@ export function GuidedInputsChat({
       setDraft(d);
       setError(null);
       setTouched(false);
-      setTimeout(() => inputRef.current?.focus(), 50);
+      // Focus the new input as soon as it mounts. Use rAF so the ref is
+      // attached after React commits, and try again shortly after to cover
+      // the date-input case where the first focus call may be ignored.
+      const focusInput = () => inputRef.current?.focus();
+      const raf = requestAnimationFrame(focusInput);
+      const t = window.setTimeout(focusInput, 80);
+      return () => {
+        cancelAnimationFrame(raf);
+        window.clearTimeout(t);
+      };
     } else if (isSummary) {
-      setTimeout(() => summaryRef.current?.focus(), 50);
+      const t = window.setTimeout(() => summaryRef.current?.focus(), 50);
+      return () => window.clearTimeout(t);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stepIdx, isSummary]);
