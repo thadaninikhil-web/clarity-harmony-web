@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StrategySwitcher } from "@/components/retirement/StrategySwitcher";
+import { BetaBanner } from "@/components/retirement/BetaBanner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -500,6 +501,7 @@ const CompareStrategies = () => {
       </section>
 
       <main className="container mx-auto px-6 lg:px-8 py-10 space-y-6">
+        <div className="-mx-6 lg:-mx-8 mb-2"><BetaBanner /></div>
         {linkError && (
           <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 flex items-start gap-2 text-sm">
             <AlertTriangle className="size-4 text-destructive mt-0.5 shrink-0" />
