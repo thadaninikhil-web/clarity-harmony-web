@@ -31,7 +31,6 @@ const Calculators = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="pt-20"><BetaBanner /></div>
       <section className="pt-32 pb-12 bg-primary text-primary-foreground">
         <div className="container mx-auto px-6 lg:px-8 text-center">
           <p className="label-caps text-gold mb-3">Tools</p>
