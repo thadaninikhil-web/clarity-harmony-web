@@ -161,7 +161,7 @@ const TwoBucketSimulator = () => {
         <InputsErrorBoundary>
           <GuidedInputsChat
             values={values}
-            skipQuestionIds={["prepYearsBeforeRetirement", "prepReturn", "prepEquityPct", "withdrawalYears", "withdrawalReturn"]}
+            skipQuestionIds={["prepYearsBeforeRetirement", "prepReturn", "prepEquityPct", "withdrawalYears"]}
             onChange={setValues}
             completed={completed}
             startInSummary={hasPrefilled}
