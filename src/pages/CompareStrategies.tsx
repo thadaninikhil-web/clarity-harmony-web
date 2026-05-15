@@ -96,20 +96,6 @@ function writeInputs(key: string, values: RetirementInputs) {
 
 const pct = (n: number) => `${(n * 100).toFixed(1)}%`;
 
-function encodeStateToHash(
-  one: RetirementInputs,
-  two: RetirementInputs,
-  three: RetirementInputs,
-): string {
-  const payload = { v: 2, one, two, three };
-  const json = JSON.stringify(payload);
-  if (typeof window === "undefined") return "";
-  return btoa(unescape(encodeURIComponent(json)))
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
-}
-
 function isValidLeg(x: unknown): x is RetirementInputs {
   if (!x || typeof x !== "object") return false;
   const o = x as Record<string, unknown>;
@@ -137,37 +123,9 @@ function isValidLeg(x: unknown): x is RetirementInputs {
   return true;
 }
 
-function decodeStateFromHash(
-  hash: string,
-): { one: RetirementInputs; two: RetirementInputs; three: RetirementInputs } | null {
-  try {
-    const b64 = hash.replace(/-/g, "+").replace(/_/g, "/");
-    const padded = b64 + "=".repeat((4 - (b64.length % 4)) % 4);
-    const json = decodeURIComponent(escape(atob(padded)));
-    const parsed = JSON.parse(json);
-    if (!parsed || typeof parsed !== "object") return null;
-    if (parsed.v === 1 && isValidLeg(parsed.three) && isValidLeg(parsed.two)) {
-      const three = { ...baseInputs, ...parsed.three };
-      const two = { ...baseInputs, ...parsed.two };
-      return { one: oneBucketDefaults(three), two, three };
-    }
-    if (parsed.v === 2 && isValidLeg(parsed.one) && isValidLeg(parsed.two) && isValidLeg(parsed.three)) {
-      return {
-        one: { ...baseInputs, ...parsed.one },
-        two: { ...baseInputs, ...parsed.two },
-        three: { ...baseInputs, ...parsed.three },
-      };
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
-
 function oneBucketDefaults(src: RetirementInputs): RetirementInputs {
   return {
     ...src,
-    accEquityPct: 1,
     prepEquityPct: 0,
     prepYearsBeforeRetirement: 0,
     withdrawalYears: 0,
@@ -183,37 +141,14 @@ const CompareStrategies = () => {
     accEquityPct: 0.6,
     prepEquityPct: 0,
     prepYearsBeforeRetirement: 0,
-    withdrawalYears: 0,
+    withdrawalYears: 3,
     withdrawalReturn: 0.07,
   });
   const [oneInputs, setOneInputs] = useState<RetirementInputs>(oneBucketDefaults(baseInputs));
-  const [copied, setCopied] = useState(false);
-  const [linkError, setLinkError] = useState<string | null>(null);
 
   useEffect(() => {
     document.title = "Compare Retirement Strategies | Balancing Act";
     if (typeof window === "undefined") return;
-    const rawHash = window.location.hash.replace(/^#/, "");
-    if (rawHash.startsWith("s=")) {
-      const decoded = decodeStateFromHash(rawHash.slice(2));
-      if (decoded) {
-        setOneInputs(decoded.one);
-        setTwoInputs(decoded.two);
-        setThreeInputs(decoded.three);
-        writeShared(decoded.three);
-        writeInputs(THREE_KEY, decoded.three);
-        writeInputs(TWO_KEY, decoded.two);
-        return;
-      }
-      setLinkError(
-        "This shareable link is malformed or from an older version of the calculator. We've loaded your saved inputs instead.",
-      );
-      window.history.replaceState(
-        null,
-        "",
-        window.location.pathname + window.location.search,
-      );
-    }
     const sharedNow = readShared() ?? {};
     setThreeInputs((prev) => ({ ...readInputs(THREE_KEY, prev), ...sharedNow }));
     setTwoInputs((prev) => ({ ...readInputs(TWO_KEY, prev), ...sharedNow }));
@@ -262,7 +197,7 @@ const CompareStrategies = () => {
       accEquityPct: 0.6,
       prepEquityPct: 0,
       prepYearsBeforeRetirement: 0,
-      withdrawalYears: 0,
+      withdrawalYears: 3,
       withdrawalReturn: 0.07,
     });
     setOneInputs(oneBucketDefaults(baseInputs));
@@ -270,20 +205,6 @@ const CompareStrategies = () => {
     writeInputs(THREE_KEY, baseInputs);
     writeInputs(TWO_KEY, baseInputs);
   }, []);
-
-  const copyShareLink = async () => {
-    if (typeof window === "undefined") return;
-    const hash = encodeStateToHash(oneInputs, twoInputs, threeInputs);
-    const url = `${window.location.origin}${window.location.pathname}#s=${hash}`;
-    try {
-      await navigator.clipboard.writeText(url);
-      window.history.replaceState(null, "", `#s=${hash}`);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
-    } catch {
-      window.prompt("Copy this shareable link", url);
-    }
-  };
 
   const [threeMC, setThreeMC] = useState<MonteCarloResult | undefined>();
   const [twoMC, setTwoMC] = useState<MonteCarloResult | undefined>();
@@ -502,18 +423,6 @@ const CompareStrategies = () => {
 
       <main className="container mx-auto px-6 lg:px-8 py-10 space-y-6">
         <div className="-mx-6 lg:-mx-8 mb-2"><BetaBanner /></div>
-        {linkError && (
-          <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 flex items-start gap-2 text-sm">
-            <AlertTriangle className="size-4 text-destructive mt-0.5 shrink-0" />
-            <div className="flex-1">
-              <div className="font-medium text-destructive">Couldn't load that link</div>
-              <div className="text-muted-foreground">{linkError}</div>
-            </div>
-            <Button size="sm" variant="outline" onClick={() => setLinkError(null)}>
-              Dismiss
-            </Button>
-          </div>
-        )}
         <Card className="shadow-[var(--shadow-card)]">
           <CardHeader>
             <CardTitle className="font-serif text-2xl">Base assumptions (shared)</CardTitle>

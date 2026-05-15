@@ -136,19 +136,6 @@ export function emergencyAmountAtRetirement(input: RetirementInputs, yearsToReti
   return emergencyAmountToday(input) * Math.pow(1 + input.inflationRate, yearsToRetirement);
 }
 
-// Going forward all calculators treat the entered corpus as the value on
-// retirement day and start the projection at retirement age. SIP / step-up
-// questions are intentionally not asked, but if any caller still passes
-// them they are zeroed out here so they cannot leak into the math.
-function normaliseStartAtRetirement<T extends RetirementInputs>(input: T): T {
-  return {
-    ...input,
-    monthlyInvestment: 0,
-    sipStepUpRate: 0,
-    prepYearsBeforeRetirement: 0,
-  };
-}
-
 export function planYears(input: Pick<RetirementInputs, "lifeExpectancyAge" | "lifeExpectancyYears" | "retirementAge">): number {
   if (typeof input.lifeExpectancyAge === "number" && input.lifeExpectancyAge > input.retirementAge) {
     return input.lifeExpectancyAge - input.retirementAge;
@@ -400,8 +387,6 @@ export function buildYearBullets(
     if (strategy === "three-bucket") {
       if (r.prepGrowth) lines.push(`Preparation growth: ${fmt(r.prepGrowth)}`);
       if (r.accToPrep) lines.push(`Glide-path Acc → Prep: ${fmt(r.accToPrep)}`);
-    } else if (r.withdGrowth) {
-      lines.push(`Debt sleeve growth: ${fmt(r.withdGrowth)}`);
     }
   } else {
     // retirement
@@ -414,8 +399,9 @@ export function buildYearBullets(
       if (r.accToPrep) lines.push(`Refill Acc → Prep: ${fmt(r.accToPrep)}`);
       if (r.accToWithd) lines.push(`Last-resort Acc → spend: ${fmt(r.accToWithd)}`);
     } else {
-      if (r.withdGrowth) lines.push(`Debt sleeve growth: ${fmt(r.withdGrowth)}`);
-      if (r.accToWithd) lines.push(`Rebalance: ${fmt(r.accToWithd)} equity → debt`);
+      // two-bucket
+      if (r.withdGrowth) lines.push(`Withdrawal growth: ${fmt(r.withdGrowth)}`);
+      if (r.accToWithd) lines.push(`Refill Acc → Withd: ${fmt(r.accToWithd)}`);
     }
     if (r.emergencyUsed > 0) lines.push(`⚠ Emergency reserve used: ${fmt(r.emergencyUsed)}`);
   }
@@ -497,10 +483,13 @@ export function projectTwoBucket(rawInput: RetirementInputs): ProjectionResult {
   const yearsToRetirement = Math.max(0, input.retirementAge - ageAtStart);
   const totalYears = Math.min(150, yearsToRetirement + planYears(input));
   const startYear = new Date().getFullYear();
-  const equityWeight = Math.max(0, Math.min(1, input.accEquityPct));
-  const debtWeight = 1 - equityWeight;
-  let equity = input.currentCorpus * equityWeight;
-  let debt = input.currentCorpus * debtWeight;
+  // True two-bucket: Accumulation bucket holds SIP + corpus and grows at
+  // accReturn (sequence-sampled). At retirement we seed the Withdrawal
+  // bucket with Y years of expenses + the emergency reserve. Each
+  // retirement year we spend from Withdrawal and refill it from
+  // Accumulation. No equity/debt rebalancing.
+  let acc = input.currentCorpus;
+  let withd = 0;
   let monthlySip = input.monthlyInvestment;
   let emergencyReserve = 0;
   let emergencyUsedTotal = 0;
@@ -516,36 +505,26 @@ export function projectTwoBucket(rawInput: RetirementInputs): ProjectionResult {
   let depletionAge: number | undefined;
   rows.push({
     year: startYear, age: ageAtStart, phase: "accumulation",
-    accumulation: equity, preparation: 0, withdrawal: debt,
-    total: equity + debt, contribution: 0, expense: 0, withdrawn: 0,
+    accumulation: acc, preparation: 0, withdrawal: 0,
+    total: acc, contribution: 0, expense: 0, withdrawn: 0,
     ...emptyTransfers(),
-    accReturnApplied: 0, accOpening: equity, accGrowth: 0,
+    accReturnApplied: 0, accOpening: acc, accGrowth: 0,
     prepOpening: 0, prepGrowth: 0,
-    withdOpening: debt, withdGrowth: 0,
+    withdOpening: 0, withdGrowth: 0,
     emergencyReserve: 0, emergencyUsed: 0,
-    note: `Starting position — ${(equityWeight * 100).toFixed(0)}/${(debtWeight * 100).toFixed(0)} split`,
+    note: "Starting position",
   });
   for (let y = 1; y <= totalYears; y++) {
     const age = ageAtStart + y;
     const isRetired = y > yearsToRetirement;
     const yrsSinceRetire = y - yearsToRetirement - 1;
-    const equityOpening = equity;
-    const debtOpening = debt;
-    let equityReturn = input.accReturn;
+    const accOpening = acc;
+    const withdOpening = withd;
+    let accReturn = input.accReturn;
     let stressNote: string | undefined;
-    if (input.stressEnabled) {
-      if (input.stressMode === "crash") {
-        if (y === input.crashYearOffset) {
-          const lossAmount = equity * input.crashPct;
-          equity -= lossAmount;
-          stressNote = `Equity crash: -${(input.crashPct * 100).toFixed(0)}% (${formatINR(lossAmount)} loss)`;
-        }
-        const inStress = y >= input.crashYearOffset && y < input.crashYearOffset + input.recoveryYears + 1;
-        if (inStress) equityReturn = input.stressedAccReturn;
-      } else if (input.stressMode === "sequence" && sequenceReturns) {
-        equityReturn = sequenceReturns[y - 1];
-        stressNote = `Sequence year: equity return ${(equityReturn * 100).toFixed(1)}%`;
-      }
+    if (input.stressEnabled && sequenceReturns) {
+      accReturn = sequenceReturns[y - 1];
+      stressNote = `Sequence year: Acc return ${(accReturn * 100).toFixed(1)}%`;
     }
     let contribution = 0;
     let expense = 0;
@@ -554,44 +533,55 @@ export function projectTwoBucket(rawInput: RetirementInputs): ProjectionResult {
     const transfers = emptyTransfers();
     const notes: string[] = [];
     if (stressNote) notes.push(stressNote);
-    equity = equity * (1 + equityReturn);
-    debt = debt * (1 + input.withdrawalReturn);
     if (!isRetired) {
       const annualSip = monthlySip * 12;
-      equity += annualSip * equityWeight;
-      debt += annualSip * debtWeight;
+      acc = acc * (1 + accReturn) + annualSip;
       contribution = annualSip;
-      notes.push(`SIP ${formatINR(annualSip)} split ${(equityWeight * 100).toFixed(0)}/${(debtWeight * 100).toFixed(0)}`);
+      notes.push(`SIP: ${formatINR(annualSip)}`);
       monthlySip = monthlySip * (1 + input.sipStepUpRate);
     } else {
-      if (yrsSinceRetire === 0) {
-        emergencyReserve = emergencyAtRetirement;
-        notes.push(`Parked ${formatINR(emergencyReserve)} emergency reserve in debt sleeve`);
-      } else {
-        emergencyReserve = emergencyReserve * (1 + input.inflationRate);
-      }
       const annualExpense = input.currentMonthlyExpenses * 12 * Math.pow(1 + input.inflationRate, yearsToRetirement + yrsSinceRetire);
       expense = annualExpense;
-      let remaining = annualExpense;
-      const spendableDebt = Math.max(0, debt - emergencyReserve);
-      const fromDebt = Math.min(spendableDebt, remaining);
-      debt -= fromDebt;
-      withdrawn += fromDebt;
-      remaining -= fromDebt;
-      if (remaining > 0) {
-        const fromEquity = Math.min(equity, remaining);
-        equity -= fromEquity;
-        withdrawn += fromEquity;
-        remaining -= fromEquity;
-        if (fromEquity > 0) notes.push(`Drew ${formatINR(fromEquity)} from equity sleeve`);
+      // Year 0: seed Withdrawal bucket from Accumulation.
+      if (yrsSinceRetire === 0) {
+        emergencyReserve = emergencyAtRetirement;
+        const seedTarget = annualExpense * input.withdrawalYears + emergencyReserve;
+        const seed = Math.min(acc, seedTarget);
+        acc -= seed;
+        withd += seed;
+        transfers.accToWithd += seed;
+        notes.push(`Seeded Withdrawal with ${formatINR(seed)} (${input.withdrawalYears} yrs of expenses + ${formatINR(emergencyReserve)} emergency reserve)`);
       }
-      if (remaining > 0 && debt > 0) {
-        const fromEmergency = Math.min(debt, remaining);
-        debt -= fromEmergency;
+      // Grow both buckets.
+      acc = acc * (1 + accReturn);
+      withd = withd * (1 + input.withdrawalReturn);
+      // Inflate the fenced emergency reserve only from year 2 onward
+      // (year 1 was just seeded at retirement-year value).
+      if (yrsSinceRetire > 0) {
+        emergencyReserve = emergencyReserve * (1 + input.inflationRate);
+      }
+      // Spend from Withdrawal (excluding fenced reserve).
+      const spendable = Math.max(0, withd - emergencyReserve);
+      const fromW = Math.min(spendable, annualExpense);
+      withd -= fromW;
+      withdrawn = fromW;
+      let short = annualExpense - fromW;
+      // Refill Withdrawal from Accumulation up to next-year target.
+      const nextExpense = annualExpense * (1 + input.inflationRate);
+      const withdTarget = nextExpense * input.withdrawalYears + emergencyReserve;
+      const refillW = Math.min(acc, Math.max(0, withdTarget - withd));
+      acc -= refillW;
+      withd += refillW;
+      transfers.accToWithd += refillW;
+      if (refillW > 0) notes.push(`Refilled Withdrawal with ${formatINR(refillW)} from Acc`);
+      // If still short, dip into emergency reserve.
+      if (short > 0 && withd > 0) {
+        const fromEmergency = Math.min(withd, short);
+        withd -= fromEmergency;
         emergencyReserve = Math.max(0, emergencyReserve - fromEmergency);
         withdrawn += fromEmergency;
-        remaining -= fromEmergency;
-        emergencyUsed = fromEmergency;
+        short -= fromEmergency;
+        emergencyUsed += fromEmergency;
         emergencyUsedTotal += fromEmergency;
         if (emergencyUsedFirstYear === undefined) {
           emergencyUsedFirstYear = startYear + y;
@@ -599,47 +589,36 @@ export function projectTwoBucket(rawInput: RetirementInputs): ProjectionResult {
         }
         notes.push(`⚠ Used emergency reserve: ${formatINR(fromEmergency)}`);
       }
-      notes.push(`Spent ${formatINR(annualExpense)}`);
-    }
-    const portfolio = equity + debt;
-    if (portfolio > 0) {
-      const targetEquity = portfolio * equityWeight;
-      const minDebt = Math.min(debt, emergencyReserve);
-      const equityCap = portfolio - minDebt;
-      const newEquity = Math.max(0, Math.min(equityCap, targetEquity));
-      const newDebt = portfolio - newEquity;
-      const flow = newEquity - equity;
-      if (Math.abs(flow) > 1) {
-        if (flow > 0) {
-          transfers.accToWithd = 0;
-          notes.push(`Rebalance: ${formatINR(flow)} debt → equity`);
-        } else {
-          transfers.accToWithd = -flow;
-          notes.push(`Rebalance: ${formatINR(-flow)} equity → debt`);
-        }
+      // Last resort: pull directly from Accumulation.
+      if (short > 0 && acc > 0) {
+        const fromA = Math.min(acc, short);
+        acc -= fromA;
+        withdrawn += fromA;
+        transfers.accToWithd += fromA;
+        short -= fromA;
+        notes.push(`⚠ Last-resort: ${formatINR(fromA)} Acc → spending`);
       }
-      equity = newEquity;
-      debt = newDebt;
+      notes.push(`Spent ${formatINR(annualExpense)}`);
+      if (acc + withd <= 0 && !depleted) {
+        depleted = true;
+        depletionAge = age;
+        notes.push("⚠ Corpus depleted");
+      }
     }
-    if (equity + debt <= 0 && !depleted) {
-      depleted = true;
-      depletionAge = age;
-      notes.push("⚠ Corpus depleted");
-    }
-    equity = Math.max(0, equity);
-    debt = Math.max(0, debt);
-    const accGrowth = equityOpening * equityReturn;
-    const withdGrowth = debtOpening * input.withdrawalReturn;
+    acc = Math.max(0, acc);
+    withd = Math.max(0, withd);
+    const accGrowth = accOpening * accReturn;
+    const withdGrowth = isRetired ? withdOpening * input.withdrawalReturn : 0;
     rows.push({
       year: startYear + y, age,
       phase: isRetired ? "retirement" : "accumulation",
-      accumulation: equity, preparation: 0, withdrawal: debt,
-      total: equity + debt, contribution, expense, withdrawn,
+      accumulation: acc, preparation: 0, withdrawal: withd,
+      total: acc + withd, contribution, expense, withdrawn,
       ...transfers,
-      accReturnApplied: equityReturn,
-      accOpening: equityOpening, accGrowth,
+      accReturnApplied: accReturn,
+      accOpening, accGrowth,
       prepOpening: 0, prepGrowth: 0,
-      withdOpening: debtOpening, withdGrowth,
+      withdOpening, withdGrowth,
       emergencyReserve, emergencyUsed,
       note: notes.join(" · ") || undefined,
     });
@@ -741,7 +720,10 @@ export function project(rawInput: RetirementInputs): ProjectionResult {
         const expensesAtRetire = input.currentMonthlyExpenses * 12 * Math.pow(1 + input.inflationRate, yearsToRetirement);
         const prepTarget = expensesAtRetire * input.prepYearsBeforeRetirement;
         const yearsToGrow = yearsLeft;
-        const prepFvNoTopup = prep * Math.pow(1 + input.prepReturn, yearsToGrow);
+        // `prep` already had this year's growth applied above. Compute
+        // future value from the pre-growth balance to avoid double-counting.
+        const prepPreGrowth = prep / (1 + input.prepReturn);
+        const prepFvNoTopup = prepPreGrowth * Math.pow(1 + input.prepReturn, Math.max(0, yearsToGrow));
         const fvGap = Math.max(0, prepTarget - prepFvNoTopup);
         const slicesLeft = yearsLeft + 1;
         const pvOfGap = yearsToGrow === 0 ? fvGap : fvGap / Math.pow(1 + input.prepReturn, yearsToGrow);
@@ -777,7 +759,10 @@ export function project(rawInput: RetirementInputs): ProjectionResult {
       acc = acc * (1 + accReturn);
       prep = prep * (1 + input.prepReturn);
       withd = withd * (1 + input.withdrawalReturn);
-      emergencyReserve = emergencyReserve * (1 + input.inflationRate);
+      // Inflate fenced reserve only from year 2 onward.
+      if (yrsSinceRetire > 0) {
+        emergencyReserve = emergencyReserve * (1 + input.inflationRate);
+      }
       {
         const spendable = Math.max(0, withd - emergencyReserve);
         const fromW = Math.min(spendable, annualExpense);
@@ -812,7 +797,10 @@ export function project(rawInput: RetirementInputs): ProjectionResult {
           }
           notes.push(`⚠ Used emergency reserve: ${formatINR(fromEmergency)}`);
         }
-        const prepTarget = nextExpense * input.prepYearsBeforeRetirement;
+        // Refill Preparation back to current-year target (X years of
+        // current annual expense). Using nextExpense over-funds by one
+        // inflation step.
+        const prepTarget = annualExpense * input.prepYearsBeforeRetirement;
         const refillP = Math.min(acc, Math.max(0, prepTarget - prep));
         acc -= refillP;
         prep += refillP;
@@ -868,26 +856,29 @@ export function project(rawInput: RetirementInputs): ProjectionResult {
   return output;
 }
 
-// One-Bucket: a single sleeve. The entered corpus is the value on retirement
-// day. Each year: grow at the sampled return, deduct that year's expenses,
-// only break the emergency reserve (months × today's expenses) when the
-// remaining corpus can't cover the spend.
+// One-Bucket: a single corpus that runs through both accumulation
+// (with SIP + step-up) and retirement (single-sleeve withdrawal).
+// Each year uses a sequence-sampled return on the whole corpus.
+// Emergency reserve (months × today's expenses, inflation-indexed) is
+// fenced and only tapped when the corpus cannot cover the spend.
 export function projectOneBucket(rawInput: RetirementInputs): ProjectionResult {
   const input: RetirementInputs = {
-    ...normaliseStartAtRetirement(rawInput),
+    ...rawInput,
     stressEnabled: true,
     stressMode: "sequence",
     sequenceMode: "montecarlo",
   };
-  const ageAtStart = Math.max(ageFromDob(input.dob), input.retirementAge);
-  const yearsToRetirement = 0;
-  const totalYears = Math.min(150, planYears(input));
+  const ageAtStart = ageFromDob(input.dob);
+  const yearsToRetirement = Math.max(0, input.retirementAge - ageAtStart);
+  const totalYears = Math.min(150, yearsToRetirement + planYears(input));
   const startYear = new Date().getFullYear();
   let corpus = input.currentCorpus;
-  let emergencyReserve = emergencyAmountToday(input);
+  let monthlySip = input.monthlyInvestment;
+  let emergencyReserve = 0;
   let emergencyUsedTotal = 0;
   let emergencyUsedFirstYear: number | undefined;
   let emergencyUsedFirstAge: number | undefined;
+  const emergencyAtRetirement = emergencyAmountAtRetirement(input, yearsToRetirement);
   const sequenceReturns = buildSequenceReturns(
     totalYears,
     input.sequenceCagr,
@@ -899,57 +890,75 @@ export function projectOneBucket(rawInput: RetirementInputs): ProjectionResult {
   let depleted = false;
   let depletionAge: number | undefined;
   rows.push({
-    year: startYear, age: ageAtStart, phase: "retirement",
+    year: startYear, age: ageAtStart, phase: "accumulation",
     accumulation: corpus, preparation: 0, withdrawal: 0,
     total: corpus, contribution: 0, expense: 0, withdrawn: 0,
     ...emptyTransfers(),
     accReturnApplied: 0, accOpening: corpus, accGrowth: 0,
     prepOpening: 0, prepGrowth: 0,
     withdOpening: 0, withdGrowth: 0,
-    emergencyReserve, emergencyUsed: 0,
-    note: `Starting position at retirement (incl. ${formatINR(emergencyReserve)} emergency reserve)`,
+    emergencyReserve: 0, emergencyUsed: 0,
+    note: "Starting position",
   });
   for (let y = 1; y <= totalYears; y++) {
     const age = ageAtStart + y;
+    const isRetired = y > yearsToRetirement;
+    const yrsSinceRetire = y - yearsToRetirement - 1;
     const opening = corpus;
     const ret = sequenceReturns[y - 1] ?? input.sequenceCagr;
-    corpus = corpus * (1 + ret);
-    emergencyReserve = emergencyReserve * (1 + input.inflationRate);
-    const annualExpense = input.currentMonthlyExpenses * 12 * Math.pow(1 + input.inflationRate, y - 1);
     const notes: string[] = [`Sequence year: return ${(ret * 100).toFixed(1)}%`];
+    let contribution = 0;
+    let expense = 0;
     let withdrawn = 0;
     let emergencyUsed = 0;
-    const spendable = Math.max(0, corpus - emergencyReserve);
-    const fromCorpus = Math.min(spendable, annualExpense);
-    corpus -= fromCorpus;
-    withdrawn = fromCorpus;
-    let short = annualExpense - fromCorpus;
-    if (short > 0 && corpus > 0) {
-      const fromReserve = Math.min(corpus, short);
-      corpus -= fromReserve;
-      emergencyReserve = Math.max(0, emergencyReserve - fromReserve);
-      withdrawn += fromReserve;
-      short -= fromReserve;
-      emergencyUsed = fromReserve;
-      emergencyUsedTotal += fromReserve;
-      if (emergencyUsedFirstYear === undefined) {
-        emergencyUsedFirstYear = startYear + y;
-        emergencyUsedFirstAge = age;
+    if (!isRetired) {
+      const annualSip = monthlySip * 12;
+      corpus = corpus * (1 + ret) + annualSip;
+      contribution = annualSip;
+      notes.push(`SIP: ${formatINR(annualSip)}`);
+      monthlySip = monthlySip * (1 + input.sipStepUpRate);
+    } else {
+      // Seed reserve at retirement, then inflate from year 2 onward.
+      if (yrsSinceRetire === 0) {
+        emergencyReserve = emergencyAtRetirement;
+      } else {
+        emergencyReserve = emergencyReserve * (1 + input.inflationRate);
       }
-      notes.push(`⚠ Used emergency reserve: ${formatINR(fromReserve)}`);
-    }
-    notes.push(`Spent ${formatINR(annualExpense)}${withdrawn < annualExpense - 1 ? ` (shortfall ${formatINR(annualExpense - withdrawn)})` : ""}`);
-    if (corpus <= 0 && !depleted) {
-      depleted = true;
-      depletionAge = age;
-      notes.push("⚠ Corpus depleted");
+      corpus = corpus * (1 + ret);
+      const annualExpense = input.currentMonthlyExpenses * 12 * Math.pow(1 + input.inflationRate, yearsToRetirement + yrsSinceRetire);
+      expense = annualExpense;
+      const spendable = Math.max(0, corpus - emergencyReserve);
+      const fromCorpus = Math.min(spendable, annualExpense);
+      corpus -= fromCorpus;
+      withdrawn = fromCorpus;
+      let short = annualExpense - fromCorpus;
+      if (short > 0 && corpus > 0) {
+        const fromReserve = Math.min(corpus, short);
+        corpus -= fromReserve;
+        emergencyReserve = Math.max(0, emergencyReserve - fromReserve);
+        withdrawn += fromReserve;
+        short -= fromReserve;
+        emergencyUsed = fromReserve;
+        emergencyUsedTotal += fromReserve;
+        if (emergencyUsedFirstYear === undefined) {
+          emergencyUsedFirstYear = startYear + y;
+          emergencyUsedFirstAge = age;
+        }
+        notes.push(`⚠ Used emergency reserve: ${formatINR(fromReserve)}`);
+      }
+      notes.push(`Spent ${formatINR(annualExpense)}${withdrawn < annualExpense - 1 ? ` (shortfall ${formatINR(annualExpense - withdrawn)})` : ""}`);
+      if (corpus <= 0 && !depleted) {
+        depleted = true;
+        depletionAge = age;
+        notes.push("⚠ Corpus depleted");
+      }
     }
     corpus = Math.max(0, corpus);
     rows.push({
       year: startYear + y, age,
-      phase: "retirement",
+      phase: isRetired ? "retirement" : "accumulation",
       accumulation: corpus, preparation: 0, withdrawal: 0,
-      total: corpus, contribution: 0, expense: annualExpense, withdrawn,
+      total: corpus, contribution, expense: isRetired ? expense : 0, withdrawn,
       ...emptyTransfers(),
       accReturnApplied: ret,
       accOpening: opening, accGrowth: opening * ret,
@@ -963,11 +972,12 @@ export function projectOneBucket(rawInput: RetirementInputs): ProjectionResult {
   const currentRunCagr = appliedReturns.length
     ? Math.exp(appliedReturns.reduce((s, r) => s + Math.log1p(r), 0) / appliedReturns.length) - 1
     : undefined;
+  const retireRow = rows[yearsToRetirement] ?? rows[rows.length - 1];
   return {
     rows, ageAtStart, yearsToRetirement,
-    corpusAtRetirement: input.currentCorpus,
-    monthlyExpenseAtRetirement: input.currentMonthlyExpenses,
-    emergencyFundAtRetirement: emergencyAmountToday(input),
+    corpusAtRetirement: retireRow.total,
+    monthlyExpenseAtRetirement: input.currentMonthlyExpenses * Math.pow(1 + input.inflationRate, yearsToRetirement),
+    emergencyFundAtRetirement: emergencyAtRetirement,
     depleted, depletionAge,
     finalCorpus: rows[rows.length - 1].total,
     emergencyUsedFirstYear, emergencyUsedFirstAge, emergencyUsedTotal, currentRunCagr,

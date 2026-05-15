@@ -35,7 +35,7 @@ const defaults: RetirementInputs = {
   prepEquityPct: 0,
   prepReturn: 0.07,
   prepYearsBeforeRetirement: 0,
-  withdrawalYears: 0,
+  withdrawalYears: 3,
   withdrawalReturn: 0.07,
   emergencyFundMonths: 12,
   emergencyFundToday: defaultMonthlyExpenses * 12,
@@ -71,7 +71,6 @@ const TwoBucketSimulator = () => {
       ...values,
       prepYearsBeforeRetirement: 0,
       prepEquityPct: 0,
-      withdrawalYears: 0,
     }),
     [values],
   );
@@ -146,8 +145,9 @@ const TwoBucketSimulator = () => {
             Two-Bucket Retirement Simulator
           </h1>
           <p className="max-w-2xl mx-auto text-base text-primary-foreground/80">
-            One rebalanced portfolio with a target equity / debt split — no
-            preparation bucket, no glide path.
+            Two buckets — Accumulation grows with SIP, then seeds the
+            Withdrawal bucket with Y years of expenses at retirement and
+            refills it annually.
           </p>
           <StrategySwitcher activeTab="two" />
         </div>
@@ -161,7 +161,7 @@ const TwoBucketSimulator = () => {
         <InputsErrorBoundary>
           <GuidedInputsChat
             values={values}
-            skipQuestionIds={["prepYearsBeforeRetirement", "prepReturn", "prepEquityPct", "withdrawalYears"]}
+            skipQuestionIds={["prepYearsBeforeRetirement", "prepReturn", "prepEquityPct"]}
             onChange={setValues}
             completed={completed}
             startInSummary={hasPrefilled}

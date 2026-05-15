@@ -498,7 +498,7 @@ function SimpleHead({
           <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground bg-bucket-preparation/5">Preparation</th>
         )}
         {hasWithd && (
-          <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground bg-bucket-withdrawal/5">{isTwoBucket ? "Debt sleeve" : "Withdrawal"}</th>
+          <th className="h-10 px-2 text-right align-middle font-medium text-muted-foreground bg-bucket-withdrawal/5">Withdrawal</th>
         )}
         <th className="h-10 px-2 text-left align-middle font-medium text-muted-foreground min-w-[260px]">What happened</th>
       </tr>
@@ -538,7 +538,7 @@ function DetailedHead({
         )}
         {hasWithd && (
           <th colSpan={withdCols} className="h-9 px-2 text-left align-middle text-xs font-semibold bg-bucket-withdrawal/15 text-foreground">
-            {isTwoBucket ? "Debt sleeve" : "Withdrawal"}
+            Withdrawal
           </th>
         )}
         <th rowSpan={2} className="h-9 px-2 text-left align-middle font-medium text-muted-foreground min-w-[260px]">

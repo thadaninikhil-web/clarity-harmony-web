@@ -22,12 +22,12 @@ const defaultMonthlyExpenses = 100000;
 const defaultRetireAge = 60;
 const defaults: RetirementInputs = {
   name: "",
-  dob: "1965-01-01",
+  dob: "1985-01-01",
   currentMonthlyExpenses: defaultMonthlyExpenses,
   inflationRate: 0.07,
-  currentCorpus: 50000000,
-  monthlyInvestment: 0,
-  sipStepUpRate: 0,
+  currentCorpus: 2000000,
+  monthlyInvestment: 50000,
+  sipStepUpRate: 0.08,
   retirementAge: defaultRetireAge,
   lifeExpectancyYears: 30,
   lifeExpectancyAge: defaultRetireAge + 30,
@@ -56,10 +56,8 @@ const defaults: RetirementInputs = {
 };
 
 // One-bucket only needs the corpus + sequence inputs. Skip the
-// growth/SIP/preparation/withdrawal questions entirely.
+// preparation / withdrawal-bucket questions (no other buckets exist).
 const SKIP = [
-  "monthlyInvestment",
-  "sipStepUpRate",
   "prepYearsBeforeRetirement",
   "prepReturn",
   "prepEquityPct",
@@ -70,22 +68,18 @@ const SKIP = [
 const OneBucketSimulator = () => {
   const initialShared = useMemo(() => readShared(), []);
   const [values, setValues] = useState<RetirementInputs>(() =>
-    initialShared ? { ...defaults, ...initialShared, monthlyInvestment: 0, sipStepUpRate: 0, accEquityPct: 1 } : defaults,
+    initialShared ? { ...defaults, ...initialShared } : defaults,
   );
   const hasPrefilled = !!initialShared;
   const skipNextWriteRef = useRef(false);
-  const safeValues = useMemo(
-    () => ({ ...values, monthlyInvestment: 0, sipStepUpRate: 0, accEquityPct: 1 }),
-    [values],
-  );
-  const validation = useMemo(() => validateInputs(safeValues), [safeValues]);
+  const validation = useMemo(() => validateInputs(values), [values]);
   const result = useMemo(
     () =>
       attachBullets(
-        validation.ok ? projectOneBucket(safeValues) : projectOneBucket(defaults),
+        validation.ok ? projectOneBucket(values) : projectOneBucket(defaults),
         "one-bucket",
       ),
-    [safeValues, validation.ok],
+    [values, validation.ok],
   );
   const [completed, setCompleted] = useState(hasPrefilled);
   const resultsRef = useRef<HTMLDivElement>(null);
@@ -133,9 +127,9 @@ const OneBucketSimulator = () => {
             One-Bucket Retirement Simulator
           </h1>
           <p className="max-w-2xl mx-auto text-base text-primary-foreground/80">
-            A single retirement corpus that grows, gets spent down, and is
-            stress-tested for sequence-of-returns risk — no equity / debt
-            split, no buckets.
+            A single corpus through accumulation (with SIP) and retirement —
+            no separate buckets, just one sleeve grown and spent down with
+            sequence-of-returns stress testing.
           </p>
           <StrategySwitcher activeTab="one" />
         </div>
@@ -173,7 +167,7 @@ const OneBucketSimulator = () => {
             <Results
               result={result}
               name={values.name}
-              inputs={safeValues}
+              inputs={values}
               strategy="one-bucket"
               onReshuffleSequence={reshuffleSequence}
               onMonteCarloRunsChange={(runs) => setValues((v) => ({ ...v, monteCarloRuns: runs }))}
@@ -185,9 +179,9 @@ const OneBucketSimulator = () => {
           <Methodology strategy="one-bucket" />
         </section>
         <p className="mt-12 text-center text-xs text-muted-foreground">
-          Educational calculator — not investment advice. The corpus you enter
-          is treated as the value on retirement day; the simulation begins
-          there and runs to your plan-until age.
+          Educational calculator — not investment advice. SIP contributions
+          and step-ups grow the corpus until retirement; from then on the
+          corpus is drawn down annually for living expenses.
         </p>
       </main>
       <Footer />
