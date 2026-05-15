@@ -145,33 +145,10 @@ const CompareStrategies = () => {
     withdrawalReturn: 0.07,
   });
   const [oneInputs, setOneInputs] = useState<RetirementInputs>(oneBucketDefaults(baseInputs));
-  const [copied, setCopied] = useState(false);
-  const [linkError, setLinkError] = useState<string | null>(null);
 
   useEffect(() => {
     document.title = "Compare Retirement Strategies | Balancing Act";
     if (typeof window === "undefined") return;
-    const rawHash = window.location.hash.replace(/^#/, "");
-    if (rawHash.startsWith("s=")) {
-      const decoded = decodeStateFromHash(rawHash.slice(2));
-      if (decoded) {
-        setOneInputs(decoded.one);
-        setTwoInputs(decoded.two);
-        setThreeInputs(decoded.three);
-        writeShared(decoded.three);
-        writeInputs(THREE_KEY, decoded.three);
-        writeInputs(TWO_KEY, decoded.two);
-        return;
-      }
-      setLinkError(
-        "This shareable link is malformed or from an older version of the calculator. We've loaded your saved inputs instead.",
-      );
-      window.history.replaceState(
-        null,
-        "",
-        window.location.pathname + window.location.search,
-      );
-    }
     const sharedNow = readShared() ?? {};
     setThreeInputs((prev) => ({ ...readInputs(THREE_KEY, prev), ...sharedNow }));
     setTwoInputs((prev) => ({ ...readInputs(TWO_KEY, prev), ...sharedNow }));
@@ -228,20 +205,6 @@ const CompareStrategies = () => {
     writeInputs(THREE_KEY, baseInputs);
     writeInputs(TWO_KEY, baseInputs);
   }, []);
-
-  const copyShareLink = async () => {
-    if (typeof window === "undefined") return;
-    const hash = encodeStateToHash(oneInputs, twoInputs, threeInputs);
-    const url = `${window.location.origin}${window.location.pathname}#s=${hash}`;
-    try {
-      await navigator.clipboard.writeText(url);
-      window.history.replaceState(null, "", `#s=${hash}`);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
-    } catch {
-      window.prompt("Copy this shareable link", url);
-    }
-  };
 
   const [threeMC, setThreeMC] = useState<MonteCarloResult | undefined>();
   const [twoMC, setTwoMC] = useState<MonteCarloResult | undefined>();
