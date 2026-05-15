@@ -136,19 +136,6 @@ export function emergencyAmountAtRetirement(input: RetirementInputs, yearsToReti
   return emergencyAmountToday(input) * Math.pow(1 + input.inflationRate, yearsToRetirement);
 }
 
-// Going forward all calculators treat the entered corpus as the value on
-// retirement day and start the projection at retirement age. SIP / step-up
-// questions are intentionally not asked, but if any caller still passes
-// them they are zeroed out here so they cannot leak into the math.
-function normaliseStartAtRetirement<T extends RetirementInputs>(input: T): T {
-  return {
-    ...input,
-    monthlyInvestment: 0,
-    sipStepUpRate: 0,
-    prepYearsBeforeRetirement: 0,
-  };
-}
-
 export function planYears(input: Pick<RetirementInputs, "lifeExpectancyAge" | "lifeExpectancyYears" | "retirementAge">): number {
   if (typeof input.lifeExpectancyAge === "number" && input.lifeExpectancyAge > input.retirementAge) {
     return input.lifeExpectancyAge - input.retirementAge;
