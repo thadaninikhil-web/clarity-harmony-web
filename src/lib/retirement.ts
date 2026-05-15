@@ -387,8 +387,6 @@ export function buildYearBullets(
     if (strategy === "three-bucket") {
       if (r.prepGrowth) lines.push(`Preparation growth: ${fmt(r.prepGrowth)}`);
       if (r.accToPrep) lines.push(`Glide-path Acc → Prep: ${fmt(r.accToPrep)}`);
-    } else if (r.withdGrowth) {
-      lines.push(`Debt sleeve growth: ${fmt(r.withdGrowth)}`);
     }
   } else {
     // retirement
@@ -401,8 +399,9 @@ export function buildYearBullets(
       if (r.accToPrep) lines.push(`Refill Acc → Prep: ${fmt(r.accToPrep)}`);
       if (r.accToWithd) lines.push(`Last-resort Acc → spend: ${fmt(r.accToWithd)}`);
     } else {
-      if (r.withdGrowth) lines.push(`Debt sleeve growth: ${fmt(r.withdGrowth)}`);
-      if (r.accToWithd) lines.push(`Rebalance: ${fmt(r.accToWithd)} equity → debt`);
+      // two-bucket
+      if (r.withdGrowth) lines.push(`Withdrawal growth: ${fmt(r.withdGrowth)}`);
+      if (r.accToWithd) lines.push(`Refill Acc → Withd: ${fmt(r.accToWithd)}`);
     }
     if (r.emergencyUsed > 0) lines.push(`⚠ Emergency reserve used: ${fmt(r.emergencyUsed)}`);
   }
