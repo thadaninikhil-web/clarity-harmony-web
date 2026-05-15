@@ -721,7 +721,10 @@ export function project(rawInput: RetirementInputs): ProjectionResult {
         const expensesAtRetire = input.currentMonthlyExpenses * 12 * Math.pow(1 + input.inflationRate, yearsToRetirement);
         const prepTarget = expensesAtRetire * input.prepYearsBeforeRetirement;
         const yearsToGrow = yearsLeft;
-        const prepFvNoTopup = prep * Math.pow(1 + input.prepReturn, yearsToGrow);
+        // `prep` already had this year's growth applied above. Compute
+        // future value from the pre-growth balance to avoid double-counting.
+        const prepPreGrowth = prep / (1 + input.prepReturn);
+        const prepFvNoTopup = prepPreGrowth * Math.pow(1 + input.prepReturn, Math.max(0, yearsToGrow));
         const fvGap = Math.max(0, prepTarget - prepFvNoTopup);
         const slicesLeft = yearsLeft + 1;
         const pvOfGap = yearsToGrow === 0 ? fvGap : fvGap / Math.pow(1 + input.prepReturn, yearsToGrow);
@@ -757,7 +760,10 @@ export function project(rawInput: RetirementInputs): ProjectionResult {
       acc = acc * (1 + accReturn);
       prep = prep * (1 + input.prepReturn);
       withd = withd * (1 + input.withdrawalReturn);
-      emergencyReserve = emergencyReserve * (1 + input.inflationRate);
+      // Inflate fenced reserve only from year 2 onward.
+      if (yrsSinceRetire > 0) {
+        emergencyReserve = emergencyReserve * (1 + input.inflationRate);
+      }
       {
         const spendable = Math.max(0, withd - emergencyReserve);
         const fromW = Math.min(spendable, annualExpense);
@@ -792,7 +798,10 @@ export function project(rawInput: RetirementInputs): ProjectionResult {
           }
           notes.push(`⚠ Used emergency reserve: ${formatINR(fromEmergency)}`);
         }
-        const prepTarget = nextExpense * input.prepYearsBeforeRetirement;
+        // Refill Preparation back to current-year target (X years of
+        // current annual expense). Using nextExpense over-funds by one
+        // inflation step.
+        const prepTarget = annualExpense * input.prepYearsBeforeRetirement;
         const refillP = Math.min(acc, Math.max(0, prepTarget - prep));
         acc -= refillP;
         prep += refillP;
