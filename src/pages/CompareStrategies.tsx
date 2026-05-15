@@ -96,20 +96,6 @@ function writeInputs(key: string, values: RetirementInputs) {
 
 const pct = (n: number) => `${(n * 100).toFixed(1)}%`;
 
-function encodeStateToHash(
-  one: RetirementInputs,
-  two: RetirementInputs,
-  three: RetirementInputs,
-): string {
-  const payload = { v: 2, one, two, three };
-  const json = JSON.stringify(payload);
-  if (typeof window === "undefined") return "";
-  return btoa(unescape(encodeURIComponent(json)))
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
-}
-
 function isValidLeg(x: unknown): x is RetirementInputs {
   if (!x || typeof x !== "object") return false;
   const o = x as Record<string, unknown>;
@@ -137,37 +123,9 @@ function isValidLeg(x: unknown): x is RetirementInputs {
   return true;
 }
 
-function decodeStateFromHash(
-  hash: string,
-): { one: RetirementInputs; two: RetirementInputs; three: RetirementInputs } | null {
-  try {
-    const b64 = hash.replace(/-/g, "+").replace(/_/g, "/");
-    const padded = b64 + "=".repeat((4 - (b64.length % 4)) % 4);
-    const json = decodeURIComponent(escape(atob(padded)));
-    const parsed = JSON.parse(json);
-    if (!parsed || typeof parsed !== "object") return null;
-    if (parsed.v === 1 && isValidLeg(parsed.three) && isValidLeg(parsed.two)) {
-      const three = { ...baseInputs, ...parsed.three };
-      const two = { ...baseInputs, ...parsed.two };
-      return { one: oneBucketDefaults(three), two, three };
-    }
-    if (parsed.v === 2 && isValidLeg(parsed.one) && isValidLeg(parsed.two) && isValidLeg(parsed.three)) {
-      return {
-        one: { ...baseInputs, ...parsed.one },
-        two: { ...baseInputs, ...parsed.two },
-        three: { ...baseInputs, ...parsed.three },
-      };
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
-
 function oneBucketDefaults(src: RetirementInputs): RetirementInputs {
   return {
     ...src,
-    accEquityPct: 1,
     prepEquityPct: 0,
     prepYearsBeforeRetirement: 0,
     withdrawalYears: 0,
