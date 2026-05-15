@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { project, projectTwoBucket, type RetirementInputs } from "@/lib/retirement";
+import { project, projectTwoBucket, projectOneBucket, type RetirementInputs } from "@/lib/retirement";
 
 const base: RetirementInputs = {
   name: "Test",
@@ -105,5 +105,36 @@ describe("retirement engine audits", () => {
       expect(count).toBeGreaterThan(0);
       expect(count).toBeLessThan(expectedPerBin * 2.5);
     }
+  });
+
+  it("one-bucket: SIP accumulation grows the corpus before retirement", () => {
+    const r = projectOneBucket({ ...base, sequenceMode: "controlled" });
+    expect(r.yearsToRetirement).toBeGreaterThan(0);
+    // Corpus at retirement should exceed initial corpus + simple SIP sum
+    // (ignoring step-up & growth — a very loose lower bound).
+    const naiveLowerBound = base.currentCorpus + base.monthlyInvestment * 12 * r.yearsToRetirement;
+    expect(r.corpusAtRetirement).toBeGreaterThan(naiveLowerBound * 0.9);
+  });
+
+  it("two-bucket: Withdrawal bucket seeded at retirement with Y years + emergency", () => {
+    const r = projectTwoBucket({ ...base, sequenceMode: "controlled" });
+    const retireRowIdx = r.yearsToRetirement + 1; // year 1 of retirement
+    const row = r.rows[retireRowIdx];
+    expect(row).toBeDefined();
+    expect(row.phase).toBe("retirement");
+    // Withdrawal bucket should be non-trivial after seeding.
+    expect(row.withdrawal).toBeGreaterThan(0);
+    // Some accToWithd transfer must have occurred at year 0.
+    expect(row.accToWithd).toBeGreaterThan(0);
+  });
+
+  it("three-bucket: emergency reserve is not over-inflated in year 1 of retirement", () => {
+    const r = project({ ...base, sequenceMode: "controlled" });
+    const firstRetire = r.rows.find((row) => row.phase === "retirement");
+    expect(firstRetire).toBeDefined();
+    // First retirement-year reserve should equal the inflated-to-retirement
+    // emergency amount, NOT inflated one extra year.
+    const expected = r.emergencyFundAtRetirement;
+    expect(Math.abs(firstRetire!.emergencyReserve - expected)).toBeLessThan(expected * 0.001 + 1);
   });
 });
