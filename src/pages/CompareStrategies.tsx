@@ -141,7 +141,7 @@ const CompareStrategies = () => {
     accEquityPct: 0.6,
     prepEquityPct: 0,
     prepYearsBeforeRetirement: 0,
-    withdrawalYears: 0,
+    withdrawalYears: 3,
     withdrawalReturn: 0.07,
   });
   const [oneInputs, setOneInputs] = useState<RetirementInputs>(oneBucketDefaults(baseInputs));
@@ -197,7 +197,7 @@ const CompareStrategies = () => {
       accEquityPct: 0.6,
       prepEquityPct: 0,
       prepYearsBeforeRetirement: 0,
-      withdrawalYears: 0,
+      withdrawalYears: 3,
       withdrawalReturn: 0.07,
     });
     setOneInputs(oneBucketDefaults(baseInputs));
