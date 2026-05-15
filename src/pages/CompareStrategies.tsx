@@ -423,18 +423,6 @@ const CompareStrategies = () => {
 
       <main className="container mx-auto px-6 lg:px-8 py-10 space-y-6">
         <div className="-mx-6 lg:-mx-8 mb-2"><BetaBanner /></div>
-        {linkError && (
-          <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 flex items-start gap-2 text-sm">
-            <AlertTriangle className="size-4 text-destructive mt-0.5 shrink-0" />
-            <div className="flex-1">
-              <div className="font-medium text-destructive">Couldn't load that link</div>
-              <div className="text-muted-foreground">{linkError}</div>
-            </div>
-            <Button size="sm" variant="outline" onClick={() => setLinkError(null)}>
-              Dismiss
-            </Button>
-          </div>
-        )}
         <Card className="shadow-[var(--shadow-card)]">
           <CardHeader>
             <CardTitle className="font-serif text-2xl">Base assumptions (shared)</CardTitle>
