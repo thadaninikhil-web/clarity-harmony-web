@@ -22,8 +22,6 @@ export function TwoBucketInputsForm({ values, onChange, onReset }: Props) {
   const set = <K extends keyof RetirementInputs>(k: K, v: RetirementInputs[K]) =>
     onChange({ ...values, [k]: v });
 
-  const equityPct = values.accEquityPct;
-  const debtPct = 1 - equityPct;
   const lifeAge = values.lifeExpectancyAge ?? values.retirementAge + values.lifeExpectancyYears;
   const lifeInvalid = lifeAge <= values.retirementAge;
   const efMonths =
@@ -152,28 +150,28 @@ export function TwoBucketInputsForm({ values, onChange, onReset }: Props) {
           <AccordionTrigger className="px-6">
             <span className="flex items-center gap-3">
               <span className="size-3 rounded-full bg-bucket-accumulation" />
-              Portfolio split — rebalanced every year
+              Bucket setup — Accumulation &amp; Withdrawal
             </span>
           </AccordionTrigger>
           <AccordionContent className="px-6">
             <div className="space-y-2">
               <Label className="text-xs">
-                Equity allocation: {(equityPct * 100).toFixed(0)}% · Debt: {(debtPct * 100).toFixed(0)}%
+                Years of expenses parked in Withdrawal bucket: {values.withdrawalYears}
               </Label>
-              <Slider value={[equityPct * 100]} min={0} max={100} step={5} onValueChange={(v) => set("accEquityPct", v[0] / 100)} />
+              <Slider value={[values.withdrawalYears]} min={1} max={10} step={1} onValueChange={(v) => set("withdrawalYears", v[0])} />
               <p className="text-[11px] text-muted-foreground">
-                Whole portfolio is split today by this weight. Each year both sleeves grow at their own returns; expenses drawn from debt first then equity; portfolio rebalanced back to target.
+                Accumulation holds your corpus + SIPs and grows through to retirement. At retirement we move this many years of expenses (plus your emergency reserve) into the Withdrawal bucket. Each retirement year, spending comes from Withdrawal and Accumulation refills it back to target.
               </p>
             </div>
           </AccordionContent>
         </AccordionItem>
 
         <AccordionItem value="returns" className="rounded-xl border bg-card shadow-[var(--shadow-card)]">
-          <AccordionTrigger className="px-6">Equity sleeve · returns &amp; sequence risk</AccordionTrigger>
+          <AccordionTrigger className="px-6">Expected returns &amp; sequence risk</AccordionTrigger>
           <AccordionContent className="px-6 space-y-4">
             <div className="grid gap-3 lg:grid-cols-2">
               <div className="space-y-1.5">
-                <Label className="text-xs">Equity CAGR: {(values.sequenceCagr * 100).toFixed(1)}%</Label>
+                <Label className="text-xs">Accumulation CAGR: {(values.sequenceCagr * 100).toFixed(1)}%</Label>
                 <Slider
                   value={[values.sequenceCagr * 100]}
                   min={2}
@@ -183,7 +181,7 @@ export function TwoBucketInputsForm({ values, onChange, onReset }: Props) {
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs">Debt sleeve return: {(values.withdrawalReturn * 100).toFixed(2)}%</Label>
+                <Label className="text-xs">Withdrawal bucket return: {(values.withdrawalReturn * 100).toFixed(2)}%</Label>
                 <Slider value={[values.withdrawalReturn * 100]} min={4} max={18} step={0.25} onValueChange={(v) => set("withdrawalReturn", v[0] / 100)} />
               </div>
             </div>
@@ -192,7 +190,7 @@ export function TwoBucketInputsForm({ values, onChange, onReset }: Props) {
               <div>
                 <div className="font-medium text-sm">Sequence-of-returns risk (always on)</div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Year-to-year equity returns swing between min and max while averaging the CAGR.
+                  Year-to-year Accumulation returns swing between min and max while averaging the CAGR.
                 </p>
               </div>
               <div className="grid gap-3 lg:grid-cols-3">
