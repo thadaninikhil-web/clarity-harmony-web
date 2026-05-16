@@ -27,14 +27,14 @@ export function Methodology({ strategy = "three-bucket" }: Props) {
         <Accordion type="multiple" className="w-full">
           <AccordionItem value="m1">
             <AccordionTrigger>
-              1 · {isTwoBucket ? "Two sleeves and how they're spent" : "Three buckets and how they're spent"}
+              1 · {isTwoBucket ? "Two buckets and how they're spent" : "Three buckets and how they're spent"}
             </AccordionTrigger>
             <AccordionContent className="text-sm space-y-2">
               {isTwoBucket ? (
                 <>
-                  <p><strong>Equity sleeve</strong> — the growth engine. This is what swings up and down.</p>
-                  <p><strong>Debt sleeve</strong> — the safer side. We spend from here first and also keep the emergency fund here.</p>
-                  <p>Each year both sleeves grow at their own returns, then the portfolio is rebalanced back to your target mix.</p>
+                  <p><strong>Accumulation</strong> — your growth bucket. It holds the current corpus and every SIP you make, and grows through to retirement at the Accumulation return.</p>
+                  <p><strong>Withdrawal</strong> — the safer bucket you actually live off in retirement. Seeded at retirement with N years of expenses plus the emergency reserve.</p>
+                  <p>During accumulation, SIPs flow into Accumulation. At retirement, money is moved from Accumulation into Withdrawal. Each retirement year, spending comes from Withdrawal and Accumulation tops it back up to target.</p>
                 </>
               ) : (
                 <>
@@ -66,16 +66,35 @@ export function Methodology({ strategy = "three-bucket" }: Props) {
             </AccordionItem>
           )}
 
+          {isTwoBucket && (
+            <AccordionItem value="m2-two">
+              <AccordionTrigger>2 · Moving money from Accumulation to Withdrawal</AccordionTrigger>
+              <AccordionContent className="text-sm space-y-2">
+                <p>
+                  On day-1 of retirement we move <em>N × annual expense</em> plus
+                  the emergency reserve from Accumulation into Withdrawal — where
+                  N is the number of years of expenses you chose to park.
+                </p>
+                <p>
+                  After that, each retirement year refills Withdrawal back to its
+                  target (next-year expense × N, plus the emergency reserve) by
+                  pulling whatever is needed from Accumulation. Accumulation is
+                  only spent from directly as a last resort.
+                </p>
+              </AccordionContent>
+            </AccordionItem>
+          )}
+
           <AccordionItem value="m3">
             <AccordionTrigger>3 · Spending order in retirement</AccordionTrigger>
             <AccordionContent className="text-sm space-y-2">
               {isTwoBucket ? (
                 <ol className="list-decimal pl-5 space-y-1">
-                  <li>Both sleeves grow at their own returns.</li>
-                  <li>Spend from debt first (but don't touch the emergency reserve).</li>
-                  <li>If debt isn't enough, draw from equity.</li>
+                  <li>Both buckets grow at their own returns.</li>
+                  <li>Spend from Withdrawal (but don't touch the emergency reserve).</li>
+                  <li>Refill Withdrawal from Accumulation back to its N-year target.</li>
                   <li>If still short, break into the emergency reserve.</li>
-                  <li>Rebalance back to the target equity / debt mix.</li>
+                  <li>As an absolute last resort, take money straight from Accumulation.</li>
                 </ol>
               ) : (
                 <ol className="list-decimal pl-5 space-y-1">
@@ -95,14 +114,14 @@ export function Methodology({ strategy = "three-bucket" }: Props) {
             <AccordionContent className="text-sm">
               You enter it as a number of months of <em>today's</em> expenses.
               We grow it with inflation up to retirement, park it inside the{" "}
-              {isTwoBucket ? "debt sleeve" : "Withdrawal bucket"} on day-1 of
+              Withdrawal bucket on day-1 of
               retirement, and only touch it after every other source has run out.
             </AccordionContent>
           </AccordionItem>
 
           <AccordionItem value="m5">
             <AccordionTrigger>
-              5 · Sequence-of-returns risk on {isTwoBucket ? "the equity sleeve" : "Accumulation"}
+              5 · Sequence-of-returns risk on Accumulation
             </AccordionTrigger>
             <AccordionContent className="text-sm space-y-2">
               <p>
@@ -113,10 +132,10 @@ export function Methodology({ strategy = "three-bucket" }: Props) {
               </p>
               <p>
                 We model it by generating a year-by-year return series for{" "}
-                {isTwoBucket ? "the equity sleeve" : "Accumulation"} that swings
+                Accumulation that swings
                 between your min and max returns but is bias-corrected so the
                 long-run CAGR is exactly what you set. The conservative{" "}
-                {isTwoBucket ? "debt sleeve" : "Preparation and Withdrawal buckets"}{" "}
+                {isTwoBucket ? "Withdrawal bucket grows" : "Preparation and Withdrawal buckets grow"}{" "}
                 are insulated by design and grow at their own steady returns.
               </p>
             </AccordionContent>
