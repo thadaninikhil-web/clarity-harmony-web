@@ -348,13 +348,31 @@ const CompareStrategies = () => {
       pct(twoInputs.withdrawalReturn),
       pct(threeInputs.withdrawalReturn),
     ],
+    [
+      "Preparation bucket return",
+      "—",
+      "—",
+      pct(threeInputs.prepReturn),
+    ],
+    [
+      "Years funded in Preparation bucket",
+      "—",
+      "—",
+      String(threeInputs.prepYearsBeforeRetirement),
+    ],
+    [
+      "Years funded in Withdrawal bucket",
+      "—",
+      String(twoInputs.withdrawalYears),
+      String(threeInputs.withdrawalYears),
+    ],
   ];
 
   const strategyRows: Array<[string, string, string, string]> = [
     [
       "Accumulation equity %",
       "100% (single sleeve)",
-      `${pct(twoInputs.accEquityPct)} (whole portfolio)`,
+      "100% (Accumulation bucket)",
       pct(threeInputs.accEquityPct),
     ],
     ["Preparation equity %", "—", "—", pct(threeInputs.prepEquityPct)],
@@ -365,7 +383,12 @@ const CompareStrategies = () => {
       "—",
       String(threeInputs.prepYearsBeforeRetirement),
     ],
-    ["Withdrawal bucket years parked", "—", "—", String(threeInputs.withdrawalYears)],
+    [
+      "Withdrawal bucket years parked",
+      "—",
+      String(twoInputs.withdrawalYears),
+      String(threeInputs.withdrawalYears),
+    ],
   ];
 
   const sequenceRows: Array<[string, string, string, string]> = [
@@ -801,8 +824,9 @@ const CompareStrategies = () => {
             </p>
             <p>
               The <span className="font-medium text-foreground">two-bucket strategy</span> uses a single
-              portfolio with a fixed equity / debt target weight, rebalanced every year — simpler to
-              operate, but more exposed to a bad sequence of returns near retirement.
+              Accumulation bucket that runs SIPs and growth right through to retirement. At retirement
+              it seeds a Withdrawal bucket with a few years of expenses plus the emergency reserve,
+              and refills that bucket from Accumulation each year as expenses are drawn.
             </p>
             <p>
               Confidence comes from running thousands of independent sequence-of-returns scenarios and
