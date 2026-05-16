@@ -483,7 +483,7 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
             {result.ageAtStart + result.yearsToRetirement + (inputs.lifeExpectancyAge ? Math.max(0, inputs.lifeExpectancyAge - inputs.retirementAge) : inputs.lifeExpectancyYears)},
             applying SIPs, expenses,{" "}
             {strategy === "two-bucket"
-              ? "annual rebalancing between equity and debt sleeves"
+              ? "the seeding and yearly refill of the Withdrawal bucket from Accumulation"
               : "bucket transfers, glide-path top-ups and the emergency reserve"}
             .
           </p>
