@@ -40,10 +40,13 @@ export function exportRetirementXLSX(
     ["Emergency fund today (₹)", input.emergencyFundToday ?? input.currentMonthlyExpenses * (input.emergencyFundMonths || 0)],
     ["Emergency fund at retirement (₹)", result.emergencyFundAtRetirement],
     ["Strategy", isTwoBucket ? "Two-bucket" : "Three-bucket"],
-    ["Equity allocation (acc / equity sleeve)", input.accEquityPct],
+    ["Accumulation equity allocation", input.accEquityPct],
     ["Accumulation expected return", input.accReturn],
     ...(isTwoBucket
-      ? [["Debt sleeve expected return", input.withdrawalReturn] as (string | number)[]]
+      ? [
+          ["Withdrawal bucket expected return", input.withdrawalReturn] as (string | number)[],
+          ["Withdrawal years parked", input.withdrawalYears] as (string | number)[],
+        ]
       : [
           ["Preparation equity allocation", input.prepEquityPct] as (string | number)[],
           ["Preparation expected return", input.prepReturn],
@@ -87,7 +90,7 @@ export function exportRetirementXLSX(
   const accGroup = ["Accumulation", "Accumulation", "Accumulation", "Accumulation", "Accumulation"];
   const prepGroup = ["Preparation", "Preparation", "Preparation", "Preparation", "Preparation"];
   const withdGroup = isTwoBucket
-    ? ["Debt sleeve", "Debt sleeve", "Debt sleeve", "Debt sleeve", "Debt sleeve"]
+    ? ["Withdrawal", "Withdrawal", "Withdrawal", "Withdrawal", "Withdrawal"]
     : ["Withdrawal", "Withdrawal", "Withdrawal", "Withdrawal", "Withdrawal", "Withdrawal"];
   const groupRow = isTwoBucket
     ? [...summaryGroup, ...accGroup, ...withdGroup, "Notes"]
@@ -96,7 +99,7 @@ export function exportRetirementXLSX(
   const summaryHeaders = ["Year", "Age", "Phase", "Total corpus (₹)", "Expense (₹)", "Withdrawn (₹)"];
   const accHeaders = ["Acc start (₹)", "Acc addition (₹)", "Acc return %", "Acc growth (₹)", "Acc closing (₹)"];
   const prepHeaders = ["Prep start (₹)", "Prep addition (Acc→Prep) (₹)", "Prep return %", "Prep growth (₹)", "Prep closing (₹)"];
-  const withdHeadersTwo = ["Debt start (₹)", "Rebalance (Eq→Debt) (₹)", "Debt return %", "Debt growth (₹)", "Debt closing (₹)"];
+  const withdHeadersTwo = ["Withd start (₹)", "Inflow (Acc→Withd) (₹)", "Withd return %", "Withd growth (₹)", "Withd closing (₹)"];
   const withdHeadersThree = ["Withd start (₹)", "Inflow (Prep→Withd / Acc→Withd) (₹)", "Withd return %", "Withd growth (₹)", "Emergency reserve (₹)", "Withd closing (₹)"];
   const headers = isTwoBucket
     ? [...summaryHeaders, ...accHeaders, ...withdHeadersTwo, "Notes"]
@@ -107,9 +110,9 @@ export function exportRetirementXLSX(
     if (isTwoBucket) {
       return [
         r.year, r.age, r.phase, r.total, r.expense, r.withdrawn,
-        // Accumulation (= equity sleeve)
+        // Accumulation bucket
         r.accOpening, r.contribution, r.accReturnApplied, r.accGrowth, r.accumulation,
-        // Debt sleeve (stored under withdrawal fields in two-bucket)
+        // Withdrawal bucket
         r.withdOpening, r.accToWithd, input.withdrawalReturn, r.withdGrowth, r.withdrawal,
         bullets,
       ];

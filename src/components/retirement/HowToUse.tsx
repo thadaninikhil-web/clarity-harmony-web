@@ -18,7 +18,7 @@ export function HowToUse({ strategy = "three-bucket" }: Props) {
           investment and the way you split your money will be enough to fund
           your retirement — and shows you how that money should be{" "}
           {isTwoBucket
-            ? "split between equity and debt"
+            ? "moved between an Accumulation bucket and a Withdrawal bucket"
             : "split across three pots of money with different risk levels"}.
         </p>
         <ol className="list-decimal pl-5 space-y-2">
@@ -31,11 +31,14 @@ export function HowToUse({ strategy = "three-bucket" }: Props) {
           <li>
             {isTwoBucket ? (
               <>
-                <strong>Set your portfolio mix.</strong>{" "}
-                Pick how much of your money sits in equity (the growth part)
-                and how much in debt (the safer part). The model rebalances back
-                to this mix each year. Withdrawals come from debt first; equity
-                is only touched when debt isn't enough.
+                <strong>Set up the two buckets.</strong>{" "}
+                <span className="font-medium">Bucket 1 (Accumulation)</span> holds
+                your current corpus and every SIP you make, growing through to
+                retirement.{" "}
+                <span className="font-medium">Bucket 2 (Withdrawal)</span> is the
+                safer bucket you actually live off — at retirement it is seeded
+                with N years of expenses plus the emergency reserve, and is
+                refilled each year from Accumulation.
               </>
             ) : (
               <>
@@ -52,7 +55,7 @@ export function HowToUse({ strategy = "three-bucket" }: Props) {
           <li>
             <strong>Add an emergency fund</strong> in months of today's expenses.
             We grow that with inflation and park it inside the{" "}
-            {isTwoBucket ? "debt sleeve" : "Withdrawal bucket"} so it's only
+            Withdrawal bucket so it's only
             touched as a last resort.
           </li>
           <li>
