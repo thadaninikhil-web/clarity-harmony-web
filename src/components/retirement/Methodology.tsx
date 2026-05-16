@@ -135,8 +135,8 @@ export function Methodology({ strategy = "three-bucket" }: Props) {
                 Accumulation that swings
                 between your min and max returns but is bias-corrected so the
                 long-run CAGR is exactly what you set. The conservative{" "}
-                {isTwoBucket ? "Withdrawal bucket grows" : "Preparation and Withdrawal buckets grow"}{" "}
-                are insulated by design and grow at their own steady returns.
+                {isTwoBucket ? "Withdrawal bucket is" : "Preparation and Withdrawal buckets are"}{" "}
+                insulated by design and grow at their own steady returns.
               </p>
             </AccordionContent>
           </AccordionItem>
