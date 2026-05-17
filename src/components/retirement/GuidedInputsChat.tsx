@@ -400,11 +400,18 @@ export function GuidedInputsChat({
       // attached after React commits, and try again shortly after to cover
       // the date-input case where the first focus call may be ignored.
       const focusInput = () => inputRef.current?.focus();
+      // Multiple focus retries — some browsers (Safari especially) ignore
+      // focus on type="date" / freshly-mounted inputs unless we retry on
+      // later ticks. Retry until a focus actually sticks.
       const raf = requestAnimationFrame(focusInput);
-      const t = window.setTimeout(focusInput, 80);
+      const timers = [10, 60, 150, 300, 500].map((ms) =>
+        window.setTimeout(() => {
+          if (document.activeElement !== inputRef.current) focusInput();
+        }, ms),
+      );
       return () => {
         cancelAnimationFrame(raf);
-        window.clearTimeout(t);
+        timers.forEach((t) => window.clearTimeout(t));
       };
     } else if (isSummary) {
       const t = window.setTimeout(() => summaryRef.current?.focus(), 50);
