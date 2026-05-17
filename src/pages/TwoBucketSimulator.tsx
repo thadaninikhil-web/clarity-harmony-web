@@ -36,7 +36,7 @@ const defaults: RetirementInputs = {
   prepReturn: 0.07,
   prepYearsBeforeRetirement: 0,
   withdrawalYears: 3,
-  withdrawalReturn: 0.07,
+  withdrawalReturn: 0.055,
   emergencyFundMonths: 12,
   emergencyFundToday: defaultMonthlyExpenses * 12,
   transferMode: "annual-topup",
