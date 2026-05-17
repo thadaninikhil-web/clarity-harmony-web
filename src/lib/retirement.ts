@@ -295,6 +295,36 @@ export function validateInputs(input: RetirementInputs): ValidationResult {
       message: "Emergency fund (months) must be zero or a positive whole number.",
     });
   }
+  // Bucket-sizing sanity checks
+  const ageAtStartForBuckets = ageFromDob(input.dob);
+  const yrsToRetire = Math.max(0, input.retirementAge - ageAtStartForBuckets);
+  const retirementPlanYears = Math.max(0, (input.lifeExpectancyAge ?? input.retirementAge + (input.lifeExpectancyYears || 0)) - input.retirementAge);
+  if (!Number.isFinite(input.withdrawalYears) || input.withdrawalYears < 0) {
+    errors.push({
+      field: "withdrawalYears",
+      rule: "withdrawalYears >= 0",
+      message: "Years of expenses in the Withdrawal bucket must be zero or more.",
+    });
+  } else if (retirementPlanYears > 0 && input.withdrawalYears > retirementPlanYears) {
+    errors.push({
+      field: "withdrawalYears",
+      rule: "withdrawalYears <= (lifeExpectancyAge - retirementAge)",
+      message: `Withdrawal bucket (${input.withdrawalYears} yrs) cannot exceed retirement horizon (${retirementPlanYears} yrs).`,
+    });
+  }
+  if (!Number.isFinite(input.prepYearsBeforeRetirement) || input.prepYearsBeforeRetirement < 0) {
+    errors.push({
+      field: "prepYearsBeforeRetirement",
+      rule: "prepYearsBeforeRetirement >= 0",
+      message: "Preparation glide-path years must be zero or more.",
+    });
+  } else if (yrsToRetire > 0 && input.prepYearsBeforeRetirement > yrsToRetire) {
+    errors.push({
+      field: "prepYearsBeforeRetirement",
+      rule: "prepYearsBeforeRetirement <= years until retirement",
+      message: `Preparation glide-path (${input.prepYearsBeforeRetirement} yrs) cannot exceed years to retirement (${yrsToRetire}).`,
+    });
+  }
   return { ok: errors.length === 0, errors };
 }
 
