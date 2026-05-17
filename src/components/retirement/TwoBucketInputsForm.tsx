@@ -24,6 +24,10 @@ export function TwoBucketInputsForm({ values, onChange, onReset }: Props) {
 
   const lifeAge = values.lifeExpectancyAge ?? values.retirementAge + values.lifeExpectancyYears;
   const lifeInvalid = lifeAge <= values.retirementAge;
+  const planYears = Math.max(1, lifeAge - values.retirementAge);
+  const withdrawalMax = Math.min(10, planYears);
+  const withdrawalInvalid =
+    values.withdrawalYears < 1 || values.withdrawalYears > planYears;
   const efMonths =
     values.emergencyFundMonths ??
     Math.round((values.emergencyFundToday ?? 0) / Math.max(1, values.currentMonthlyExpenses));
@@ -158,7 +162,18 @@ export function TwoBucketInputsForm({ values, onChange, onReset }: Props) {
               <Label className="text-xs">
                 Years of expenses parked in Withdrawal bucket: {values.withdrawalYears}
               </Label>
-              <Slider value={[values.withdrawalYears]} min={1} max={10} step={1} onValueChange={(v) => set("withdrawalYears", v[0])} />
+              <Slider
+                value={[Math.min(values.withdrawalYears, withdrawalMax)]}
+                min={1}
+                max={withdrawalMax}
+                step={1}
+                onValueChange={(v) => set("withdrawalYears", v[0])}
+              />
+              {withdrawalInvalid && (
+                <p className="text-[10px] text-destructive">
+                  Must be between 1 and {planYears} (your retirement horizon).
+                </p>
+              )}
               <p className="text-[11px] text-muted-foreground">
                 Accumulation holds your corpus + SIPs and grows through to retirement. At retirement we move this many years of expenses (plus your emergency reserve) into the Withdrawal bucket. Each retirement year, spending comes from Withdrawal and Accumulation refills it back to target.
               </p>
