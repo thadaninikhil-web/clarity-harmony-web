@@ -26,6 +26,7 @@ import {
 import { exportRetirementPDF } from "@/lib/retirement-pdf";
 import { exportRetirementXLSX } from "@/lib/retirement-xlsx";
 import { MonteCarloPanel } from "@/components/retirement/MonteCarloPanel";
+import { BucketFlowPanel } from "@/components/retirement/BucketFlowPanel";
 
 interface Props {
   result: ProjectionResult;
@@ -314,6 +315,8 @@ export function Results({
               </div>
             </div>
           )}
+
+        <BucketFlowPanel result={result} strategy={strategy} />
 
         {/* YEAR-BY-YEAR */}
         <Card className="shadow-[var(--shadow-card)]">
