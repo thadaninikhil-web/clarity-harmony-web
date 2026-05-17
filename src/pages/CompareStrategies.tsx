@@ -52,7 +52,7 @@ const baseInputs: RetirementInputs = {
   accReturn: 0.1,
   prepEquityPct: 0.3,
   prepReturn: 0.07,
-  prepYearsBeforeRetirement: 3,
+  prepYearsBeforeRetirement: 2,
   withdrawalYears: 3,
   withdrawalReturn: 0.055,
   emergencyFundMonths: 12,
@@ -142,7 +142,7 @@ const CompareStrategies = () => {
     prepEquityPct: 0,
     prepYearsBeforeRetirement: 0,
     withdrawalYears: 3,
-    withdrawalReturn: 0.07,
+    withdrawalReturn: 0.055,
   });
   const [oneInputs, setOneInputs] = useState<RetirementInputs>(oneBucketDefaults(baseInputs));
 
@@ -198,7 +198,7 @@ const CompareStrategies = () => {
       prepEquityPct: 0,
       prepYearsBeforeRetirement: 0,
       withdrawalYears: 3,
-      withdrawalReturn: 0.07,
+      withdrawalReturn: 0.055,
     });
     setOneInputs(oneBucketDefaults(baseInputs));
     writeShared(baseInputs);
