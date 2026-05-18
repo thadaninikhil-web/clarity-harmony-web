@@ -47,10 +47,12 @@ export interface RetirementInputs {
   lifeExpectancyYears: number;
   lifeExpectancyAge?: number;
 
-  accEquityPct: number;
+  /** @deprecated kept optional for backward-compat; not used by the math. */
+  accEquityPct?: number;
   accReturn: number;
 
-  prepEquityPct: number;
+  /** @deprecated kept optional for backward-compat; not used by the math. */
+  prepEquityPct?: number;
   prepReturn: number;
   prepYearsBeforeRetirement: number;
 
