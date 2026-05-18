@@ -154,13 +154,9 @@ export function InputsForm({ values, onChange, onReset }: Props) {
             </span>
           </AccordionTrigger>
           <AccordionContent className="px-6 space-y-4">
-            <div className="grid gap-3 lg:grid-cols-2">
+            <div className="grid gap-3 lg:grid-cols-1">
               <div className="space-y-1.5">
-                <Label className="text-xs">Equity allocation: {(values.accEquityPct * 100).toFixed(0)}%</Label>
-                <Slider value={[values.accEquityPct * 100]} min={0} max={100} step={5} onValueChange={(v) => set("accEquityPct", v[0] / 100)} />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs">Expected CAGR: {(values.sequenceCagr * 100).toFixed(1)}%</Label>
+                <Label className="text-xs">Growth bucket expected return (CAGR): {(values.sequenceCagr * 100).toFixed(1)}%</Label>
                 <Slider
                   value={[values.sequenceCagr * 100]}
                   min={2}
@@ -204,11 +200,7 @@ export function InputsForm({ values, onChange, onReset }: Props) {
             </span>
           </AccordionTrigger>
           <AccordionContent className="px-6">
-            <div className="grid gap-3 lg:grid-cols-3">
-              <div className="space-y-1.5">
-                <Label className="text-xs">Equity allocation: {(values.prepEquityPct * 100).toFixed(0)}%</Label>
-                <Slider value={[values.prepEquityPct * 100]} min={0} max={100} step={5} onValueChange={(v) => set("prepEquityPct", v[0] / 100)} />
-              </div>
+            <div className="grid gap-3 lg:grid-cols-2">
               <div className="space-y-1.5">
                 <Label className="text-xs">Expected return: {(values.prepReturn * 100).toFixed(1)}%</Label>
                 <Slider value={[values.prepReturn * 100]} min={4} max={18} step={0.5} onValueChange={(v) => set("prepReturn", v[0] / 100)} />

@@ -80,7 +80,7 @@ function buildQuestions(): Question[] {
     },
     {
       id: "retirementAge",
-      label: "Retirement age",
+      label: "Age you want to retire",
       prompt: () => "At what age would you like to retire?",
       type: "age",
       defaultFrom: (v) => String(v.retirementAge || 60),
@@ -120,8 +120,8 @@ function buildQuestions(): Question[] {
     },
     {
       id: "currentMonthlyExpenses",
-      label: "Current monthly expenses",
-      prompt: () => "What are your current monthly household expenses? (₹)",
+      label: "Monthly expenses today",
+      prompt: () => "What do you spend on household expenses each month today? (₹)",
       type: "money",
       defaultFrom: (v) => String(v.currentMonthlyExpenses || ""),
       apply: (v, raw) => ({ ...v, currentMonthlyExpenses: parseNumber(raw) || 0 }),
@@ -148,7 +148,7 @@ function buildQuestions(): Question[] {
     },
     {
       id: "currentCorpus",
-      label: "Current retirement corpus",
+      label: "Savings already built",
       prompt: () => "How much have you already saved or invested towards retirement? (₹)",
       type: "money",
       defaultFrom: (v) => String(v.currentCorpus || ""),
@@ -162,8 +162,8 @@ function buildQuestions(): Question[] {
     },
     {
       id: "monthlyInvestment",
-      label: "Monthly investment",
-      prompt: () => "How much are you investing every month right now? (₹)",
+      label: "Monthly SIP today",
+      prompt: () => "How much do you invest every month right now (SIP)? (₹)",
       type: "money",
       defaultFrom: (v) => String(v.monthlyInvestment || ""),
       apply: (v, raw) => ({ ...v, monthlyInvestment: parseNumber(raw) || 0 }),
@@ -176,8 +176,8 @@ function buildQuestions(): Question[] {
     },
     {
       id: "sipStepUpRate",
-      label: "SIP annual step-up",
-      prompt: () => "How much do you step up your SIP every year? (e.g. 4%)",
+      label: "Annual SIP increase",
+      prompt: () => "By how much do you increase your SIP every year? (e.g. 8%)",
       type: "percent",
       defaultFrom: (v) => String(Math.round((v.sipStepUpRate ?? 0.04) * 100)),
       apply: (v, raw) => ({ ...v, sipStepUpRate: (parseNumber(raw) || 0) / 100 }),
@@ -191,8 +191,8 @@ function buildQuestions(): Question[] {
     // Bucket 1 — Accumulation
     {
       id: "accReturn",
-      label: "Accumulation: equity return",
-      prompt: () => "What annual return do you expect from your equity investments? (e.g. 10%)",
+      label: "Growth bucket return",
+      prompt: () => "What yearly return do you expect from your growth (equity) investments? (e.g. 10%)",
       type: "percent",
       defaultFrom: (v) => String(Math.round((v.sequenceCagr ?? v.accReturn ?? 0.1) * 1000) / 10),
       apply: (v, raw) => {
@@ -255,7 +255,7 @@ function buildQuestions(): Question[] {
     },
     {
       id: "prepReturn",
-      label: "Return on de-risked money",
+      label: "Preparation bucket return",
       prompt: () =>
         "During this de-risking period, what return do you expect on this money? (mostly debt with a bit of equity, e.g. 7%)",
       type: "percent",
@@ -267,21 +267,6 @@ function buildQuestions(): Question[] {
         return null;
       },
       format: (v) => pct(v.prepReturn, 1),
-    },
-    {
-      id: "prepEquityPct",
-      label: "Equity % during de-risking",
-      prompt: () =>
-        "What % of this de-risked money should still stay in equity? (default 30%)",
-      type: "percent",
-      defaultFrom: (v) => String(Math.round((v.prepEquityPct ?? 0.3) * 100)),
-      apply: (v, raw) => ({ ...v, prepEquityPct: (parseNumber(raw) || 0) / 100 }),
-      validate: (raw) => {
-        const n = parseNumber(raw);
-        if (!Number.isFinite(n) || n < 0 || n > 100) return "Enter 0–100";
-        return null;
-      },
-      format: (v) => pct(v.prepEquityPct, 0),
     },
     // Withdrawal — safe income reserve
     {
@@ -301,7 +286,7 @@ function buildQuestions(): Question[] {
     },
     {
       id: "withdrawalReturn",
-      label: "Return on safe withdrawal money",
+      label: "Safe bucket return (after tax)",
       prompt: () =>
         "What return do you expect on this safe money? (e.g. 5.5%)",
       type: "percent",
