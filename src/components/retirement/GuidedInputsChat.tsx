@@ -268,21 +268,6 @@ function buildQuestions(): Question[] {
       },
       format: (v) => pct(v.prepReturn, 1),
     },
-    {
-      id: "prepEquityPct",
-      label: "Equity % during de-risking",
-      prompt: () =>
-        "What % of this de-risked money should still stay in equity? (default 30%)",
-      type: "percent",
-      defaultFrom: (v) => String(Math.round((v.prepEquityPct ?? 0.3) * 100)),
-      apply: (v, raw) => ({ ...v, prepEquityPct: (parseNumber(raw) || 0) / 100 }),
-      validate: (raw) => {
-        const n = parseNumber(raw);
-        if (!Number.isFinite(n) || n < 0 || n > 100) return "Enter 0–100";
-        return null;
-      },
-      format: (v) => pct(v.prepEquityPct, 0),
-    },
     // Withdrawal — safe income reserve
     {
       id: "withdrawalYears",
