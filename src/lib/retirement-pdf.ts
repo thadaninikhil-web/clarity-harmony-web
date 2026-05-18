@@ -128,8 +128,8 @@ export function exportRetirementPDF(input: RetirementInputs, result: ProjectionR
     ["Accumulation", `SIP + corpus, grown to retirement`, `${(input.accReturn * 100).toFixed(1)}% expected`],
     ["Withdrawal", `${input.withdrawalYears} yrs of expenses + emergency reserve, refilled from Accumulation`, `${(input.withdrawalReturn * 100).toFixed(2)}% expected`],
   ] : [
-    ["Accumulation", `${(input.accEquityPct * 100).toFixed(0)}% equity`, `${(input.accReturn * 100).toFixed(1)}% expected`],
-    ["Preparation", `${(input.prepEquityPct * 100).toFixed(0)}% equity - starts ${input.prepYearsBeforeRetirement} yrs pre-retirement`, `${(input.prepReturn * 100).toFixed(1)}% expected`],
+    ["Accumulation", `Growth bucket - SIP + corpus until retirement`, `${(input.accReturn * 100).toFixed(1)}% expected`],
+    ["Preparation", `Glide-path begins ${input.prepYearsBeforeRetirement} yrs pre-retirement`, `${(input.prepReturn * 100).toFixed(1)}% expected`],
     ["Withdrawal", `${input.withdrawalYears} yrs of expenses parked - debt only`, `${(input.withdrawalReturn * 100).toFixed(2)}% expected`],
   ];
 
