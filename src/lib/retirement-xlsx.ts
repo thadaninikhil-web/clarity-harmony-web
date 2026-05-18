@@ -40,7 +40,6 @@ export function exportRetirementXLSX(
     ["Emergency fund today (₹)", input.emergencyFundToday ?? input.currentMonthlyExpenses * (input.emergencyFundMonths || 0)],
     ["Emergency fund at retirement (₹)", result.emergencyFundAtRetirement],
     ["Strategy", isTwoBucket ? "Two-bucket" : "Three-bucket"],
-    ["Accumulation equity allocation", input.accEquityPct],
     ["Accumulation expected return", input.accReturn],
     ...(isTwoBucket
       ? [
@@ -48,7 +47,6 @@ export function exportRetirementXLSX(
           ["Withdrawal years parked", input.withdrawalYears] as (string | number)[],
         ]
       : [
-          ["Preparation equity allocation", input.prepEquityPct] as (string | number)[],
           ["Preparation expected return", input.prepReturn],
           ["Preparation glide-path years", input.prepYearsBeforeRetirement],
           ["Withdrawal years parked", input.withdrawalYears],
