@@ -369,13 +369,6 @@ const CompareStrategies = () => {
   ];
 
   const strategyRows: Array<[string, string, string, string]> = [
-    [
-      "Accumulation equity %",
-      "100% (single sleeve)",
-      "100% (Accumulation bucket)",
-      pct(threeInputs.accEquityPct),
-    ],
-    ["Preparation equity %", "—", "—", pct(threeInputs.prepEquityPct)],
     ["Preparation expected return", "—", "—", pct(threeInputs.prepReturn)],
     [
       "Years prep starts before retirement",
