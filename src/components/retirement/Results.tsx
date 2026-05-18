@@ -27,6 +27,7 @@ import { exportRetirementPDF } from "@/lib/retirement-pdf";
 import { exportRetirementXLSX } from "@/lib/retirement-xlsx";
 import { MonteCarloPanel } from "@/components/retirement/MonteCarloPanel";
 import { BucketFlowPanel } from "@/components/retirement/BucketFlowPanel";
+import { OutcomeCard } from "@/components/retirement/OutcomeCard";
 
 interface Props {
   result: ProjectionResult;
@@ -160,6 +161,9 @@ export function Results({
           </Button>
         </div>
       </div>
+
+      {/* TIER 1 — Plain-English outcome card */}
+      <OutcomeCard result={result} inputs={inputs} />
 
       {/* MONTE CARLO */}
       <Card className="shadow-[var(--shadow-card)]">
@@ -316,7 +320,14 @@ export function Results({
             </div>
           )}
 
-        <BucketFlowPanel result={result} strategy={strategy} />
+        <details className="rounded-lg border bg-card shadow-[var(--shadow-card)]">
+          <summary className="cursor-pointer select-none px-4 py-3 text-sm font-medium">
+            Advanced: year-by-year bucket flow diagnostics
+          </summary>
+          <div className="px-4 pb-4">
+            <BucketFlowPanel result={result} strategy={strategy} />
+          </div>
+        </details>
 
         {/* YEAR-BY-YEAR */}
         <Card className="shadow-[var(--shadow-card)]">
