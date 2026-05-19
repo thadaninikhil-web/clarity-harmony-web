@@ -6,6 +6,7 @@ interface Props {
 
 export function HowToUse({ strategy = "three-bucket" }: Props) {
   const isTwoBucket = strategy === "two-bucket";
+  const isOneBucket = strategy === "one-bucket";
 
   return (
     <Card className="shadow-[var(--shadow-card)] border-border">
@@ -17,9 +18,11 @@ export function HowToUse({ strategy = "three-bucket" }: Props) {
           <strong>What it does.</strong> It checks whether your savings, monthly
           investment and the way you split your money will be enough to fund
           your retirement — and shows you how that money should be{" "}
-          {isTwoBucket
-            ? "moved between an Accumulation bucket and a Withdrawal bucket"
-            : "split across three pots of money with different risk levels"}.
+          {isOneBucket
+            ? "grown in a single corpus and then drawn down for living expenses"
+            : isTwoBucket
+              ? "moved between an Accumulation bucket and a Withdrawal bucket"
+              : "split across three pots of money with different risk levels"}.
         </p>
         <ol className="list-decimal pl-5 space-y-2">
           <li>
@@ -29,7 +32,14 @@ export function HowToUse({ strategy = "three-bucket" }: Props) {
             to (life expectancy).
           </li>
           <li>
-            {isTwoBucket ? (
+            {isOneBucket ? (
+              <>
+                <strong>Set up the single bucket.</strong> Your current corpus
+                plus every SIP grows in one investment sleeve at the return you
+                set, all the way through retirement. Annual expenses are
+                withdrawn directly from this same bucket each year.
+              </>
+            ) : isTwoBucket ? (
               <>
                 <strong>Set up the two buckets.</strong>{" "}
                 <span className="font-medium">Bucket 1 (Accumulation)</span> holds
@@ -55,7 +65,7 @@ export function HowToUse({ strategy = "three-bucket" }: Props) {
           <li>
             <strong>Add an emergency fund</strong> in months of today's expenses.
             We grow that with inflation and park it inside the{" "}
-            Withdrawal bucket so it's only
+            {isOneBucket ? "single corpus" : "Withdrawal bucket"} so it's only
             touched as a last resort.
           </li>
           <li>

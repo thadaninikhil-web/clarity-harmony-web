@@ -12,6 +12,7 @@ interface Props {
 
 export function Methodology({ strategy = "three-bucket" }: Props) {
   const isTwoBucket = strategy === "two-bucket";
+  const isOneBucket = strategy === "one-bucket";
 
   return (
     <Card className="shadow-[var(--shadow-card)]">
@@ -21,16 +22,26 @@ export function Methodology({ strategy = "three-bucket" }: Props) {
       <CardContent>
         <p className="text-sm text-muted-foreground mb-4">
           A plain-English summary of the rules the calculator uses to grow your
-          money, move it between {isTwoBucket ? "sleeves" : "buckets"}, and
+          money{isOneBucket ? "" : `, move it between ${isTwoBucket ? "the two buckets" : "the three buckets"}`}, and
           decide whether your plan survives.
         </p>
         <Accordion type="multiple" className="w-full">
           <AccordionItem value="m1">
             <AccordionTrigger>
-              1 · {isTwoBucket ? "Two buckets and how they're spent" : "Three buckets and how they're spent"}
+              1 · {isOneBucket
+                ? "The single corpus and how it's spent"
+                : isTwoBucket
+                  ? "Two buckets and how they're spent"
+                  : "Three buckets and how they're spent"}
             </AccordionTrigger>
             <AccordionContent className="text-sm space-y-2">
-              {isTwoBucket ? (
+              {isOneBucket ? (
+                <>
+                  <p><strong>Single corpus</strong> — your current savings plus every SIP grow inside one sleeve at the return you set, both before and after retirement.</p>
+                  <p>During retirement, the inflation-adjusted annual expense is withdrawn directly from this same corpus each year. There are no transfers, no glide path and no separate safe bucket — just one pot.</p>
+                  <p>The emergency fund grows with inflation inside the same corpus and is only used after the main spendable balance is gone.</p>
+                </>
+              ) : isTwoBucket ? (
                 <>
                   <p><strong>Accumulation</strong> — your growth bucket. It holds the current corpus and every SIP you make, and grows through to retirement at the Accumulation return.</p>
                   <p><strong>Withdrawal</strong> — the safer bucket you actually live off in retirement. Seeded at retirement with N years of expenses plus the emergency reserve.</p>
@@ -46,7 +57,7 @@ export function Methodology({ strategy = "three-bucket" }: Props) {
             </AccordionContent>
           </AccordionItem>
 
-          {!isTwoBucket && (
+          {!isTwoBucket && !isOneBucket && (
             <AccordionItem value="m2">
               <AccordionTrigger>2 · Moving money from Accumulation to Preparation</AccordionTrigger>
               <AccordionContent className="text-sm space-y-2">
@@ -88,7 +99,14 @@ export function Methodology({ strategy = "three-bucket" }: Props) {
           <AccordionItem value="m3">
             <AccordionTrigger>3 · Spending order in retirement</AccordionTrigger>
             <AccordionContent className="text-sm space-y-2">
-              {isTwoBucket ? (
+              {isOneBucket ? (
+                <ol className="list-decimal pl-5 space-y-1">
+                  <li>The corpus grows at its return for the year.</li>
+                  <li>The inflation-adjusted annual expense is withdrawn from the spendable balance.</li>
+                  <li>If the spendable balance can't cover it, the emergency reserve is tapped.</li>
+                  <li>If both are exhausted, the year is marked as a shortfall and the run is considered depleted.</li>
+                </ol>
+              ) : isTwoBucket ? (
                 <ol className="list-decimal pl-5 space-y-1">
                   <li>Both buckets grow at their own returns.</li>
                   <li>Spend from Withdrawal (but don't touch the emergency reserve).</li>
@@ -114,14 +132,14 @@ export function Methodology({ strategy = "three-bucket" }: Props) {
             <AccordionContent className="text-sm">
               You enter it as a number of months of <em>today's</em> expenses.
               We grow it with inflation up to retirement, park it inside the{" "}
-              Withdrawal bucket on day-1 of
+              {isOneBucket ? "single corpus" : "Withdrawal bucket"} on day-1 of
               retirement, and only touch it after every other source has run out.
             </AccordionContent>
           </AccordionItem>
 
           <AccordionItem value="m5">
             <AccordionTrigger>
-              5 · Sequence-of-returns risk on Accumulation
+              5 · Sequence-of-returns risk{isOneBucket ? "" : " on Accumulation"}
             </AccordionTrigger>
             <AccordionContent className="text-sm space-y-2">
               <p>
@@ -132,11 +150,14 @@ export function Methodology({ strategy = "three-bucket" }: Props) {
               </p>
               <p>
                 We model it by generating a year-by-year return series for{" "}
-                Accumulation that swings
+                {isOneBucket ? "the single corpus" : "Accumulation"} that swings
                 between your min and max returns but is bias-corrected so the
-                long-run CAGR is exactly what you set. The conservative{" "}
-                {isTwoBucket ? "Withdrawal bucket is" : "Preparation and Withdrawal buckets are"}{" "}
-                insulated by design and grow at their own steady returns.
+                long-run CAGR is exactly what you set.
+                {isOneBucket
+                  ? " Because there is only one bucket, every rupee is exposed to that swing — there is no safe sleeve to insulate spending."
+                  : isTwoBucket
+                    ? " The conservative Withdrawal bucket is insulated by design and grows at its own steady return."
+                    : " The conservative Preparation and Withdrawal buckets are insulated by design and grow at their own steady returns."}
               </p>
             </AccordionContent>
           </AccordionItem>
