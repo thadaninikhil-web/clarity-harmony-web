@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, AlertTriangle, ShieldAlert, Info } from "lucide-react";
 import { formatINR, type MonteCarloResult, type ProjectionResult, type RetirementInputs } from "@/lib/retirement";
+import { GlossaryTooltip } from "@/components/retirement/GlossaryTooltip";
 
 interface Props {
   result: ProjectionResult;
@@ -71,8 +72,13 @@ export function OutcomeCard({ result, inputs, mcOverride }: Props) {
 
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
-            <div className="text-xs uppercase tracking-wide opacity-70">
+            <div className="text-xs uppercase tracking-wide opacity-70 flex items-center gap-1">
               Confidence score
+              <GlossaryTooltip term="Confidence score">
+                The share of simulated futures (Monte Carlo runs) in which your
+                money lasted to your planned age. Higher is better; we treat
+                85%+ as on track.
+              </GlossaryTooltip>
             </div>
             <div className="font-display text-3xl font-semibold tabular-nums">
               {Math.round(confidence * 100)}%
@@ -83,8 +89,13 @@ export function OutcomeCard({ result, inputs, mcOverride }: Props) {
           </div>
 
           <div>
-            <div className="text-xs uppercase tracking-wide opacity-70">
+            <div className="text-xs uppercase tracking-wide opacity-70 flex items-center gap-1">
               Shortfall age (poor outcome)
+              <GlossaryTooltip term="Shortfall age (P10)">
+                In the worst 10% of simulated futures, this is the age at
+                which the corpus typically runs out. A useful stress-test
+                number, not a forecast.
+              </GlossaryTooltip>
             </div>
             <div className="font-display text-3xl font-semibold tabular-nums">
               {shortfallAge ?? "Never"}
@@ -95,8 +106,13 @@ export function OutcomeCard({ result, inputs, mcOverride }: Props) {
           </div>
 
           <div>
-            <div className="text-xs uppercase tracking-wide opacity-70">
+            <div className="text-xs uppercase tracking-wide opacity-70 flex items-center gap-1">
               Likely corpus at retirement
+              <GlossaryTooltip term="Corpus at retirement">
+                The total portfolio value on the day you retire, from one
+                representative simulation. Real outcomes will spread above
+                and below this number — see the percentile bands below.
+              </GlossaryTooltip>
             </div>
             <div className="font-display text-3xl font-semibold tabular-nums">
               {formatINR(result.corpusAtRetirement)}
