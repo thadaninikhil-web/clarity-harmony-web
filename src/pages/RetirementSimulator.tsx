@@ -63,7 +63,7 @@ const RetirementSimulator = () => {
     [values, validation.ok],
   );
   const skipNextWriteRef = useRef(false);
-  const [completed, setCompleted] = useState(false);
+  const [completed, setCompleted] = useState(hasPrefilled);
   const resultsRef = useRef<HTMLDivElement>(null);
 
   const reshuffleSequence = useCallback(() => {

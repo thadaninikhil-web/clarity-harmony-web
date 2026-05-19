@@ -20,6 +20,7 @@ import {
   buildYearBullets,
   formatINR,
   formatINRExact,
+  type MonteCarloResult,
   type ProjectionResult,
   type RetirementInputs,
 } from "@/lib/retirement";
@@ -56,6 +57,7 @@ export function Results({
   onSelectRun,
 }: Props) {
   const [showDetails, setShowDetails] = useState(false);
+  const [liveMc, setLiveMc] = useState<MonteCarloResult | undefined>(result.monteCarlo);
   const isTwoBucket = strategy === "two-bucket";
   const isOneBucket = strategy === "one-bucket";
   const hasPrep = strategy === "three-bucket";
@@ -163,7 +165,7 @@ export function Results({
       </div>
 
       {/* TIER 1 — Plain-English outcome card */}
-      <OutcomeCard result={result} inputs={inputs} />
+      <OutcomeCard result={result} inputs={inputs} mcOverride={liveMc} />
 
       {/* MONTE CARLO */}
       <Card className="shadow-[var(--shadow-card)]">
@@ -184,6 +186,7 @@ export function Results({
             onSipSolved={onSipSolved}
             onMonteCarloRunsChange={onMonteCarloRunsChange}
             onSelectRun={onSelectRun}
+            onMcResult={setLiveMc}
           />
         </CardContent>
       </Card>
