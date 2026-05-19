@@ -97,7 +97,7 @@ export function AssumptionAuditPanel({ inputs, strategy }: Props) {
   if (!visible) return null;
   const rows = buildRows(strategy);
   const valueOf = (key: string): string => {
-    const v = (inputs as Record<string, unknown>)[key];
+    const v = (inputs as unknown as Record<string, unknown>)[key];
     if (v === undefined || v === null || v === "") return "—";
     if (typeof v === "number") return Number.isInteger(v) ? String(v) : v.toFixed(4);
     return String(v);
