@@ -27,9 +27,12 @@ interface Props {
   onSipSolved?: (monthlySip: number) => void;
   onMonteCarloRunsChange?: (runs: number) => void;
   onSelectRun?: (seed: number) => void;
+  /** Fires whenever the MC pass finishes so parents (e.g. OutcomeCard) can
+   *  display the same confidence/percentile numbers as this panel. */
+  onMcResult?: (mc: MonteCarloResult | undefined) => void;
 }
 
-export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSolved, onMonteCarloRunsChange, onSelectRun }: Props) {
+export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSolved, onMonteCarloRunsChange, onSelectRun, onMcResult }: Props) {
 
   const [mc, setMc] = useState<MonteCarloResult | undefined>(result.monteCarlo);
   const [progress, setProgress] = useState({ done: 0, total: 0, running: false });
@@ -68,6 +71,7 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
       .then((r) => {
         if (!ctrl.signal.aborted) {
           setMc(r);
+          onMcResult?.(r);
           setProgress((p) => ({ ...p, running: false }));
         }
       })

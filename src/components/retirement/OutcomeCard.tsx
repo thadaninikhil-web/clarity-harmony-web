@@ -1,11 +1,14 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle2, AlertTriangle, ShieldAlert, Info } from "lucide-react";
-import { formatINR, type ProjectionResult, type RetirementInputs } from "@/lib/retirement";
+import { formatINR, type MonteCarloResult, type ProjectionResult, type RetirementInputs } from "@/lib/retirement";
 
 interface Props {
   result: ProjectionResult;
   inputs: RetirementInputs;
+  /** Override the MC numbers with the live aggregate from MonteCarloPanel,
+   *  so the headline matches the panel below it exactly. */
+  mcOverride?: MonteCarloResult;
 }
 
 function statusFor(confidence: number) {
@@ -39,8 +42,8 @@ const toneClasses: Record<"ok" | "warn" | "bad", string> = {
   bad: "border-rose-600/40 bg-rose-50 text-rose-900 dark:bg-rose-950/30 dark:text-rose-200",
 };
 
-export function OutcomeCard({ result, inputs }: Props) {
-  const mc = result.monteCarlo;
+export function OutcomeCard({ result, inputs, mcOverride }: Props) {
+  const mc = mcOverride ?? result.monteCarlo;
   const planAge =
     inputs.lifeExpectancyAge ?? inputs.retirementAge + inputs.lifeExpectancyYears;
   const confidence = mc?.successProbability ?? (result.depleted ? 0 : 1);
