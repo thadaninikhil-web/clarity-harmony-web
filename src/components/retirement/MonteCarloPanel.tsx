@@ -213,18 +213,16 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
         )}
       </div>
 
-      {/* Percentile bands — now showing P10/P25/P50/P75/P90 */}
+      {/* Final-corpus bands — plain-English labels (Worst 10% / Median / Best 10%) */}
       {mc && !progress.running && (
-        <div className="grid gap-3 sm:grid-cols-5">
+        <div className="grid gap-3 sm:grid-cols-3">
           {[
-            { label: "P10", v: mc.p10FinalCorpus, hint: "10% ended below" },
-            { label: "P25", v: mc.p25FinalCorpus, hint: "Lower quartile" },
-            { label: "P50", v: mc.p50FinalCorpus, hint: "Median" },
-            { label: "P75", v: mc.p75FinalCorpus, hint: "Upper quartile" },
-            { label: "P90", v: mc.p90FinalCorpus, hint: "10% ended above" },
+            { label: "Worst 10% expected corpus", v: mc.p10FinalCorpus, hint: "Only 10% of futures ended below this" },
+            { label: "Median expected corpus", v: mc.p50FinalCorpus, hint: "Half of futures landed above, half below" },
+            { label: "Best 10% expected corpus", v: mc.p90FinalCorpus, hint: "Only 10% of futures ended above this" },
           ].map(({ label, v, hint }) => (
             <div key={label} className="rounded-md border border-border bg-muted/30 p-3">
-              <div className="label-caps">{label} final corpus</div>
+              <div className="label-caps">{label}</div>
               <div className="text-base font-semibold">{formatINR(v)}</div>
               <div className="text-xs text-muted-foreground">{hint}</div>
             </div>
@@ -245,13 +243,11 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
               </p>
             </div>
           </div>
-          <div className="grid gap-2 grid-cols-5">
+          <div className="grid gap-2 grid-cols-3">
             {[
-              { label: "P10", v: mc.depletionAgeP10, hint: "10% earlier than" },
-              { label: "P25", v: mc.depletionAgeP25, hint: "Lower quartile" },
-              { label: "P50", v: mc.depletionAgeP50, hint: "Median" },
-              { label: "P75", v: mc.depletionAgeP75, hint: "Upper quartile" },
-              { label: "P90", v: mc.depletionAgeP90, hint: "10% later than" },
+              { label: "Worst 10% depletion age", v: mc.depletionAgeP10, hint: "Earliest 10% of failures" },
+              { label: "Median depletion age", v: mc.depletionAgeP50, hint: "Typical failure age" },
+              { label: "Best 10% depletion age", v: mc.depletionAgeP90, hint: "Latest 10% of failures" },
             ].map(({ label, v, hint }) => (
               <div key={label} className="rounded-md bg-card border border-border p-2 text-center">
                 <div className="label-caps">{label}</div>
@@ -268,11 +264,11 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
                 run we record the age at depletion, then sort that list ascending.
               </p>
               <p>
-                <span className="font-mono">Pₓ</span> is the value at the{" "}
-                <span className="font-mono">x</span>th-percentile position
-                (linear interpolation between neighbours). So <span className="font-mono">P10</span>{" "}
-                means 10% of failed runs depleted at or before that age — the earliest failures —
-                while <span className="font-mono">P90</span> is the latest. <span className="font-mono">P50</span> is the median failure age.
+                <span className="font-medium">Worst 10%</span> means the earliest 10% of failed
+                runs — i.e. the unlucky scenarios where the corpus depleted soonest.
+                <span className="font-medium"> Best 10%</span> is the latest 10% of failed runs
+                (corpus lasted longest before depleting). <span className="font-medium">Median</span>{" "}
+                is the typical failure age.
               </p>
             </div>
           </details>
@@ -300,12 +296,12 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
         <div className="rounded-md border border-border bg-card p-3 space-y-2">
           <div className="flex items-center justify-between gap-3">
             <Label className="text-xs">
-              Monte Carlo runs:{" "}
+              Simulated futures:{" "}
               <span className="font-semibold text-foreground">
                 {inputs.monteCarloRuns.toLocaleString("en-IN")}
               </span>
             </Label>
-            <span className="text-[11px] text-muted-foreground">More runs → smoother estimate, slower.</span>
+            <span className="text-[11px] text-muted-foreground">More futures → smoother estimate, slower.</span>
           </div>
           <Slider
             value={[inputs.monteCarloRuns]}
@@ -313,17 +309,24 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
             max={10000}
             step={500}
             onValueChange={(v) => onMonteCarloRunsChange(v[0])}
-            aria-label="Number of Monte Carlo runs"
+            aria-label="Number of simulated futures"
           />
+          <p className="text-[11px] text-muted-foreground">
+            A <em>Monte Carlo</em> simulation is used to play out{" "}
+            <span className="font-medium text-foreground">
+              {inputs.monteCarloRuns.toLocaleString("en-IN")}
+            </span>{" "}
+            independent &quot;what-if&quot; futures with random market returns.
+          </p>
         </div>
       )}
 
-      {/* Per-run details — first 50 paths, click to load that path into the chart */}
+      {/* Per-run details — first 50 paths, collapsed by default (advanced users) */}
       {mc?.perRun && mc.perRun.length > 0 && !progress.running && (
-        <div className="rounded-md border border-border bg-card">
-          <div className="flex items-center justify-between gap-2 border-b p-3">
+        <details className="rounded-md border border-border bg-card">
+          <summary className="flex cursor-pointer items-center justify-between gap-2 border-b p-3 select-none">
             <div>
-              <div className="font-medium text-sm">Per-run details</div>
+              <div className="font-medium text-sm">Advanced: per-run details</div>
               <p className="text-[11px] text-muted-foreground">
                 Showing first {mc.perRun.length} of {mc.runs.toLocaleString("en-IN")} runs.
                 Click a row to load that path into the chart and table above.
@@ -333,7 +336,7 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
               Target CAGR{" "}
               <span className="font-mono text-foreground">{(inputs.sequenceCagr * 100).toFixed(2)}%</span>
             </div>
-          </div>
+          </summary>
           <div className="max-h-72 overflow-auto">
             <table className="w-full text-xs" aria-label="Monte Carlo per-run details">
               <caption className="sr-only">
@@ -415,7 +418,7 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
               </tbody>
             </table>
           </div>
-        </div>
+        </details>
       )}
 
       {/* Solver: target probability → required monthly SIP */}
@@ -470,12 +473,13 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
       {/* Explainer */}
       <details className="rounded-md border border-border bg-card p-3 text-sm">
         <summary className="cursor-pointer font-medium">
-          How is success probability computed?
+          How is the confidence number computed? (Monte Carlo)
         </summary>
         <div className="mt-3 space-y-2 text-muted-foreground leading-relaxed">
           <p>
             We run <span className="font-medium text-foreground">N independent scenarios</span>{" "}
-            (currently {inputs.monteCarloRuns.toLocaleString("en-IN")}). In each scenario we
+            (currently {inputs.monteCarloRuns.toLocaleString("en-IN")}) using a{" "}
+            <span className="font-medium text-foreground">Monte Carlo simulation</span>. In each scenario we
             generate a fresh sequence of annual{" "}
             {strategy === "two-bucket" ? "equity-sleeve" : "Accumulation-bucket"} returns
             around your CAGR ({(inputs.sequenceCagr * 100).toFixed(1)}%) with volatility set
@@ -504,10 +508,11 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
             </li>
           </ul>
           <p>
-            Confidence = successes ÷ N. P10 / P25 / P50 / P75 / P90 describe the spread of{" "}
+            Confidence = successes ÷ N. The Worst 10% / Median / Best 10%
+            numbers describe the spread of{" "}
             <span className="font-medium text-foreground">final corpus values</span> across
             all runs (including the ones that hit zero, which contribute 0). A wide gap
-            between P10 and P90 means your plan is highly path-dependent.
+            between Worst 10% and Best 10% means your plan is highly path-dependent.
           </p>
         </div>
       </details>

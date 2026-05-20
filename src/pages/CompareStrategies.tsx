@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StrategySwitcher } from "@/components/retirement/StrategySwitcher";
@@ -33,6 +33,7 @@ import {
   subscribeShared,
   writeShared,
 } from "@/lib/sharedInputs";
+import { StrategyDifferenceNote } from "@/components/retirement/StrategyDifferenceNote";
 
 const defaultRetireAge = 60;
 const defaultMonthlyExpenses = 80000;
@@ -439,6 +440,7 @@ const CompareStrategies = () => {
 
       <main className="container mx-auto px-6 lg:px-8 py-10 space-y-6">
         <div className="-mx-6 lg:-mx-8 mb-2"><BetaBanner /></div>
+        <StrategyDifferenceNote />
         <Card className="shadow-[var(--shadow-card)]">
           <CardHeader>
             <CardTitle className="font-serif text-2xl">Base assumptions (shared)</CardTitle>
@@ -751,31 +753,19 @@ const CompareStrategies = () => {
                     ],
                     ["Median depletion age (failed runs)", medianOrDash(oneMC), medianOrDash(twoMC), medianOrDash(threeMC)],
                     [
-                      "Poor outcome — final corpus (P10)",
+                      "Worst 10% expected corpus",
                       oneMC ? formatINR(oneMC.p10FinalCorpus) : "—",
                       twoMC ? formatINR(twoMC.p10FinalCorpus) : "—",
                       threeMC ? formatINR(threeMC.p10FinalCorpus) : "—",
                     ],
                     [
-                      "P25 final corpus",
-                      oneMC ? formatINR(oneMC.p25FinalCorpus) : "—",
-                      twoMC ? formatINR(twoMC.p25FinalCorpus) : "—",
-                      threeMC ? formatINR(threeMC.p25FinalCorpus) : "—",
-                    ],
-                    [
-                      "Middle outcome — final corpus (P50, median)",
+                      "Median expected corpus",
                       oneMC ? formatINR(oneMC.p50FinalCorpus) : "—",
                       twoMC ? formatINR(twoMC.p50FinalCorpus) : "—",
                       threeMC ? formatINR(threeMC.p50FinalCorpus) : "—",
                     ],
                     [
-                      "P75 final corpus",
-                      oneMC ? formatINR(oneMC.p75FinalCorpus) : "—",
-                      twoMC ? formatINR(twoMC.p75FinalCorpus) : "—",
-                      threeMC ? formatINR(threeMC.p75FinalCorpus) : "—",
-                    ],
-                    [
-                      "Strong outcome — final corpus (P90)",
+                      "Best 10% expected corpus",
                       oneMC ? formatINR(oneMC.p90FinalCorpus) : "—",
                       twoMC ? formatINR(twoMC.p90FinalCorpus) : "—",
                       threeMC ? formatINR(threeMC.p90FinalCorpus) : "—",
@@ -804,6 +794,12 @@ const CompareStrategies = () => {
             <AssumptionTable title="Sequence-of-returns / Monte Carlo settings" rows={sequenceRows} />
           </CardContent>
         </Card>
+
+        <SameSequenceComparison
+          oneInputs={oneInputs}
+          twoInputs={twoInputs}
+          threeInputs={threeInputs}
+        />
 
         <Card className="shadow-[var(--shadow-card)]">
           <CardHeader>
@@ -871,3 +867,99 @@ function AssumptionTable({
 }
 
 export default CompareStrategies;
+
+function SameSequenceComparison({
+  oneInputs,
+  twoInputs,
+  threeInputs,
+}: {
+  oneInputs: RetirementInputs;
+  twoInputs: RetirementInputs;
+  threeInputs: RetirementInputs;
+}) {
+  // Force a deterministic single-path projection by disabling MC mode but
+  // keeping the sequence-of-returns generator with the shared seed.
+  // The runners internally force sequence MC mode and the sequence
+  // generator is deterministic for a given seed, so passing the same seed
+  // through all three strategies gives identical year-by-year returns.
+  const detInputs = (src: RetirementInputs): RetirementInputs => ({
+    ...src,
+    sequenceSeed: threeInputs.sequenceSeed,
+  });
+  const one = useMemo(() => projectOneBucket(detInputs(oneInputs)), [oneInputs, threeInputs.sequenceSeed]);
+  const two = useMemo(() => projectTwoBucket(detInputs(twoInputs)), [twoInputs, threeInputs.sequenceSeed]);
+  const three = useMemo(() => project(detInputs(threeInputs)), [threeInputs]);
+
+  // Align rows by year
+  const ages = useMemo(() => {
+    const set = new Set<number>();
+    [one.rows, two.rows, three.rows].forEach((rs) => rs.forEach((r) => set.add(r.age)));
+    return Array.from(set).sort((a, b) => a - b);
+  }, [one.rows, two.rows, three.rows]);
+
+  const byAge = (rs: typeof one.rows) => {
+    const m = new Map<number, (typeof rs)[number]>();
+    rs.forEach((r) => m.set(r.age, r));
+    return m;
+  };
+  const oneM = byAge(one.rows);
+  const twoM = byAge(two.rows);
+  const threeM = byAge(three.rows);
+
+  return (
+    <Card className="shadow-[var(--shadow-card)]">
+      <CardHeader>
+        <CardTitle className="font-serif text-2xl">
+          Advanced: same-sequence year-by-year comparison
+        </CardTitle>
+        <p className="text-sm text-muted-foreground">
+          All three strategies are run against the{" "}
+          <span className="font-medium text-foreground">exact same sequence of market returns</span>{" "}
+          (seed{" "}
+          <span className="font-mono">{threeInputs.sequenceSeed}</span>) so you
+          can compare how each one handles identical conditions. Expand to view.
+        </p>
+      </CardHeader>
+      <CardContent>
+        <details>
+          <summary className="cursor-pointer select-none text-sm font-medium mb-3">
+            Show year-by-year table
+          </summary>
+          <div className="rounded-md border overflow-auto max-h-[560px]">
+            <table className="w-full text-xs caption-bottom border-collapse">
+              <thead className="sticky top-0 bg-card border-b">
+                <tr className="text-left">
+                  <th className="px-3 py-2 font-medium text-muted-foreground">Age</th>
+                  <th className="px-3 py-2 font-medium text-muted-foreground text-right">One-bucket total</th>
+                  <th className="px-3 py-2 font-medium text-muted-foreground text-right">Two-bucket total</th>
+                  <th className="px-3 py-2 font-medium text-muted-foreground text-right">Three-bucket total</th>
+                  <th className="px-3 py-2 font-medium text-muted-foreground text-right">Annual expense</th>
+                  <th className="px-3 py-2 font-medium text-muted-foreground text-right">Return applied</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ages.map((age) => {
+                  const o = oneM.get(age);
+                  const t = twoM.get(age);
+                  const th = threeM.get(age);
+                  const ret = th?.accReturnApplied ?? t?.accReturnApplied ?? o?.accReturnApplied ?? 0;
+                  const exp = th?.expense ?? t?.expense ?? o?.expense ?? 0;
+                  return (
+                    <tr key={age} className="border-b hover:bg-muted/40">
+                      <td className="px-3 py-1.5 tabular-nums">{age}</td>
+                      <td className="px-3 py-1.5 text-right tabular-nums">{o ? formatINR(o.total) : "—"}</td>
+                      <td className="px-3 py-1.5 text-right tabular-nums">{t ? formatINR(t.total) : "—"}</td>
+                      <td className="px-3 py-1.5 text-right tabular-nums">{th ? formatINR(th.total) : "—"}</td>
+                      <td className="px-3 py-1.5 text-right tabular-nums text-muted-foreground">{exp ? formatINR(exp) : "—"}</td>
+                      <td className="px-3 py-1.5 text-right tabular-nums font-mono text-muted-foreground">{(ret * 100).toFixed(2)}%</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </CardContent>
+    </Card>
+  );
+}
