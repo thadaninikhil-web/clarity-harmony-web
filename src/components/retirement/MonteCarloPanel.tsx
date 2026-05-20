@@ -296,12 +296,12 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
         <div className="rounded-md border border-border bg-card p-3 space-y-2">
           <div className="flex items-center justify-between gap-3">
             <Label className="text-xs">
-              Monte Carlo runs:{" "}
+              Simulated futures:{" "}
               <span className="font-semibold text-foreground">
                 {inputs.monteCarloRuns.toLocaleString("en-IN")}
               </span>
             </Label>
-            <span className="text-[11px] text-muted-foreground">More runs → smoother estimate, slower.</span>
+            <span className="text-[11px] text-muted-foreground">More futures → smoother estimate, slower.</span>
           </div>
           <Slider
             value={[inputs.monteCarloRuns]}
@@ -309,17 +309,24 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
             max={10000}
             step={500}
             onValueChange={(v) => onMonteCarloRunsChange(v[0])}
-            aria-label="Number of Monte Carlo runs"
+            aria-label="Number of simulated futures"
           />
+          <p className="text-[11px] text-muted-foreground">
+            A <em>Monte Carlo</em> simulation is used to play out{" "}
+            <span className="font-medium text-foreground">
+              {inputs.monteCarloRuns.toLocaleString("en-IN")}
+            </span>{" "}
+            independent &quot;what-if&quot; futures with random market returns.
+          </p>
         </div>
       )}
 
-      {/* Per-run details — first 50 paths, click to load that path into the chart */}
+      {/* Per-run details — first 50 paths, collapsed by default (advanced users) */}
       {mc?.perRun && mc.perRun.length > 0 && !progress.running && (
-        <div className="rounded-md border border-border bg-card">
-          <div className="flex items-center justify-between gap-2 border-b p-3">
+        <details className="rounded-md border border-border bg-card">
+          <summary className="flex cursor-pointer items-center justify-between gap-2 border-b p-3 select-none">
             <div>
-              <div className="font-medium text-sm">Per-run details</div>
+              <div className="font-medium text-sm">Advanced: per-run details</div>
               <p className="text-[11px] text-muted-foreground">
                 Showing first {mc.perRun.length} of {mc.runs.toLocaleString("en-IN")} runs.
                 Click a row to load that path into the chart and table above.
@@ -329,7 +336,7 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
               Target CAGR{" "}
               <span className="font-mono text-foreground">{(inputs.sequenceCagr * 100).toFixed(2)}%</span>
             </div>
-          </div>
+          </summary>
           <div className="max-h-72 overflow-auto">
             <table className="w-full text-xs" aria-label="Monte Carlo per-run details">
               <caption className="sr-only">
