@@ -20,7 +20,6 @@ import {
   buildYearBullets,
   formatINR,
   formatINRExact,
-  type MonteCarloResult,
   type ProjectionResult,
   type RetirementInputs,
 } from "@/lib/retirement";
