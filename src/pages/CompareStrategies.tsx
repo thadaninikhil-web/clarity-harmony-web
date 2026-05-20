@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StrategySwitcher } from "@/components/retirement/StrategySwitcher";
@@ -794,6 +794,12 @@ const CompareStrategies = () => {
             <AssumptionTable title="Sequence-of-returns / Monte Carlo settings" rows={sequenceRows} />
           </CardContent>
         </Card>
+
+        <SameSequenceComparison
+          oneInputs={oneInputs}
+          twoInputs={twoInputs}
+          threeInputs={threeInputs}
+        />
 
         <Card className="shadow-[var(--shadow-card)]">
           <CardHeader>
