@@ -20,7 +20,6 @@ import {
   buildYearBullets,
   formatINR,
   formatINRExact,
-  type MonteCarloResult,
   type ProjectionResult,
   type RetirementInputs,
 } from "@/lib/retirement";
@@ -28,7 +27,6 @@ import { exportRetirementPDF } from "@/lib/retirement-pdf";
 import { exportRetirementXLSX } from "@/lib/retirement-xlsx";
 import { MonteCarloPanel } from "@/components/retirement/MonteCarloPanel";
 import { BucketFlowPanel } from "@/components/retirement/BucketFlowPanel";
-import { OutcomeCard } from "@/components/retirement/OutcomeCard";
 import { AssumptionAuditPanel } from "@/components/retirement/AssumptionAuditPanel";
 
 interface Props {
@@ -58,7 +56,6 @@ export function Results({
   onSelectRun,
 }: Props) {
   const [showDetails, setShowDetails] = useState(false);
-  const [liveMc, setLiveMc] = useState<MonteCarloResult | undefined>(result.monteCarlo);
   const isTwoBucket = strategy === "two-bucket";
   const isOneBucket = strategy === "one-bucket";
   const hasPrep = strategy === "three-bucket";
@@ -165,9 +162,6 @@ export function Results({
         </div>
       </div>
 
-      {/* TIER 1 — Plain-English outcome card */}
-      <OutcomeCard result={result} inputs={inputs} mcOverride={liveMc} />
-
       <AssumptionAuditPanel inputs={inputs} strategy={strategy} />
 
       {/* MONTE CARLO */}
@@ -189,7 +183,6 @@ export function Results({
             onSipSolved={onSipSolved}
             onMonteCarloRunsChange={onMonteCarloRunsChange}
             onSelectRun={onSelectRun}
-            onMcResult={setLiveMc}
           />
         </CardContent>
       </Card>
