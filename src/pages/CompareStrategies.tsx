@@ -751,7 +751,7 @@ const CompareStrategies = () => {
                     ],
                     ["Median depletion age (failed runs)", medianOrDash(oneMC), medianOrDash(twoMC), medianOrDash(threeMC)],
                     [
-                      "P10 final corpus",
+                      "Poor outcome — final corpus (P10)",
                       oneMC ? formatINR(oneMC.p10FinalCorpus) : "—",
                       twoMC ? formatINR(twoMC.p10FinalCorpus) : "—",
                       threeMC ? formatINR(threeMC.p10FinalCorpus) : "—",
@@ -763,7 +763,7 @@ const CompareStrategies = () => {
                       threeMC ? formatINR(threeMC.p25FinalCorpus) : "—",
                     ],
                     [
-                      "P50 final corpus (median)",
+                      "Middle outcome — final corpus (P50, median)",
                       oneMC ? formatINR(oneMC.p50FinalCorpus) : "—",
                       twoMC ? formatINR(twoMC.p50FinalCorpus) : "—",
                       threeMC ? formatINR(threeMC.p50FinalCorpus) : "—",
@@ -775,7 +775,7 @@ const CompareStrategies = () => {
                       threeMC ? formatINR(threeMC.p75FinalCorpus) : "—",
                     ],
                     [
-                      "P90 final corpus",
+                      "Strong outcome — final corpus (P90)",
                       oneMC ? formatINR(oneMC.p90FinalCorpus) : "—",
                       twoMC ? formatINR(twoMC.p90FinalCorpus) : "—",
                       threeMC ? formatINR(threeMC.p90FinalCorpus) : "—",
