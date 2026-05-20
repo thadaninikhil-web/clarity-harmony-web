@@ -473,12 +473,13 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
       {/* Explainer */}
       <details className="rounded-md border border-border bg-card p-3 text-sm">
         <summary className="cursor-pointer font-medium">
-          How is success probability computed?
+          How is the confidence number computed? (Monte Carlo)
         </summary>
         <div className="mt-3 space-y-2 text-muted-foreground leading-relaxed">
           <p>
             We run <span className="font-medium text-foreground">N independent scenarios</span>{" "}
-            (currently {inputs.monteCarloRuns.toLocaleString("en-IN")}). In each scenario we
+            (currently {inputs.monteCarloRuns.toLocaleString("en-IN")}) using a{" "}
+            <span className="font-medium text-foreground">Monte Carlo simulation</span>. In each scenario we
             generate a fresh sequence of annual{" "}
             {strategy === "two-bucket" ? "equity-sleeve" : "Accumulation-bucket"} returns
             around your CAGR ({(inputs.sequenceCagr * 100).toFixed(1)}%) with volatility set
@@ -507,10 +508,11 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
             </li>
           </ul>
           <p>
-            Confidence = successes ÷ N. P10 / P25 / P50 / P75 / P90 describe the spread of{" "}
+            Confidence = successes ÷ N. The Worst 10% / Median / Best 10%
+            numbers describe the spread of{" "}
             <span className="font-medium text-foreground">final corpus values</span> across
             all runs (including the ones that hit zero, which contribute 0). A wide gap
-            between P10 and P90 means your plan is highly path-dependent.
+            between Worst 10% and Best 10% means your plan is highly path-dependent.
           </p>
         </div>
       </details>
