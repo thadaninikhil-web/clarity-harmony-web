@@ -57,7 +57,6 @@ export function Results({
   onSelectRun,
 }: Props) {
   const [showDetails, setShowDetails] = useState(false);
-  const [liveMc, setLiveMc] = useState<MonteCarloResult | undefined>(result.monteCarlo);
   const isTwoBucket = strategy === "two-bucket";
   const isOneBucket = strategy === "one-bucket";
   const hasPrep = strategy === "three-bucket";
@@ -185,7 +184,6 @@ export function Results({
             onSipSolved={onSipSolved}
             onMonteCarloRunsChange={onMonteCarloRunsChange}
             onSelectRun={onSelectRun}
-            onMcResult={setLiveMc}
           />
         </CardContent>
       </Card>
