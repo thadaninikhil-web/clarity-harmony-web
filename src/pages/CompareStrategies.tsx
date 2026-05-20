@@ -879,11 +879,11 @@ function SameSequenceComparison({
 }) {
   // Force a deterministic single-path projection by disabling MC mode but
   // keeping the sequence-of-returns generator with the shared seed.
+  // The runners internally force sequence MC mode and the sequence
+  // generator is deterministic for a given seed, so passing the same seed
+  // through all three strategies gives identical year-by-year returns.
   const detInputs = (src: RetirementInputs): RetirementInputs => ({
     ...src,
-    stressEnabled: true,
-    stressMode: "sequence",
-    sequenceMode: "controlled",
     sequenceSeed: threeInputs.sequenceSeed,
   });
   const one = useMemo(() => projectOneBucket(detInputs(oneInputs)), [oneInputs, threeInputs.sequenceSeed]);
