@@ -867,3 +867,99 @@ function AssumptionTable({
 }
 
 export default CompareStrategies;
+
+function SameSequenceComparison({
+  oneInputs,
+  twoInputs,
+  threeInputs,
+}: {
+  oneInputs: RetirementInputs;
+  twoInputs: RetirementInputs;
+  threeInputs: RetirementInputs;
+}) {
+  // Force a deterministic single-path projection by disabling MC mode but
+  // keeping the sequence-of-returns generator with the shared seed.
+  const detInputs = (src: RetirementInputs): RetirementInputs => ({
+    ...src,
+    stressEnabled: true,
+    stressMode: "sequence",
+    sequenceMode: "fixed",
+    sequenceSeed: threeInputs.sequenceSeed,
+  });
+  const one = useMemo(() => projectOneBucket(detInputs(oneInputs)), [oneInputs, threeInputs.sequenceSeed]);
+  const two = useMemo(() => projectTwoBucket(detInputs(twoInputs)), [twoInputs, threeInputs.sequenceSeed]);
+  const three = useMemo(() => project(detInputs(threeInputs)), [threeInputs]);
+
+  // Align rows by year
+  const ages = useMemo(() => {
+    const set = new Set<number>();
+    [one.rows, two.rows, three.rows].forEach((rs) => rs.forEach((r) => set.add(r.age)));
+    return Array.from(set).sort((a, b) => a - b);
+  }, [one.rows, two.rows, three.rows]);
+
+  const byAge = (rs: typeof one.rows) => {
+    const m = new Map<number, (typeof rs)[number]>();
+    rs.forEach((r) => m.set(r.age, r));
+    return m;
+  };
+  const oneM = byAge(one.rows);
+  const twoM = byAge(two.rows);
+  const threeM = byAge(three.rows);
+
+  return (
+    <Card className="shadow-[var(--shadow-card)]">
+      <CardHeader>
+        <CardTitle className="font-serif text-2xl">
+          Advanced: same-sequence year-by-year comparison
+        </CardTitle>
+        <p className="text-sm text-muted-foreground">
+          All three strategies are run against the{" "}
+          <span className="font-medium text-foreground">exact same sequence of market returns</span>{" "}
+          (seed{" "}
+          <span className="font-mono">{threeInputs.sequenceSeed}</span>) so you
+          can compare how each one handles identical conditions. Expand to view.
+        </p>
+      </CardHeader>
+      <CardContent>
+        <details>
+          <summary className="cursor-pointer select-none text-sm font-medium mb-3">
+            Show year-by-year table
+          </summary>
+          <div className="rounded-md border overflow-auto max-h-[560px]">
+            <table className="w-full text-xs caption-bottom border-collapse">
+              <thead className="sticky top-0 bg-card border-b">
+                <tr className="text-left">
+                  <th className="px-3 py-2 font-medium text-muted-foreground">Age</th>
+                  <th className="px-3 py-2 font-medium text-muted-foreground text-right">One-bucket total</th>
+                  <th className="px-3 py-2 font-medium text-muted-foreground text-right">Two-bucket total</th>
+                  <th className="px-3 py-2 font-medium text-muted-foreground text-right">Three-bucket total</th>
+                  <th className="px-3 py-2 font-medium text-muted-foreground text-right">Annual expense</th>
+                  <th className="px-3 py-2 font-medium text-muted-foreground text-right">Return applied</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ages.map((age) => {
+                  const o = oneM.get(age);
+                  const t = twoM.get(age);
+                  const th = threeM.get(age);
+                  const ret = th?.accReturnApplied ?? t?.accReturnApplied ?? o?.accReturnApplied ?? 0;
+                  const exp = th?.expense ?? t?.expense ?? o?.expense ?? 0;
+                  return (
+                    <tr key={age} className="border-b hover:bg-muted/40">
+                      <td className="px-3 py-1.5 tabular-nums">{age}</td>
+                      <td className="px-3 py-1.5 text-right tabular-nums">{o ? formatINR(o.total) : "—"}</td>
+                      <td className="px-3 py-1.5 text-right tabular-nums">{t ? formatINR(t.total) : "—"}</td>
+                      <td className="px-3 py-1.5 text-right tabular-nums">{th ? formatINR(th.total) : "—"}</td>
+                      <td className="px-3 py-1.5 text-right tabular-nums text-muted-foreground">{exp ? formatINR(exp) : "—"}</td>
+                      <td className="px-3 py-1.5 text-right tabular-nums font-mono text-muted-foreground">{(ret * 100).toFixed(2)}%</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </CardContent>
+    </Card>
+  );
+}
