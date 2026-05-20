@@ -28,7 +28,6 @@ import { exportRetirementPDF } from "@/lib/retirement-pdf";
 import { exportRetirementXLSX } from "@/lib/retirement-xlsx";
 import { MonteCarloPanel } from "@/components/retirement/MonteCarloPanel";
 import { BucketFlowPanel } from "@/components/retirement/BucketFlowPanel";
-import { OutcomeCard } from "@/components/retirement/OutcomeCard";
 import { AssumptionAuditPanel } from "@/components/retirement/AssumptionAuditPanel";
 
 interface Props {
@@ -164,9 +163,6 @@ export function Results({
           </Button>
         </div>
       </div>
-
-      {/* TIER 1 — Plain-English outcome card */}
-      <OutcomeCard result={result} inputs={inputs} mcOverride={liveMc} />
 
       <AssumptionAuditPanel inputs={inputs} strategy={strategy} />
 
