@@ -883,7 +883,7 @@ function SameSequenceComparison({
     ...src,
     stressEnabled: true,
     stressMode: "sequence",
-    sequenceMode: "fixed",
+    sequenceMode: "controlled",
     sequenceSeed: threeInputs.sequenceSeed,
   });
   const one = useMemo(() => projectOneBucket(detInputs(oneInputs)), [oneInputs, threeInputs.sequenceSeed]);
