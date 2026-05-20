@@ -28,6 +28,7 @@ import { exportRetirementXLSX } from "@/lib/retirement-xlsx";
 import { MonteCarloPanel } from "@/components/retirement/MonteCarloPanel";
 import { BucketFlowPanel } from "@/components/retirement/BucketFlowPanel";
 import { AssumptionAuditPanel } from "@/components/retirement/AssumptionAuditPanel";
+import { StrategyDifferenceNote } from "@/components/retirement/StrategyDifferenceNote";
 
 interface Props {
   result: ProjectionResult;
@@ -137,7 +138,8 @@ export function Results({
             {isOneBucket ? "One-bucket" : isTwoBucket ? "Two-bucket" : "Three-bucket"} projection
           </h2>
           <p className="text-xs text-muted-foreground">
-            Sequence-of-returns Monte Carlo · {inputs.monteCarloRuns.toLocaleString("en-IN")} runs
+            Across {inputs.monteCarloRuns.toLocaleString("en-IN")} simulated futures
+            (Monte Carlo, sequence-of-returns)
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -164,14 +166,17 @@ export function Results({
 
       <AssumptionAuditPanel inputs={inputs} strategy={strategy} />
 
+      <StrategyDifferenceNote />
+
       {/* MONTE CARLO */}
       <Card className="shadow-[var(--shadow-card)]">
         <CardHeader>
-          <CardTitle>Monte Carlo aggregate results</CardTitle>
+          <CardTitle>How likely is your plan to last?</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Summary across all{" "}
+            Summary across{" "}
             <span className="font-semibold">{inputs.monteCarloRuns.toLocaleString("en-IN")}</span>{" "}
-            sequence-of-returns scenarios.
+            simulated futures (Monte Carlo simulation across N runs of
+            different sequence-of-returns scenarios).
           </p>
         </CardHeader>
         <CardContent>
