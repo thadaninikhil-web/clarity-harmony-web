@@ -418,7 +418,7 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
               </tbody>
             </table>
           </div>
-        </div>
+        </details>
       )}
 
       {/* Solver: target probability → required monthly SIP */}
