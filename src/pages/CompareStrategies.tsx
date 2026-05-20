@@ -33,6 +33,7 @@ import {
   subscribeShared,
   writeShared,
 } from "@/lib/sharedInputs";
+import { StrategyDifferenceNote } from "@/components/retirement/StrategyDifferenceNote";
 
 const defaultRetireAge = 60;
 const defaultMonthlyExpenses = 80000;
@@ -757,22 +758,10 @@ const CompareStrategies = () => {
                       threeMC ? formatINR(threeMC.p10FinalCorpus) : "—",
                     ],
                     [
-                      "P25 final corpus",
-                      oneMC ? formatINR(oneMC.p25FinalCorpus) : "—",
-                      twoMC ? formatINR(twoMC.p25FinalCorpus) : "—",
-                      threeMC ? formatINR(threeMC.p25FinalCorpus) : "—",
-                    ],
-                    [
                       "Middle outcome — final corpus (P50, median)",
                       oneMC ? formatINR(oneMC.p50FinalCorpus) : "—",
                       twoMC ? formatINR(twoMC.p50FinalCorpus) : "—",
                       threeMC ? formatINR(threeMC.p50FinalCorpus) : "—",
-                    ],
-                    [
-                      "P75 final corpus",
-                      oneMC ? formatINR(oneMC.p75FinalCorpus) : "—",
-                      twoMC ? formatINR(twoMC.p75FinalCorpus) : "—",
-                      threeMC ? formatINR(threeMC.p75FinalCorpus) : "—",
                     ],
                     [
                       "Strong outcome — final corpus (P90)",
