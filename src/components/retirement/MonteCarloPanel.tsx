@@ -213,18 +213,16 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
         )}
       </div>
 
-      {/* Percentile bands — now showing P10/P25/P50/P75/P90 */}
+      {/* Final-corpus bands — plain-English labels (Worst 10% / Median / Best 10%) */}
       {mc && !progress.running && (
-        <div className="grid gap-3 sm:grid-cols-5">
+        <div className="grid gap-3 sm:grid-cols-3">
           {[
-            { label: "P10", v: mc.p10FinalCorpus, hint: "10% ended below" },
-            { label: "P25", v: mc.p25FinalCorpus, hint: "Lower quartile" },
-            { label: "P50", v: mc.p50FinalCorpus, hint: "Median" },
-            { label: "P75", v: mc.p75FinalCorpus, hint: "Upper quartile" },
-            { label: "P90", v: mc.p90FinalCorpus, hint: "10% ended above" },
+            { label: "Worst 10% expected corpus", v: mc.p10FinalCorpus, hint: "Only 10% of futures ended below this" },
+            { label: "Median expected corpus", v: mc.p50FinalCorpus, hint: "Half of futures landed above, half below" },
+            { label: "Best 10% expected corpus", v: mc.p90FinalCorpus, hint: "Only 10% of futures ended above this" },
           ].map(({ label, v, hint }) => (
             <div key={label} className="rounded-md border border-border bg-muted/30 p-3">
-              <div className="label-caps">{label} final corpus</div>
+              <div className="label-caps">{label}</div>
               <div className="text-base font-semibold">{formatINR(v)}</div>
               <div className="text-xs text-muted-foreground">{hint}</div>
             </div>
@@ -245,13 +243,11 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
               </p>
             </div>
           </div>
-          <div className="grid gap-2 grid-cols-5">
+          <div className="grid gap-2 grid-cols-3">
             {[
-              { label: "P10", v: mc.depletionAgeP10, hint: "10% earlier than" },
-              { label: "P25", v: mc.depletionAgeP25, hint: "Lower quartile" },
-              { label: "P50", v: mc.depletionAgeP50, hint: "Median" },
-              { label: "P75", v: mc.depletionAgeP75, hint: "Upper quartile" },
-              { label: "P90", v: mc.depletionAgeP90, hint: "10% later than" },
+              { label: "Worst 10% depletion age", v: mc.depletionAgeP10, hint: "Earliest 10% of failures" },
+              { label: "Median depletion age", v: mc.depletionAgeP50, hint: "Typical failure age" },
+              { label: "Best 10% depletion age", v: mc.depletionAgeP90, hint: "Latest 10% of failures" },
             ].map(({ label, v, hint }) => (
               <div key={label} className="rounded-md bg-card border border-border p-2 text-center">
                 <div className="label-caps">{label}</div>
@@ -268,11 +264,11 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
                 run we record the age at depletion, then sort that list ascending.
               </p>
               <p>
-                <span className="font-mono">Pₓ</span> is the value at the{" "}
-                <span className="font-mono">x</span>th-percentile position
-                (linear interpolation between neighbours). So <span className="font-mono">P10</span>{" "}
-                means 10% of failed runs depleted at or before that age — the earliest failures —
-                while <span className="font-mono">P90</span> is the latest. <span className="font-mono">P50</span> is the median failure age.
+                <span className="font-medium">Worst 10%</span> means the earliest 10% of failed
+                runs — i.e. the unlucky scenarios where the corpus depleted soonest.
+                <span className="font-medium"> Best 10%</span> is the latest 10% of failed runs
+                (corpus lasted longest before depleting). <span className="font-medium">Median</span>{" "}
+                is the typical failure age.
               </p>
             </div>
           </details>
