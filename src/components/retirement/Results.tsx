@@ -123,7 +123,7 @@ export function Results({
       <Info className="size-4 shrink-0 text-accent mt-0.5" />
       <div>
         Showing <span className="font-semibold">1 of {inputs.monteCarloRuns.toLocaleString("en-IN")}</span>{" "}
-        Monte Carlo scenarios. The Monte Carlo tab summarises all of them.
+        simulated futures. The summary card above aggregates all of them.
       </div>
     </div>
   );
