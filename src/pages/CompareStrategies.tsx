@@ -440,6 +440,7 @@ const CompareStrategies = () => {
 
       <main className="container mx-auto px-6 lg:px-8 py-10 space-y-6">
         <div className="-mx-6 lg:-mx-8 mb-2"><BetaBanner /></div>
+        <StrategyDifferenceNote />
         <Card className="shadow-[var(--shadow-card)]">
           <CardHeader>
             <CardTitle className="font-serif text-2xl">Base assumptions (shared)</CardTitle>
