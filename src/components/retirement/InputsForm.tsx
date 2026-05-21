@@ -10,13 +10,15 @@ interface Props {
   values: RetirementInputs;
   onChange: (next: RetirementInputs) => void;
   onReset?: () => void;
+  strategy?: "one-bucket" | "three-bucket";
 }
 
 const num = (v: string) => (v === "" ? 0 : Number(v));
 const TODAY = new Date().toISOString().slice(0, 10);
 const MIN_DOB = "1900-01-01";
 
-export function InputsForm({ values, onChange, onReset }: Props) {
+export function InputsForm({ values, onChange, onReset, strategy = "three-bucket" }: Props) {
+  const isOne = strategy === "one-bucket";
   const set = <K extends keyof RetirementInputs>(k: K, v: RetirementInputs[K]) =>
     onChange({ ...values, [k]: v });
 
@@ -158,6 +160,7 @@ export function InputsForm({ values, onChange, onReset }: Props) {
         </div>
       </section>
 
+      {!isOne && (
       <section className="space-y-3">
         <h3 className="label-caps text-[10px]">Preparation bucket</h3>
         <div className="space-y-3">
@@ -171,7 +174,9 @@ export function InputsForm({ values, onChange, onReset }: Props) {
           </div>
         </div>
       </section>
+      )}
 
+      {!isOne && (
       <section className="space-y-3">
         <h3 className="label-caps text-[10px]">Withdrawal bucket (debt)</h3>
         <div className="space-y-3">
@@ -185,6 +190,7 @@ export function InputsForm({ values, onChange, onReset }: Props) {
           </div>
         </div>
       </section>
+      )}
 
       <details className="border-t border-border pt-3">
         <summary className="label-caps text-[10px] cursor-pointer text-muted-foreground hover:text-foreground">Advanced · sequence of returns</summary>
