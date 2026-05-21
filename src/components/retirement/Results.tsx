@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Download, Shuffle, FileSpreadsheet, Info, AlertTriangle } from "lucide-react";
+import { Download, Shuffle, FileSpreadsheet, AlertTriangle } from "lucide-react";
 import {
   Area,
   CartesianGrid,
@@ -28,7 +27,6 @@ import { exportRetirementXLSX } from "@/lib/retirement-xlsx";
 import { MonteCarloPanel } from "@/components/retirement/MonteCarloPanel";
 import { BucketFlowPanel } from "@/components/retirement/BucketFlowPanel";
 import { AssumptionAuditPanel } from "@/components/retirement/AssumptionAuditPanel";
-import { StrategyDifferenceNote } from "@/components/retirement/StrategyDifferenceNote";
 
 interface Props {
   result: ProjectionResult;
@@ -119,46 +117,43 @@ export function Results({
   const cagrDelta = currentRunCagr - inputs.sequenceCagr;
 
   const scenarioBanner = (
-    <div className="mt-2 flex items-start gap-2 rounded-md border border-accent/40 bg-accent/10 p-3 text-xs text-foreground">
-      <Info className="size-4 shrink-0 text-accent mt-0.5" />
-      <div>
-        Showing <span className="font-semibold">1 of {inputs.monteCarloRuns.toLocaleString("en-IN")}</span>{" "}
-        simulated futures. The summary card above aggregates all of them.
-      </div>
-    </div>
+    <p className="mt-2 text-[11px] text-muted-foreground">
+      Showing{" "}
+      <span className="text-foreground tabular-nums">1 of {inputs.monteCarloRuns.toLocaleString("en-IN")}</span>{" "}
+      simulated futures. The outcome panel above aggregates all of them.
+    </p>
   );
 
   return (
-    <div className="space-y-4 max-w-full">
+    <div className="space-y-8 max-w-full">
       {/* Top action bar — exports always visible */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3">
         <div>
-          <h2 className="font-display text-xl font-semibold">
+          <h2 className="font-display text-lg font-semibold">
             {displayName ? `${displayName}'s ` : ""}
             {isOneBucket ? "One-bucket" : isTwoBucket ? "Two-bucket" : "Three-bucket"} projection
           </h2>
           <p className="text-xs text-muted-foreground">
-            Across {inputs.monteCarloRuns.toLocaleString("en-IN")} simulated futures
-            (Monte Carlo, sequence-of-returns)
+            Across <span className="tabular-nums">{inputs.monteCarloRuns.toLocaleString("en-IN")}</span> simulated futures.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             onClick={() => exportRetirementXLSX(inputs, result, { strategy })}
-            className="gap-2"
+            className="gap-1.5 text-xs h-8"
           >
-            <FileSpreadsheet className="size-4" />
+            <FileSpreadsheet className="size-3.5" />
             Excel
           </Button>
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             onClick={() => exportRetirementPDF(inputs, result, { showCalculation: showDetails, strategy })}
-            className="gap-2"
+            className="gap-1.5 text-xs h-8"
           >
-            <Download className="size-4" />
+            <Download className="size-3.5" />
             PDF
           </Button>
         </div>
@@ -166,21 +161,16 @@ export function Results({
 
       <AssumptionAuditPanel inputs={inputs} strategy={strategy} />
 
-      <StrategyDifferenceNote />
-
-      {/* MONTE CARLO */}
-      <Card className="shadow-[var(--shadow-card)]">
-        <CardHeader>
-          <CardTitle>How likely is your plan to last?</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Summary across{" "}
-            <span className="font-semibold">{inputs.monteCarloRuns.toLocaleString("en-IN")}</span>{" "}
-            simulated futures (Monte Carlo simulation across N runs of
-            different sequence-of-returns scenarios).
+      {/* OUTCOME — Monte Carlo summary */}
+      <section>
+        <header className="mb-3">
+          <h3 className="label-caps text-xs">Outcome</h3>
+          <p className="text-xs text-muted-foreground mt-1">
+            Summary across <span className="tabular-nums">{inputs.monteCarloRuns.toLocaleString("en-IN")}</span>{" "}
+            simulated futures.
           </p>
-        </CardHeader>
-        <CardContent>
-          <MonteCarloPanel
+        </header>
+        <MonteCarloPanel
             inputs={inputs}
             result={result}
             strategy={strategy}
@@ -189,59 +179,45 @@ export function Results({
             onMonteCarloRunsChange={onMonteCarloRunsChange}
             onSelectRun={onSelectRun}
           />
-        </CardContent>
-      </Card>
+      </section>
 
       {/* SCENARIO HEADLINE — Chart + Year-by-year together (one of N) */}
-      <div className="space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2">
-            <Card className="shadow-[var(--shadow-card)]">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm text-muted-foreground font-medium">
-                  Years to retirement
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-semibold">{result.yearsToRetirement}</div>
-                <div className="text-xs text-muted-foreground">
-                  Current age {result.ageAtStart}
-                  {inputs.lifeExpectancyAge ? ` · plan to ${inputs.lifeExpectancyAge}` : ""}
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="shadow-[var(--shadow-card)]">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm text-muted-foreground font-medium">
-                  Monthly expense at retirement
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-semibold">{formatINR(result.monthlyExpenseAtRetirement)}</div>
-                <div className="text-xs text-muted-foreground">inflation-adjusted</div>
-              </CardContent>
-            </Card>
+      <section className="space-y-6">
+        <div className="grid gap-0 sm:grid-cols-2 border border-border divide-y sm:divide-y-0 sm:divide-x divide-border">
+          <div className="p-4">
+            <div className="label-caps text-[10px]">Years to retirement</div>
+            <div className="text-2xl font-display tabular-nums mt-1">{result.yearsToRetirement}</div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Current age {result.ageAtStart}
+              {inputs.lifeExpectancyAge ? ` · plan to ${inputs.lifeExpectancyAge}` : ""}
+            </div>
           </div>
+          <div className="p-4">
+            <div className="label-caps text-[10px]">Monthly expense at retirement</div>
+            <div className="text-2xl font-display tabular-nums mt-1">{formatINR(result.monthlyExpenseAtRetirement)}</div>
+            <div className="text-[11px] text-muted-foreground mt-1">inflation-adjusted</div>
+          </div>
+        </div>
 
-          <Card className="shadow-[var(--shadow-card)]">
-            <CardHeader>
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <CardTitle>Corpus over time — single scenario</CardTitle>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Current run CAGR <span className="font-mono text-foreground">{(currentRunCagr * 100).toFixed(2)}%</span>
-                    {` · target ${(inputs.sequenceCagr * 100).toFixed(1)}%`}
-                  </p>
-                </div>
-                {onReshuffleSequence && (
-                  <Button variant="outline" size="sm" onClick={onReshuffleSequence} className="gap-2">
-                    <Shuffle className="size-4" />
-                    Reshuffle
-                  </Button>
-                )}
-              </div>
-              {scenarioBanner}
-            </CardHeader>
-            <CardContent>
+        <div>
+          <header className="mb-3 flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h3 className="label-caps text-xs">Corpus over time — single scenario</h3>
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                Current run CAGR{" "}
+                <span className="font-mono text-foreground tabular-nums">{(currentRunCagr * 100).toFixed(2)}%</span>
+                {` · target ${(inputs.sequenceCagr * 100).toFixed(1)}%`}
+              </p>
+            </div>
+            {onReshuffleSequence && (
+              <Button variant="ghost" size="sm" onClick={onReshuffleSequence} className="gap-1.5 h-8 text-xs">
+                <Shuffle className="size-3.5" />
+                Reshuffle
+              </Button>
+            )}
+          </header>
+          {scenarioBanner}
+          <div className="border border-border p-3 mt-2">
               <div className="h-[380px] w-full">
                 <ResponsiveContainer>
                   <ComposedChart data={data} margin={{ left: 0, right: 16, top: 8, bottom: 0 }}>
@@ -308,11 +284,11 @@ export function Results({
                   </ComposedChart>
                 </ResponsiveContainer>
               </div>
-            </CardContent>
-          </Card>
+          </div>
+        </div>
 
           {result.emergencyUsedTotal > 0 && (
-            <div className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-xs">
+            <div className="flex items-start gap-2 border-l-2 border-destructive bg-card p-3 text-xs">
               <AlertTriangle className="size-4 shrink-0 text-destructive mt-0.5" />
               <div>
                 <div className="font-medium text-destructive">Emergency reserve was tapped in this scenario</div>
@@ -324,7 +300,7 @@ export function Results({
             </div>
           )}
 
-        <details className="rounded-lg border bg-card shadow-[var(--shadow-card)]">
+        <details className="border border-border bg-card">
           <summary className="cursor-pointer select-none px-4 py-3 text-sm font-medium">
             Advanced: year-by-year bucket flow diagnostics
           </summary>
@@ -334,21 +310,18 @@ export function Results({
         </details>
 
         {/* YEAR-BY-YEAR */}
-        <Card className="shadow-[var(--shadow-card)]">
-            <CardHeader className="space-y-3">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <CardTitle>Year-by-year</CardTitle>
-                <div className="flex items-center gap-2">
-                  <Switch id="show-detail" checked={showDetails} onCheckedChange={setShowDetails} />
-                  <Label htmlFor="show-detail" className="text-xs">
-                    Detailed view (per-bucket Start → Add → Returns → Closing)
-                  </Label>
-                </div>
-              </div>
-              {scenarioBanner}
-            </CardHeader>
-            <CardContent>
-              <div className="relative h-[480px] w-full overflow-auto rounded-md border">
+        <div>
+          <header className="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <h3 className="label-caps text-xs">Year-by-year</h3>
+            <div className="flex items-center gap-2">
+              <Switch id="show-detail" checked={showDetails} onCheckedChange={setShowDetails} />
+              <Label htmlFor="show-detail" className="text-xs text-muted-foreground">
+                Detailed view (per-bucket Start → Add → Returns → Closing)
+              </Label>
+            </div>
+          </header>
+          {scenarioBanner}
+          <div className="relative h-[480px] w-full overflow-auto border border-border mt-2">
                 <table className="caption-bottom text-sm border-collapse">
                   {showDetails ? (
                     <DetailedHead isTwoBucket={isTwoBucket} hasPrep={hasPrep} hasWithd={hasWithd} accLabel={accLabel} stickyColHead={stickyColHead} />
@@ -476,15 +449,14 @@ export function Results({
                   </tbody>
                 </table>
               </div>
-              <p className="mt-2 text-xs text-muted-foreground">
+              <p className="mt-2 text-[11px] text-muted-foreground">
                 All values shown using lakh/crore formatting. The Excel export uses full rupee precision and
                 reconciles exactly to these on-screen values.{" "}
                 Hover any total: see <span className="font-medium text-foreground">{formatINRExact(result.finalCorpus)}</span>{" "}
                 as the precise final corpus.
               </p>
-            </CardContent>
-          </Card>
-      </div>
+        </div>
+      </section>
     </div>
   );
 }
