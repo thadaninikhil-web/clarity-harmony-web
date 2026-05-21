@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { GuidedInputsChat } from "@/components/retirement/GuidedInputsChat";
 import { InputsErrorBoundary } from "@/components/retirement/InputsErrorBoundary";
+import { InputsForm } from "@/components/retirement/InputsForm";
 import { Results } from "@/components/retirement/Results";
 import { Methodology } from "@/components/retirement/Methodology";
 import { HowToUse } from "@/components/retirement/HowToUse";
@@ -10,6 +10,7 @@ import { CalculatorSectionNav } from "@/components/retirement/CalculatorSectionN
 import { ValidationBanner } from "@/components/retirement/ValidationBanner";
 import { StrategySwitcher } from "@/components/retirement/StrategySwitcher";
 import { BetaBanner } from "@/components/retirement/BetaBanner";
+import { StrategyDifferenceNote } from "@/components/retirement/StrategyDifferenceNote";
 import {
   projectOneBucket,
   validateInputs,
@@ -55,22 +56,11 @@ const defaults: RetirementInputs = {
   sequenceSeed: 1,
 };
 
-// One-bucket only needs the corpus + sequence inputs. Skip the
-// preparation / withdrawal-bucket questions (no other buckets exist).
-const SKIP = [
-  "prepYearsBeforeRetirement",
-  "prepReturn",
-  "prepEquityPct",
-  "withdrawalYears",
-  "withdrawalReturn",
-];
-
 const OneBucketSimulator = () => {
   const initialShared = useMemo(() => readShared(), []);
   const [values, setValues] = useState<RetirementInputs>(() =>
     initialShared ? { ...defaults, ...initialShared } : defaults,
   );
-  const hasPrefilled = !!initialShared;
   const skipNextWriteRef = useRef(false);
   const validation = useMemo(() => validateInputs(values), [values]);
   const result = useMemo(
@@ -81,8 +71,6 @@ const OneBucketSimulator = () => {
       ),
     [values, validation.ok],
   );
-  const [completed, setCompleted] = useState(hasPrefilled);
-  const resultsRef = useRef<HTMLDivElement>(null);
 
   const reshuffleSequence = useCallback(() => {
     setValues((v) => ({ ...v, sequenceSeed: Math.floor(Math.random() * 2 ** 31) || 1 }));
@@ -120,49 +108,30 @@ const OneBucketSimulator = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <section className="pt-32 pb-10 bg-primary text-primary-foreground">
-        <div className="container mx-auto px-6 lg:px-8 text-center">
-          <p className="label-caps text-gold mb-3">Calculator</p>
-          <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-3">
-            One-Bucket Retirement Simulator
+      <section className="pt-24 pb-6 bg-primary text-primary-foreground border-b border-primary-foreground/10">
+        <div className="container mx-auto px-6 lg:px-8">
+          <p className="label-caps text-gold mb-2 text-[10px]">Retirement Calculator</p>
+          <h1 className="font-display text-2xl md:text-3xl font-semibold tracking-tight">
+            One-Bucket Simulator
           </h1>
-          <p className="max-w-2xl mx-auto text-base text-primary-foreground/80">
-            A single corpus through accumulation (with SIP) and retirement —
-            no separate buckets, just one sleeve grown and spent down with
-            sequence-of-returns stress testing.
-          </p>
-          <StrategySwitcher activeTab="one" />
+          <div className="mt-4"><StrategySwitcher activeTab="one" /></div>
         </div>
       </section>
+      <BetaBanner />
 
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 max-w-full overflow-x-hidden">
-        <div className="-mx-4 sm:-mx-6 lg:-mx-8"><BetaBanner /></div>
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-full overflow-x-hidden">
         <CalculatorSectionNav />
-        <section id="how-to-use" className="scroll-mt-40">
+        <section id="how-to-use" className="scroll-mt-40 mt-4">
           <HowToUse strategy="one-bucket" />
         </section>
 
-        <InputsErrorBoundary>
-          <GuidedInputsChat
-            values={values}
-            onChange={setValues}
-            completed={completed}
-            startInSummary={hasPrefilled}
-            skipQuestionIds={SKIP}
-            onComplete={() => {
-              setCompleted(true);
-              setValues((v) => ({ ...v, sequenceSeed: Math.floor(Math.random() * 2 ** 31) || 1 }));
-              setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
-            }}
-            onRestart={() => {
-              setCompleted(false);
-              resetToDefaults();
-            }}
-          />
-        </InputsErrorBoundary>
-
-        {completed && (
-          <div ref={resultsRef} className="space-y-6 scroll-mt-24">
+        <div className="mt-6 grid gap-6 lg:grid-cols-[340px_1fr]">
+          <aside className="lg:sticky lg:top-32 lg:self-start lg:max-h-[calc(100vh-9rem)] lg:overflow-y-auto lg:pr-1">
+            <InputsErrorBoundary>
+              <InputsForm values={values} onChange={setValues} onReset={resetToDefaults} strategy="one-bucket" />
+            </InputsErrorBoundary>
+          </aside>
+          <div className="min-w-0 space-y-4">
             <ValidationBanner issues={validation.errors} />
             <Results
               result={result}
@@ -174,15 +143,12 @@ const OneBucketSimulator = () => {
               onSelectRun={(seed) => setValues((v) => ({ ...v, sequenceSeed: seed }))}
             />
           </div>
-        )}
-        <section id="how-it-works" className="scroll-mt-40">
+        </div>
+
+        <section id="how-it-works" className="scroll-mt-40 mt-10">
           <Methodology strategy="one-bucket" />
         </section>
-        <p className="mt-12 text-center text-xs text-muted-foreground">
-          Educational calculator — not investment advice. SIP contributions
-          and step-ups grow the corpus until retirement; from then on the
-          corpus is drawn down annually for living expenses.
-        </p>
+        <StrategyDifferenceNote />
       </main>
       <Footer />
     </div>

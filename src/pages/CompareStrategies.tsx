@@ -414,33 +414,29 @@ const CompareStrategies = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <section className="pt-32 pb-10 bg-primary text-primary-foreground">
-        <div className="container mx-auto px-6 lg:px-8 text-center">
-          <p className="label-caps text-gold mb-3">Calculator</p>
-          <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-3">
-            Strategy Comparison
-          </h1>
-          <p className="max-w-2xl mx-auto text-base text-primary-foreground/80">
-            Edit base assumptions here — they sync live to both strategy pages.
-          </p>
-          <StrategySwitcher activeTab="compare" />
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-            <Button
-              onClick={resetToDefaults}
-              variant="outline"
-              size="sm"
-              className="gap-2 bg-primary-foreground/10 text-primary-foreground border-primary-foreground/30 hover:bg-primary-foreground/20"
-            >
-              <RotateCcw className="size-4" />
-              Reset to defaults
-            </Button>
+      <section className="pt-24 pb-6 bg-primary text-primary-foreground border-b border-primary-foreground/10">
+        <div className="container mx-auto px-6 lg:px-8 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="label-caps text-gold mb-2 text-[10px]">Retirement Calculator</p>
+            <h1 className="font-display text-2xl md:text-3xl font-semibold tracking-tight">
+              Strategy Comparison
+            </h1>
+            <div className="mt-4"><StrategySwitcher activeTab="compare" /></div>
           </div>
+          <Button
+            onClick={resetToDefaults}
+            variant="ghost"
+            size="sm"
+            className="gap-1.5 h-8 text-xs text-primary-foreground/80 hover:bg-primary-foreground/10 hover:text-primary-foreground"
+          >
+            <RotateCcw className="size-3.5" />
+            Reset
+          </Button>
         </div>
       </section>
+      <BetaBanner />
 
-      <main className="container mx-auto px-6 lg:px-8 py-10 space-y-6">
-        <div className="-mx-6 lg:-mx-8 mb-2"><BetaBanner /></div>
-        <StrategyDifferenceNote />
+      <main className="container mx-auto px-6 lg:px-8 py-8 space-y-6">
         <Card className="shadow-[var(--shadow-card)]">
           <CardHeader>
             <CardTitle className="font-serif text-2xl">Base assumptions (shared)</CardTitle>
@@ -679,7 +675,7 @@ const CompareStrategies = () => {
             )}
 
             <div className="grid gap-4 sm:grid-cols-3">
-              <div className="rounded-lg border border-border bg-secondary/5 p-4">
+              <div className="border border-border bg-card p-4">
                 <div className="label-caps text-xs">One-bucket</div>
                 <div className="mt-1 grid grid-cols-2 gap-3">
                   <div>
@@ -692,7 +688,7 @@ const CompareStrategies = () => {
                   </div>
                 </div>
               </div>
-              <div className="rounded-lg border border-border bg-accent/5 p-4">
+              <div className="border border-border bg-card p-4">
                 <div className="label-caps text-xs">Two-bucket</div>
                 <div className="mt-1 grid grid-cols-2 gap-3">
                   <div>
@@ -705,7 +701,7 @@ const CompareStrategies = () => {
                   </div>
                 </div>
               </div>
-              <div className="rounded-lg border border-border bg-primary/5 p-4">
+              <div className="border border-border bg-card p-4">
                 <div className="label-caps text-xs">Three-bucket</div>
                 <div className="mt-1 grid grid-cols-2 gap-3">
                   <div>
@@ -825,6 +821,9 @@ const CompareStrategies = () => {
           </CardContent>
         </Card>
       </main>
+      <div className="container mx-auto px-6 lg:px-8 pb-10">
+        <StrategyDifferenceNote />
+      </div>
       <Footer />
     </div>
   );

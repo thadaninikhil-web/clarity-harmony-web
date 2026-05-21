@@ -1,14 +1,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { GuidedInputsChat } from "@/components/retirement/GuidedInputsChat";
 import { InputsErrorBoundary } from "@/components/retirement/InputsErrorBoundary";
+import { InputsForm } from "@/components/retirement/InputsForm";
 import { Results } from "@/components/retirement/Results";
 import { Methodology } from "@/components/retirement/Methodology";
 import { HowToUse } from "@/components/retirement/HowToUse";
 import { CalculatorSectionNav } from "@/components/retirement/CalculatorSectionNav";
 import { ValidationBanner } from "@/components/retirement/ValidationBanner";
 import { StrategySwitcher } from "@/components/retirement/StrategySwitcher";
+import { BetaBanner } from "@/components/retirement/BetaBanner";
+import { StrategyDifferenceNote } from "@/components/retirement/StrategyDifferenceNote";
 import { project, validateInputs, attachBullets, type RetirementInputs } from "@/lib/retirement";
 import { readShared, subscribeShared, writeShared } from "@/lib/sharedInputs";
 
@@ -56,15 +58,12 @@ const RetirementSimulator = () => {
   const [values, setValues] = useState<RetirementInputs>(() =>
     initialShared ? { ...defaults, ...initialShared } : defaults,
   );
-  const hasPrefilled = !!initialShared;
   const validation = useMemo(() => validateInputs(values), [values]);
   const result = useMemo(
     () => attachBullets(validation.ok ? project(values) : project(defaults), "three-bucket"),
     [values, validation.ok],
   );
   const skipNextWriteRef = useRef(false);
-  const [completed, setCompleted] = useState(hasPrefilled);
-  const resultsRef = useRef<HTMLDivElement>(null);
 
   const reshuffleSequence = useCallback(() => {
     setValues((v) => ({ ...v, sequenceSeed: Math.floor(Math.random() * 2 ** 31) || 1 }));
@@ -110,48 +109,30 @@ const RetirementSimulator = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      {/* Slim page banner — sits below the global Navbar */}
-      <section className="pt-32 pb-10 bg-primary text-primary-foreground">
-        <div className="container mx-auto px-6 lg:px-8 text-center">
-          <p className="label-caps text-gold mb-3">Calculator</p>
-          <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight mb-3">
-            Three-Bucket Retirement Simulator
+      <section className="pt-24 pb-6 bg-primary text-primary-foreground border-b border-primary-foreground/10">
+        <div className="container mx-auto px-6 lg:px-8">
+          <p className="label-caps text-gold mb-2 text-[10px]">Retirement Calculator</p>
+          <h1 className="font-display text-2xl md:text-3xl font-semibold tracking-tight">
+            Three-Bucket Simulator
           </h1>
-          <p className="max-w-2xl mx-auto text-base text-primary-foreground/80">
-            Plan your retirement using the accumulation, preparation and
-            withdrawal bucket framework — with sequence-of-returns stress
-            testing and a year-by-year projection.
-          </p>
-          <StrategySwitcher activeTab="three" />
+          <div className="mt-4"><StrategySwitcher activeTab="three" /></div>
         </div>
       </section>
+      <BetaBanner />
 
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 max-w-full overflow-x-hidden">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-full overflow-x-hidden">
         <CalculatorSectionNav />
-        <section id="how-to-use" className="scroll-mt-40">
+        <section id="how-to-use" className="scroll-mt-40 mt-4">
           <HowToUse strategy="three-bucket" />
         </section>
 
-        <InputsErrorBoundary>
-          <GuidedInputsChat
-            values={values}
-            onChange={setValues}
-            completed={completed}
-            startInSummary={hasPrefilled}
-            onComplete={() => {
-              setCompleted(true);
-              setValues((v) => ({ ...v, sequenceSeed: Math.floor(Math.random() * 2 ** 31) || 1 }));
-              setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
-            }}
-            onRestart={() => {
-              setCompleted(false);
-              resetToDefaults();
-            }}
-          />
-        </InputsErrorBoundary>
-
-        {completed && (
-          <div ref={resultsRef} className="space-y-6 scroll-mt-24">
+        <div className="mt-6 grid gap-6 lg:grid-cols-[340px_1fr]">
+          <aside className="lg:sticky lg:top-32 lg:self-start lg:max-h-[calc(100vh-9rem)] lg:overflow-y-auto lg:pr-1">
+            <InputsErrorBoundary>
+              <InputsForm values={values} onChange={setValues} onReset={resetToDefaults} strategy="three-bucket" />
+            </InputsErrorBoundary>
+          </aside>
+          <div className="min-w-0 space-y-4">
             <ValidationBanner issues={validation.errors} />
             <Results
               result={result}
@@ -164,15 +145,12 @@ const RetirementSimulator = () => {
               onSelectRun={(seed) => setValues((v) => ({ ...v, sequenceSeed: seed }))}
             />
           </div>
-        )}
-        <section id="how-it-works" className="scroll-mt-40">
+        </div>
+
+        <section id="how-it-works" className="scroll-mt-40 mt-10">
           <Methodology strategy="three-bucket" />
         </section>
-        <p className="mt-12 text-center text-xs text-muted-foreground">
-          Educational calculator — not investment advice. Returns shown are
-          nominal and assume constant rates apart from the configured stress
-          scenario.
-        </p>
+        <StrategyDifferenceNote />
       </main>
       <Footer />
     </div>
