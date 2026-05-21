@@ -174,7 +174,7 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
   return (
     <div className="space-y-4">
       {/* Confidence + progress */}
-      <div className="rounded-md border border-border bg-primary/5 p-4">
+      <div className="border border-border bg-card p-4">
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div>
             <div className="label-caps">Confidence portfolio outlasts life expectancy</div>
@@ -215,15 +215,15 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
 
       {/* Final-corpus bands — plain-English labels (Worst 10% / Median / Best 10%) */}
       {mc && !progress.running && (
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-0 sm:grid-cols-3 border border-border divide-y sm:divide-y-0 sm:divide-x divide-border">
           {[
             { label: "Worst 10% expected corpus", v: mc.p10FinalCorpus, hint: "Only 10% of futures ended below this" },
             { label: "Median expected corpus", v: mc.p50FinalCorpus, hint: "Half of futures landed above, half below" },
             { label: "Best 10% expected corpus", v: mc.p90FinalCorpus, hint: "Only 10% of futures ended above this" },
           ].map(({ label, v, hint }) => (
-            <div key={label} className="rounded-md border border-border bg-muted/30 p-3">
+            <div key={label} className="p-3 bg-card">
               <div className="label-caps">{label}</div>
-              <div className="text-base font-semibold">{formatINR(v)}</div>
+              <div className="text-base font-semibold tabular-nums">{formatINR(v)}</div>
               <div className="text-xs text-muted-foreground">{hint}</div>
             </div>
           ))}
@@ -232,10 +232,10 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
 
       {/* Depletion-age percentiles for failed runs */}
       {mc && !progress.running && mc.failureCount > 0 && (
-        <div className="rounded-md border border-destructive/30 bg-destructive/5 p-4 space-y-3">
+        <div className="border border-border p-4 space-y-3 bg-card">
           <div className="flex items-start justify-between gap-3 flex-wrap">
             <div>
-              <div className="font-medium text-sm text-destructive">Depletion age — failed runs only</div>
+              <div className="font-medium text-sm text-foreground">Depletion age — failed runs only</div>
               <p className="text-xs text-muted-foreground mt-0.5">
                 Of the {mc.failureCount.toLocaleString("en-IN")} runs where the corpus ran out,
                 here's the age at which it happened. Median ={" "}
@@ -243,15 +243,15 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
               </p>
             </div>
           </div>
-          <div className="grid gap-2 grid-cols-3">
+          <div className="grid gap-0 grid-cols-3 border border-border divide-x divide-border">
             {[
               { label: "Worst 10% depletion age", v: mc.depletionAgeP10, hint: "Earliest 10% of failures" },
               { label: "Median depletion age", v: mc.depletionAgeP50, hint: "Typical failure age" },
               { label: "Best 10% depletion age", v: mc.depletionAgeP90, hint: "Latest 10% of failures" },
             ].map(({ label, v, hint }) => (
-              <div key={label} className="rounded-md bg-card border border-border p-2 text-center">
+              <div key={label} className="bg-card p-2 text-center">
                 <div className="label-caps">{label}</div>
-                <div className="text-base font-semibold">{v ?? "—"}</div>
+                <div className="text-base font-semibold tabular-nums">{v ?? "—"}</div>
                 <div className="text-[10px] text-muted-foreground">{hint}</div>
               </div>
             ))}
@@ -278,7 +278,7 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
       {/* Reshuffle control — re-rolls the random paths within this session.
           Refreshing the page also yields a new random run. */}
       {onReshuffle && (
-        <div className="rounded-md border border-border bg-muted/20 p-3 flex flex-wrap items-center justify-between gap-3">
+        <div className="border border-border p-3 flex flex-wrap items-center justify-between gap-3 bg-card">
           <p className="text-xs text-muted-foreground">
             Click <span className="font-medium text-foreground">Reshuffle</span> to
             re-run the simulation with a fresh set of random return paths. Results
@@ -293,7 +293,7 @@ export function MonteCarloPanel({ inputs, result, strategy, onReshuffle, onSipSo
 
       {/* Monte Carlo runs slider — keep it next to the MC output */}
       {onMonteCarloRunsChange && (
-        <div className="rounded-md border border-border bg-card p-3 space-y-2">
+        <div className="border border-border bg-card p-3 space-y-2">
           <div className="flex items-center justify-between gap-3">
             <Label className="text-xs">
               Simulated futures:{" "}
