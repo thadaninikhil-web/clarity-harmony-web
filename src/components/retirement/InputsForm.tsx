@@ -1,10 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { RotateCcw } from "lucide-react";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { IndianNumberInput } from "@/components/retirement/IndianNumberInput";
 import type { RetirementInputs } from "@/lib/retirement";
 
@@ -29,22 +27,20 @@ export function InputsForm({ values, onChange, onReset }: Props) {
     Math.round((values.emergencyFundToday ?? 0) / Math.max(1, values.currentMonthlyExpenses));
 
   return (
-    <div className="space-y-4">
-      {onReset && (
-        <div className="flex justify-end">
-          <Button variant="outline" size="sm" onClick={onReset} className="gap-2">
-            <RotateCcw className="size-4" />
-            Reset to defaults
+    <div className="space-y-5 text-sm">
+      <div className="flex items-center justify-between border-b border-border pb-2">
+        <h2 className="label-caps text-xs">Inputs</h2>
+        {onReset && (
+          <Button variant="ghost" size="sm" onClick={onReset} className="h-7 gap-1.5 text-xs text-muted-foreground hover:text-foreground">
+            <RotateCcw className="size-3.5" />
+            Reset
           </Button>
-        </div>
-      )}
-      <Card className="shadow-[var(--shadow-card)]">
-        <CardHeader className="pb-3">
-          <CardTitle className="font-serif text-base">About you</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Row 1 — Profile: Name, DOB, Retirement age, Life expectancy */}
-          <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+        )}
+      </div>
+
+      <section className="space-y-3">
+        <h3 className="label-caps text-[10px]">About you</h3>
+        <div className="grid gap-3 grid-cols-2">
             <div className="space-y-1.5">
               <Label htmlFor="name" className="text-xs">Name</Label>
               <Input id="name" value={values.name} onChange={(e) => set("name", e.target.value)} />
@@ -73,7 +69,7 @@ export function InputsForm({ values, onChange, onReset }: Props) {
               <Input id="ret" data-field="retirementAge" type="number" min={18} max={100} value={values.retirementAge} onChange={(e) => set("retirementAge", num(e.target.value))} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="life-age" className="text-xs">Life expectancy (age)</Label>
+              <Label htmlFor="life-age" className="text-xs">Plan until age</Label>
               <Input
                 id="life-age"
                 data-field="lifeExpectancyAge"
@@ -96,20 +92,22 @@ export function InputsForm({ values, onChange, onReset }: Props) {
                 <p className="text-[10px] text-destructive">Must be &gt; {values.retirementAge}</p>
               )}
             </div>
-          </div>
+        </div>
+      </section>
 
-          {/* Row 2 — Expenses & inflation & emergency fund */}
-          <div className="grid gap-3 grid-cols-1 lg:grid-cols-3">
+      <section className="space-y-3">
+        <h3 className="label-caps text-[10px]">Cash flow &amp; reserves</h3>
+        <div className="grid gap-3 grid-cols-1">
             <div className="space-y-1.5">
-              <Label htmlFor="exp" className="text-xs">Current monthly expenses (₹)</Label>
+              <Label htmlFor="exp" className="text-xs">Monthly expenses today (₹)</Label>
               <IndianNumberInput id="exp" value={values.currentMonthlyExpenses} onChange={(n) => set("currentMonthlyExpenses", n)} />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs">Inflation rate: {(values.inflationRate * 100).toFixed(1)}%</Label>
+              <Label className="text-xs flex justify-between"><span>Inflation</span><span className="tabular-nums">{(values.inflationRate * 100).toFixed(1)}%</span></Label>
               <Slider value={[values.inflationRate * 100]} min={2} max={12} step={0.5} onValueChange={(v) => set("inflationRate", v[0] / 100)} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="ef-mo" className="text-xs">Emergency fund (months of expenses)</Label>
+              <Label htmlFor="ef-mo" className="text-xs">Emergency reserve (months of expenses)</Label>
               <Input
                 id="ef-mo"
                 type="number"
@@ -123,118 +121,88 @@ export function InputsForm({ values, onChange, onReset }: Props) {
                   });
                 }}
               />
-              <p className="text-[10px] text-muted-foreground">≈ ₹{(values.currentMonthlyExpenses * efMonths).toLocaleString("en-IN")} today</p>
+              <p className="text-[10px] text-muted-foreground tabular-nums">≈ ₹{(values.currentMonthlyExpenses * efMonths).toLocaleString("en-IN")} today</p>
             </div>
-          </div>
+        </div>
+      </section>
 
-          {/* Row 3 — Investments: Corpus, SIP, Step-up */}
-          <div className="grid gap-3 grid-cols-1 lg:grid-cols-3">
+      <section className="space-y-3">
+        <h3 className="label-caps text-[10px]">Savings &amp; investments</h3>
+        <div className="grid gap-3 grid-cols-1">
             <div className="space-y-1.5">
-              <Label htmlFor="corpus" className="text-xs">Current Retirement Corpus (₹)</Label>
+              <Label htmlFor="corpus" className="text-xs">Savings already built (₹)</Label>
               <IndianNumberInput id="corpus" value={values.currentCorpus} onChange={(n) => set("currentCorpus", n)} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="sip" className="text-xs">Monthly investment (₹)</Label>
+              <Label htmlFor="sip" className="text-xs">Monthly SIP (₹)</Label>
               <IndianNumberInput id="sip" value={values.monthlyInvestment} onChange={(n) => set("monthlyInvestment", n)} />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs">SIP annual step-up: {(values.sipStepUpRate * 100).toFixed(0)}%</Label>
+              <Label className="text-xs flex justify-between"><span>Annual SIP step-up</span><span className="tabular-nums">{(values.sipStepUpRate * 100).toFixed(0)}%</span></Label>
               <Slider value={[values.sipStepUpRate * 100]} min={0} max={20} step={1} onValueChange={(v) => set("sipStepUpRate", v[0] / 100)} />
             </div>
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <h3 className="label-caps text-[10px]">Growth bucket (equity)</h3>
+        <div className="space-y-1.5">
+          <Label className="text-xs flex justify-between"><span>Expected return (CAGR)</span><span className="tabular-nums">{(values.sequenceCagr * 100).toFixed(1)}%</span></Label>
+          <Slider
+            value={[values.sequenceCagr * 100]}
+            min={2}
+            max={18}
+            step={0.5}
+            onValueChange={(v) => onChange({ ...values, sequenceCagr: v[0] / 100, accReturn: v[0] / 100 })}
+          />
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <h3 className="label-caps text-[10px]">Preparation bucket</h3>
+        <div className="space-y-3">
+          <div className="space-y-1.5">
+            <Label className="text-xs flex justify-between"><span>Expected return</span><span className="tabular-nums">{(values.prepReturn * 100).toFixed(1)}%</span></Label>
+            <Slider value={[values.prepReturn * 100]} min={4} max={18} step={0.5} onValueChange={(v) => set("prepReturn", v[0] / 100)} />
           </div>
-        </CardContent>
-      </Card>
+          <div className="space-y-1.5">
+            <Label className="text-xs flex justify-between"><span>Glide-down starts before retirement</span><span className="tabular-nums">{values.prepYearsBeforeRetirement} yrs</span></Label>
+            <Slider value={[values.prepYearsBeforeRetirement]} min={0} max={8} step={1} onValueChange={(v) => set("prepYearsBeforeRetirement", v[0])} />
+          </div>
+        </div>
+      </section>
 
-      <Accordion type="multiple" defaultValue={["b1", "b2", "b3"]} className="space-y-4">
-        <AccordionItem value="b1" className="rounded-xl border bg-card shadow-[var(--shadow-card)]">
-          <AccordionTrigger className="px-6">
-            <span className="flex items-center gap-3">
-              <span className="size-3 rounded-full bg-bucket-accumulation" />
-              Bucket 1 — Accumulation (high risk · high return)
-            </span>
-          </AccordionTrigger>
-          <AccordionContent className="px-6 space-y-4">
-            <div className="grid gap-3 lg:grid-cols-1">
-              <div className="space-y-1.5">
-                <Label className="text-xs">Growth bucket expected return (CAGR): {(values.sequenceCagr * 100).toFixed(1)}%</Label>
-                <Slider
-                  value={[values.sequenceCagr * 100]}
-                  min={2}
-                  max={18}
-                  step={0.5}
-                  onValueChange={(v) => onChange({ ...values, sequenceCagr: v[0] / 100, accReturn: v[0] / 100 })}
-                />
-              </div>
-            </div>
+      <section className="space-y-3">
+        <h3 className="label-caps text-[10px]">Withdrawal bucket (debt)</h3>
+        <div className="space-y-3">
+          <div className="space-y-1.5">
+            <Label className="text-xs flex justify-between"><span>Years of expenses parked</span><span className="tabular-nums">{values.withdrawalYears}</span></Label>
+            <Slider value={[values.withdrawalYears]} min={0} max={8} step={1} onValueChange={(v) => set("withdrawalYears", v[0])} />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs flex justify-between"><span>Expected return</span><span className="tabular-nums">{(values.withdrawalReturn * 100).toFixed(2)}%</span></Label>
+            <Slider value={[values.withdrawalReturn * 100]} min={4} max={18} step={0.25} onValueChange={(v) => set("withdrawalReturn", v[0] / 100)} />
+          </div>
+        </div>
+      </section>
 
-            <div className="rounded-md border border-border bg-muted/20 p-4 space-y-3">
-              <div>
-                <div className="font-medium text-sm">Sequence-of-returns risk (always on)</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Year-to-year returns swing between min and max while averaging the CAGR. Monte Carlo runs many random orderings.
-                </p>
-              </div>
-              <div className="grid gap-3 lg:grid-cols-3">
-                <div className="space-y-1.5">
-                  <Label className="text-xs">Min year return: {(values.sequenceMinReturn * 100).toFixed(0)}%</Label>
-                  <Slider value={[values.sequenceMinReturn * 100]} min={-50} max={5} step={1} onValueChange={(v) => set("sequenceMinReturn", v[0] / 100)} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-xs">Max year return: {(values.sequenceMaxReturn * 100).toFixed(0)}%</Label>
-                  <Slider value={[values.sequenceMaxReturn * 100]} min={5} max={50} step={1} onValueChange={(v) => set("sequenceMaxReturn", v[0] / 100)} />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-xs">Monte Carlo runs: {values.monteCarloRuns.toLocaleString("en-IN")}</Label>
-                  <Slider value={[values.monteCarloRuns]} min={1000} max={10000} step={500} onValueChange={(v) => set("monteCarloRuns", v[0])} />
-                </div>
-              </div>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="b2" className="rounded-xl border bg-card shadow-[var(--shadow-card)]">
-          <AccordionTrigger className="px-6">
-            <span className="flex items-center gap-3">
-              <span className="size-3 rounded-full bg-bucket-preparation" />
-              Bucket 2 — Preparation (buffer)
-            </span>
-          </AccordionTrigger>
-          <AccordionContent className="px-6">
-            <div className="grid gap-3 lg:grid-cols-2">
-              <div className="space-y-1.5">
-                <Label className="text-xs">Expected return: {(values.prepReturn * 100).toFixed(1)}%</Label>
-                <Slider value={[values.prepReturn * 100]} min={4} max={18} step={0.5} onValueChange={(v) => set("prepReturn", v[0] / 100)} />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs">Shift starts: {values.prepYearsBeforeRetirement} yrs before retirement</Label>
-                <Slider value={[values.prepYearsBeforeRetirement]} min={0} max={8} step={1} onValueChange={(v) => set("prepYearsBeforeRetirement", v[0])} />
-              </div>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="b3" className="rounded-xl border bg-card shadow-[var(--shadow-card)]">
-          <AccordionTrigger className="px-6">
-            <span className="flex items-center gap-3">
-              <span className="size-3 rounded-full bg-bucket-withdrawal" />
-              Bucket 3 — Withdrawal (debt only)
-            </span>
-          </AccordionTrigger>
-          <AccordionContent className="px-6">
-            <div className="grid gap-3 lg:grid-cols-2">
-              <div className="space-y-1.5">
-                <Label className="text-xs">Years of expenses parked here: {values.withdrawalYears}</Label>
-                <Slider value={[values.withdrawalYears]} min={0} max={8} step={1} onValueChange={(v) => set("withdrawalYears", v[0])} />
-              </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs">Expected return: {(values.withdrawalReturn * 100).toFixed(2)}%</Label>
-                <Slider value={[values.withdrawalReturn * 100]} min={4} max={18} step={0.25} onValueChange={(v) => set("withdrawalReturn", v[0] / 100)} />
-              </div>
-            </div>
-            <p className="mt-2 text-[11px] text-muted-foreground">Debt-only by design (0% equity).</p>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+      <details className="border-t border-border pt-3">
+        <summary className="label-caps text-[10px] cursor-pointer text-muted-foreground hover:text-foreground">Advanced · sequence of returns</summary>
+        <div className="mt-3 grid gap-3 grid-cols-1">
+          <div className="space-y-1.5">
+            <Label className="text-xs flex justify-between"><span>Bad-year return</span><span className="tabular-nums">{(values.sequenceMinReturn * 100).toFixed(0)}%</span></Label>
+            <Slider value={[values.sequenceMinReturn * 100]} min={-50} max={5} step={1} onValueChange={(v) => set("sequenceMinReturn", v[0] / 100)} />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs flex justify-between"><span>Good-year return</span><span className="tabular-nums">{(values.sequenceMaxReturn * 100).toFixed(0)}%</span></Label>
+            <Slider value={[values.sequenceMaxReturn * 100]} min={5} max={50} step={1} onValueChange={(v) => set("sequenceMaxReturn", v[0] / 100)} />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs flex justify-between"><span>Simulated futures</span><span className="tabular-nums">{values.monteCarloRuns.toLocaleString("en-IN")}</span></Label>
+            <Slider value={[values.monteCarloRuns]} min={1000} max={10000} step={500} onValueChange={(v) => set("monteCarloRuns", v[0])} />
+          </div>
+        </div>
+      </details>
     </div>
   );
 }
